@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   FULFILLMENT_LABELS,
+  canReport,
   dueDateOf,
   fulfillmentStateOf,
   generateObligations,
@@ -52,6 +53,7 @@ describe("★合意からの予定生成", () => {
     topic: "CHILD_SUPPORT",
     status: "AGREED",
     payload: { monthlyAmount: 30000, payDay: "DAY_25", until: "AGE_20" },
+    agreedAt: "2026-01-01T00:00:00Z",
   };
 
   it("指定した月数ぶん生成される", () => {
@@ -98,19 +100,19 @@ describe("★合意からの予定生成", () => {
 
 describe("★履行の状態", () => {
   it("★どちらの申告も無ければ「まだ記録がありません」", () => {
-    expect(fulfillmentStateOf({ paidReported: false, receivedReported: false })).toBe("NO_RECORD");
+    expect(fulfillmentStateOf({})).toBe("NO_RECORD");
   });
 
   it("支払った側だけの申告", () => {
-    expect(fulfillmentStateOf({ paidReported: true, receivedReported: false })).toBe("PAID_REPORTED");
+    expect(fulfillmentStateOf({ paidBy: "p1" })).toBe("PAID_REPORTED");
   });
 
   it("受け取った側だけの申告", () => {
-    expect(fulfillmentStateOf({ paidReported: false, receivedReported: true })).toBe("RECEIVED_REPORTED");
+    expect(fulfillmentStateOf({ receivedBy: "p2" })).toBe("RECEIVED_REPORTED");
   });
 
   it("★双方の申告が揃ったときのみ「確認できました」", () => {
-    expect(fulfillmentStateOf({ paidReported: true, receivedReported: true })).toBe("CONFIRMED");
+    expect(fulfillmentStateOf({ paidBy: "p1", receivedBy: "p2" })).toBe("CONFIRMED");
   });
 });
 
@@ -132,5 +134,76 @@ describe("★状態の文言", () => {
     const t = labelOf("NO_RECORD");
     expect(t).toContain("記録");
     expect(t).not.toContain("支払われていません");
+  });
+});
+
+/**
+ * ★合意が成立していない期間の義務を作らない
+ *
+ * レビューで検出：起点が常に「6ヶ月前」で、合意の始期を見ていなかった。
+ * 合意が2026-07-01に成立したケースで、2026-02月分の義務が生成され、
+ * **存在しなかった義務について「記録が確認できていません」と表示されていた。**
+ *
+ * 観測できないことを断定しない、という規約を初回利用時に必ず破っていた。
+ */
+describe("★合意の始期", () => {
+  const item = {
+    topic: "CHILD_SUPPORT",
+    status: "AGREED",
+    payload: { monthlyAmount: 30000, payDay: "DAY_25", until: "AGE_20" },
+    agreedAt: "2026-07-01T00:00:00Z",
+  };
+
+  it("★合意より前の期日は生成されない", () => {
+    const o = generateObligations({ items: [item], from: "2026-02-01", months: 12, obligorPartyId: "p1" });
+    expect(o.every((x) => x.dueDate >= "2026-07-01")).toBe(true);
+  });
+
+  it("合意月以降は生成される", () => {
+    const o = generateObligations({ items: [item], from: "2026-02-01", months: 12, obligorPartyId: "p1" });
+    expect(o.map((x) => x.dueDate)).toContain("2026-07-25");
+  });
+
+  it("★agreedAt が無ければ生成しない（いつからか分からないものを作らない）", () => {
+    const { agreedAt: _drop, ...noDate } = item;
+    expect(generateObligations({ items: [noDate], from: "2026-02-01", months: 12, obligorPartyId: "p1" })).toHaveLength(0);
+  });
+});
+
+/**
+ * ★履行の申告は、立場に合ったものだけ
+ *
+ * レビューで検出：義務者が「入金を確認しました」と申告でき、
+ * **逸脱検知を永久に無効化できた。**相手の画面には、相手が一度も
+ * 申告していない「入金の記録があります」が表示されていた。
+ */
+describe("★申告できる種別", () => {
+  it("義務者は支払いを申告できる", () => {
+    expect(canReport({ isObligor: true, kind: "PAID" })).toBe(true);
+  });
+
+  it("権利者は入金を申告できる", () => {
+    expect(canReport({ isObligor: false, kind: "RECEIVED" })).toBe(true);
+  });
+
+  it("★義務者は入金を申告できない", () => {
+    expect(canReport({ isObligor: true, kind: "RECEIVED" })).toBe(false);
+  });
+
+  it("★権利者は支払いを申告できない", () => {
+    expect(canReport({ isObligor: false, kind: "PAID" })).toBe(false);
+  });
+});
+
+/**
+ * ★双方の申告とは、別々の人の申告である
+ */
+describe("★確認済みの条件", () => {
+  it("同じ人が両方を申告しても確認済みにならない", () => {
+    expect(fulfillmentStateOf({ paidBy: "p1", receivedBy: "p1" })).not.toBe("CONFIRMED");
+  });
+
+  it("別の人が申告すれば確認済みになる", () => {
+    expect(fulfillmentStateOf({ paidBy: "p1", receivedBy: "p2" })).toBe("CONFIRMED");
   });
 });

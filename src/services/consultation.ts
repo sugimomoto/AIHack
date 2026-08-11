@@ -23,9 +23,34 @@ import { assertOwnParty, scopedInbound, scopedMessages } from "@/domain/case/sco
  * 3 が失敗しても 1・2 は残る。**受け止めは取次ぎに依存しない。**
  */
 
+/** 合意済みの論点を、問いに差し込める形にする */
+async function currentAgreementOf(
+  caseId: ReturnType<typeof asCaseId>,
+): Promise<{ topic: string; summary: string } | null> {
+  const { listAgreementItems } = await import(
+    "@/infra-adapters/firestore/repositories/caseRepository"
+  );
+  const items = await listAgreementItems(caseId);
+  const agreed = items.find((i) => i.status === "AGREED" && i.payload);
+  if (!agreed) return null;
+
+  const p = agreed.payload!;
+  if (agreed.topic === "CHILD_SUPPORT" && typeof p.monthlyAmount === "number") {
+    return { topic: agreed.topic, summary: `養育費は月額${p.monthlyAmount.toLocaleString()}円` };
+  }
+  if (agreed.topic === "VISITATION" && typeof p.frequency === "string") {
+    const { CODE_LABELS } = await import("@/domain/document/builder");
+    const f = CODE_LABELS.frequency?.[p.frequency] ?? null;
+    if (f) return { topic: agreed.topic, summary: `面会交流は${f}` };
+  }
+  return null;
+}
+
 export type TurnResult = {
   reply: string;
   choices: { id: string; label: string }[];
+  /** ★C3：合意を参照して立てた問い */
+  effectQuestion: string | null;
   /** ★相手に届いた内容。届かなかった場合は null */
   relayed: string | null;
 };
@@ -49,7 +74,13 @@ export async function postMessage(input: {
     content: input.text,
   });
 
-  const r = await respondTo({ caseId, consultationId, text: input.text });
+  // ★現在の取り決めを渡す。これがあるからこそ「今回だけ？」と問える（C3）
+  const r = await respondTo({
+    caseId,
+    consultationId,
+    text: input.text,
+    currentAgreement: await currentAgreementOf(caseId),
+  });
   await appendMessage(caseId, consultationId, {
     partyId: input.partyId,
     role: "AI",
@@ -65,7 +96,7 @@ export async function postMessage(input: {
     topic: r.topic,
   });
 
-  return { reply: r.reply, choices: r.choices, relayed };
+  return { reply: r.reply, choices: r.choices, effectQuestion: r.effectQuestion, relayed };
 }
 
 /** ★取次ぎの失敗で受け止めを巻き戻さない */

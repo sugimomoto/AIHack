@@ -39,6 +39,7 @@ export function CaseChat({
   const [view, setView] = useState<View>({ messages: [], inbound: [] });
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [effectQuestion, setEffectQuestion] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   const headers = useCallback(
@@ -73,11 +74,14 @@ export function CaseChat({
     setText("");
     setBusy(true);
     try {
-      await fetch(`/api/cases/${caseId}/messages`, {
+      const res = await fetch(`/api/cases/${caseId}/messages`, {
         method: "POST",
         headers: headers(),
         body: JSON.stringify({ text: body }),
       });
+      // ★C3：合意を参照して立てられた問い
+      const d = res.ok ? ((await res.json()) as { effectQuestion?: string | null }) : null;
+      setEffectQuestion(d?.effectQuestion ?? null);
       await reload();
       onChanged?.(); // ★相手側も読み直す
     } finally {
@@ -110,6 +114,23 @@ export function CaseChat({
           ) : (
             <AiMessage key={i} lines={m.content.split(/\n+/).filter(Boolean)} showMark />
           ),
+        )}
+
+        {/* ★合意を参照しているからこそ立てられる問い（C3） */}
+        {effectQuestion && !busy && (
+          <div
+            style={{
+              background: "var(--bubble-ai)",
+              border: "1px dashed var(--border-dashed)",
+              borderRadius: "var(--r-md)",
+              padding: "11px 13px",
+            }}
+          >
+            <p style={{ fontSize: 13.5, lineHeight: 1.9 }}>{effectQuestion}</p>
+            <p style={{ fontSize: 11.5, lineHeight: 1.8, color: "var(--text-sub-2)", marginTop: 6 }}>
+              「今回だけ」を選んでも、取り決めは変わりません。
+            </p>
+          </div>
         )}
 
         {busy && (

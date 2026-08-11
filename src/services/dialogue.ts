@@ -4,6 +4,8 @@ import { INTENT_SCHEMA, normalizeIntents, type Intent } from "@/domain/dialogue/
 import { INTENT_SYSTEM_PROMPT, RECEPTION_SYSTEM_PROMPT } from "@/domain/dialogue/prompts";
 import { sanitizeReception } from "@/domain/dialogue/vocabulary";
 import { choicesFor } from "@/domain/dialogue/choices";
+import { ADJUSTMENT_QUESTION, needsEffectQuestion } from "@/domain/adjustment/flow";
+import { EFFECT_LABEL } from "@/domain/adjustment/effect";
 
 /**
  * 対話
@@ -20,12 +22,16 @@ export type DialogueResult = {
   topic: string | null;
   reply: string;
   choices: { id: string; label: string }[];
+  /** ★合意がある論点への変更希望のとき、AIが立てる問い（C3） */
+  effectQuestion: string | null;
 };
 
 export async function respondTo(input: {
   caseId: string;
   consultationId: string;
   text: string;
+  /** 現在の取り決め。★これがあるからこそ「今回だけ？」と問える */
+  currentAgreement?: { topic: string; summary: string } | null;
 }): Promise<DialogueResult> {
   const { intents, topic } = await classify(input);
 
@@ -44,7 +50,21 @@ export async function respondTo(input: {
   //   語彙の問題で応答を捨てると、当事者を待たせることになる。
   const reply = sanitizeReception(res.content.trim());
 
-  return { intents, topic, reply, choices: choicesFor(intents) };
+  // ★C3：合意を参照しているからこそ立てられる問い
+  const agreement = input.currentAgreement;
+  const effectQuestion =
+    agreement && agreement.topic === topic && needsEffectQuestion({ hasAgreement: true, intents })
+      ? ADJUSTMENT_QUESTION.replace("{{current}}", agreement.summary)
+      : null;
+
+  const choices = effectQuestion
+    ? [
+        { id: "one_time", label: EFFECT_LABEL.ONE_TIME },
+        { id: "permanent", label: EFFECT_LABEL.PERMANENT },
+      ]
+    : choicesFor(intents);
+
+  return { intents, topic, reply, choices, effectQuestion };
 }
 
 /** ★失敗しても落とさない。分類なしとして受け止めに進む */

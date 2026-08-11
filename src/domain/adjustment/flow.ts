@@ -57,27 +57,41 @@ export type AdjustmentResult = {
  *
  * ★元の合意を壊さない。履歴には複製を残す。
  */
+/**
+ * ★未知の値を PERMANENT に倒さない。
+ *   「今回だけ」を選んだのに合意が書き換わる、という最悪の取り違えを
+ *   構造的に防ぐ。判定できなければ何もしない（レビューで検出）。
+ */
+export function parseEffect(v: string | null | undefined): AdjustmentEffect | null {
+  const s = String(v ?? "").toUpperCase();
+  return s === "ONE_TIME" || s === "PERMANENT" ? s : null;
+}
+
+/** ★入れ子ごと複製する。浅いコピーだと履歴と現在が同じ参照を指す */
+function clone<T>(v: T): T {
+  return structuredClone(v);
+}
+
 export function applyAdjustment(
   effect: AdjustmentEffect,
   input: { agreement: { version: number; payload: Payload }; change: Payload },
 ): AdjustmentResult {
   if (effect === "ONE_TIME") {
     return {
-      agreement: { version: input.agreement.version, payload: { ...input.agreement.payload } },
+      agreement: { version: input.agreement.version, payload: clone(input.agreement.payload) },
       revision: null,
-      exception: { ...input.change },
+      exception: clone(input.change),
       regenerate: false,
     };
   }
 
-  const previousPayload = { ...input.agreement.payload };
   return {
     agreement: {
       version: input.agreement.version + 1,
       // ★変更していない項目は保たれる。差分だけを重ねる
-      payload: { ...input.agreement.payload, ...input.change },
+      payload: { ...clone(input.agreement.payload), ...clone(input.change) },
     },
-    revision: { fromVersion: input.agreement.version, previousPayload },
+    revision: { fromVersion: input.agreement.version, previousPayload: clone(input.agreement.payload) },
     exception: null,
     regenerate: true,
   };

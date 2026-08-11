@@ -17,8 +17,12 @@ import {
 
 import { asCaseId, type PartyId } from "@/domain/case/types";
 import { assertOwnParty } from "@/domain/case/scope";
+import { applyAdjustment, parseEffect } from "@/domain/adjustment/flow";
 import {
+  appendException,
+  appendRevision,
   finalizeAgreement,
+  loadAgreementItem,
   listProposalsByTopic,
   loadConsents,
   loadForLlm,
@@ -179,7 +183,7 @@ export async function loadAgreementView(input: {
 
   // 当事者ごとの最新の提案
   const byParty = new Map<string, Record<string, unknown>>();
-  for (const p of proposals) if (p.payload) byParty.set(p.byPartyId, p.payload);
+  for (const p of proposals) if (p.payload) byParty.set(p.byPartyId, p.payload); // ★作成順なので最後が最新
 
   const parties = snap.parties.map((p) => p.id);
   const ready = parties.length === 2 && parties.every((id) => byParty.has(id));
@@ -267,14 +271,36 @@ export async function recordConsent(input: {
   // ★提案が一致していなければ確定しない。
   //   合成すると、誰も合意していない内容が確定する。
   const proposals = await listProposalsByTopic(caseId, input.topic);
-  const byParty = new Map<string, Record<string, unknown>>();
-  for (const p of proposals) if (p.payload) byParty.set(p.byPartyId, p.payload);
-  const payloads = parties.map((id) => byParty.get(id) ?? null);
+  const byParty = new Map<string, (typeof proposals)[number]>();
+  for (const p of proposals) if (p.payload) byParty.set(p.byPartyId, p); // ★作成順なので最後が最新
+  const payloads = parties.map((id) => byParty.get(id)?.payload ?? null);
 
   if (canFinalizeAgreement(c, payloads)) {
-    const master = await findPublishedPayloadSchema(input.topic);
-    // ★一致しているので、どれを取っても同じ
-    await finalizeAgreement(caseId, input.topic, payloads[0]!, master?.id ?? "unknown");
+    // ★C3：今回だけか、今後もかで、起きることが変わる。
+    //   ここを分岐させないと、一時的な融通が合意そのものを書き換える。
+    const effect =
+      parseEffect(parties.map((id) => byParty.get(id)?.effect).find((e) => e) ?? null) ?? "PERMANENT";
+    const change = payloads[0]!;
+    const current = (await loadAgreementItem(caseId, input.topic)) ?? { version: 0, payload: {} };
+
+    const r = applyAdjustment(effect, { agreement: current, change });
+
+    if (r.exception) {
+      // ★合意に触れない。その回の義務にだけ効く例外として残す
+      await appendException(caseId, input.topic, { change: r.exception, byPartyId: input.partyId });
+    } else {
+      const master = await findPublishedPayloadSchema(input.topic);
+      if (r.revision && current.version > 0) {
+        await appendRevision(caseId, input.topic, r.revision);
+      }
+      await finalizeAgreement(
+        caseId,
+        input.topic,
+        r.agreement.payload,
+        master?.id ?? "unknown",
+        r.agreement.version,
+      );
+    }
   }
 
   return viewOfConsents(c, payloads);

@@ -229,11 +229,22 @@ export async function appendProposal(
     context: string;
     contextCategories: string[];
     status: string;
+    /** ★今回だけか、今後もか。判定できないうちは null */
+    effect?: "ONE_TIME" | "PERMANENT" | null;
   },
 ): Promise<string> {
   const ref = await caseRef(caseId)
     .collection("proposals")
-    .add({ ...p, createdAt: new Date().toISOString() });
+    .add({ ...p, effect: p.effect ?? null, createdAt: new Date().toISOString() });
+
+  // ★新しい提案が出たら、承諾をやり直す。
+  //   前回の ACCEPTED が残っていると、片側1クリックで別の内容が確定する
+  //   （レビューで検出）。
+  await caseRef(caseId)
+    .collection("agreementItems")
+    .doc(p.topic)
+    .set({ topic: p.topic, consents: {}, updatedAt: new Date().toISOString() }, { merge: true });
+
   return ref.id;
 }
 
@@ -245,16 +256,53 @@ export async function findOtherPartyId(caseId: CaseId, partyId: PartyId): Promis
 }
 
 /** ★論点ごとの提案。合意形成に使う */
+/** ★作成順に返す。順序が不定だと「最新の提案」が決まらない（レビューで検出） */
 export async function listProposalsByTopic(
   caseId: CaseId,
   topic: string,
-): Promise<{ id: string; byPartyId: PartyId; payload: Record<string, unknown> | null }[]> {
+): Promise<
+  {
+    id: string;
+    byPartyId: PartyId;
+    payload: Record<string, unknown> | null;
+    effect: "ONE_TIME" | "PERMANENT" | null;
+    createdAt: string;
+  }[]
+> {
   const snap = await caseRef(caseId).collection("proposals").where("topic", "==", topic).get();
-  return snap.docs.map((d) => ({
-    id: d.id,
-    byPartyId: asPartyId(d.get("byPartyId")),
-    payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
-  }));
+  return snap.docs
+    .map((d) => ({
+      id: d.id,
+      byPartyId: asPartyId(d.get("byPartyId")),
+      payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
+      effect: (d.get("effect") ?? null) as "ONE_TIME" | "PERMANENT" | null,
+      createdAt: (d.get("createdAt") ?? "") as string,
+    }))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+/** 合意の改訂履歴。★PERMANENT のときだけ積まれる */
+export async function appendRevision(
+  caseId: CaseId,
+  topic: string,
+  rev: { fromVersion: number; previousPayload: Record<string, unknown> },
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("agreementItems")
+    .doc(topic)
+    .collection("revisions")
+    .add({ ...rev, createdAt: new Date().toISOString() });
+}
+
+/** ★ONE_TIME の例外。合意は変えず、その回の義務にだけ効く */
+export async function appendException(
+  caseId: CaseId,
+  topic: string,
+  ex: { change: Record<string, unknown>; byPartyId: PartyId },
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("adjustments")
+    .add({ topic, effect: "ONE_TIME", ...ex, createdAt: new Date().toISOString() });
 }
 
 /** 合意項目の承諾状態 */
@@ -284,14 +332,25 @@ export async function finalizeAgreement(
   topic: string,
   payload: Record<string, unknown>,
   payloadSchemaId: string,
+  version = 1,
 ): Promise<void> {
   await caseRef(caseId)
     .collection("agreementItems")
     .doc(topic)
     .set(
-      { status: "AGREED", payload, payloadSchemaId, agreedAt: new Date().toISOString() },
+      { status: "AGREED", payload, payloadSchemaId, version, agreedAt: new Date().toISOString() },
       { merge: true },
     );
+}
+
+/** 現在の合意（版つき） */
+export async function loadAgreementItem(
+  caseId: CaseId,
+  topic: string,
+): Promise<{ version: number; payload: Record<string, unknown> } | null> {
+  const d = await caseRef(caseId).collection("agreementItems").doc(topic).get();
+  if (!d.exists || d.get("status") !== "AGREED") return null;
+  return { version: (d.get("version") ?? 1) as number, payload: (d.get("payload") ?? {}) as Record<string, unknown> };
 }
 
 /** 当事者の年収帯。★これだけが越える（INV-2a） */

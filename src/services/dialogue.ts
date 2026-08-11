@@ -30,8 +30,8 @@ export async function respondTo(input: {
   caseId: string;
   consultationId: string;
   text: string;
-  /** 現在の取り決め。★これがあるからこそ「今回だけ？」と問える */
-  currentAgreement?: { topic: string; summary: string } | null;
+  /** 分類後の話題に対応する取り決めを引く。★これがあるからこそ「今回だけ？」と問える */
+  resolveAgreement?: (topic: string | null) => Promise<{ topic: string; summary: string } | null>;
 }): Promise<DialogueResult> {
   const { intents, topic } = await classify(input);
 
@@ -51,7 +51,7 @@ export async function respondTo(input: {
   const reply = sanitizeReception(res.content.trim());
 
   // ★C3：合意を参照しているからこそ立てられる問い
-  const agreement = input.currentAgreement;
+  const agreement = input.resolveAgreement ? await input.resolveAgreement(topic) : null;
   const effectQuestion =
     agreement && agreement.topic === topic && needsEffectQuestion({ hasAgreement: true, intents })
       ? ADJUSTMENT_QUESTION.replace("{{current}}", agreement.summary)

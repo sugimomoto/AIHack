@@ -39,7 +39,13 @@ export function CaseChat({
   const [view, setView] = useState<View>({ messages: [], inbound: [] });
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
-  const [effectQuestion, setEffectQuestion] = useState<string | null>(null);
+  // ★問いは「どの時点のものか」を持たせる。
+  //   相手の送信で読み直したとき、前ターンの問いが残って別件に貼り付くのを防ぐ
+  //   （レビューで検出）。
+  const [question, setQuestion] = useState<{ key: number; text: string } | null>(null);
+  const effectQuestion = question && question.key === (reloadKey ?? 0) ? question.text : null;
+  const setEffectQuestion = (text: string | null) =>
+    setQuestion(text ? { key: reloadKey ?? 0, text } : null);
   const endRef = useRef<HTMLDivElement>(null);
 
   const headers = useCallback(
@@ -68,22 +74,27 @@ export function CaseChat({
     };
   }, [fetchView, reloadKey]);
 
-  const send = async () => {
+  const send = async (effect?: "ONE_TIME" | "PERMANENT") => {
     const body = text.trim();
-    if (!body || busy) return;
+    if ((!body && !effect) || busy) return;
     setText("");
     setBusy(true);
+    // ★前ターンの問いを必ず消す。残ると、無関係な発言に貼り付く
+    setEffectQuestion(null);
     try {
       const res = await fetch(`/api/cases/${caseId}/messages`, {
         method: "POST",
         headers: headers(),
-        body: JSON.stringify({ text: body }),
+        body: JSON.stringify({ text: body || "（選択）", effect }),
       });
       // ★C3：合意を参照して立てられた問い
       const d = res.ok ? ((await res.json()) as { effectQuestion?: string | null }) : null;
       setEffectQuestion(d?.effectQuestion ?? null);
       await reload();
       onChanged?.(); // ★相手側も読み直す
+    } catch {
+      // ★失敗しても、問いが残ったままにしない
+      setEffectQuestion(null);
     } finally {
       setBusy(false);
       requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
@@ -130,6 +141,27 @@ export function CaseChat({
             <p style={{ fontSize: 11.5, lineHeight: 1.8, color: "var(--text-sub-2)", marginTop: 6 }}>
               「今回だけ」を選んでも、取り決めは変わりません。
             </p>
+            <div className="mt-2.5 flex gap-2">
+              {([
+                ["ONE_TIME", "今回だけ変更する"],
+                ["PERMANENT", "今後も変更する"],
+              ] as const).map(([e, label]) => (
+                <button
+                  key={e}
+                  type="button"
+                  onClick={() => void send(e)}
+                  className="flex-1 rounded-full"
+                  style={{
+                    border: "1px solid var(--border-strong)",
+                    background: "var(--surface)",
+                    minHeight: 38,
+                    fontSize: 12.5,
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

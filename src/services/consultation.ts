@@ -10,6 +10,7 @@ import {
   loadForLlm,
 } from "@/infra-adapters/firestore/repositories/caseRepository";
 import { assertOwnParty, scopedInbound, scopedMessages } from "@/domain/case/scope";
+import { parseEffect } from "@/domain/adjustment/flow";
 
 /**
  * 相談の1往復
@@ -26,12 +27,14 @@ import { assertOwnParty, scopedInbound, scopedMessages } from "@/domain/case/sco
 /** 合意済みの論点を、問いに差し込める形にする */
 async function currentAgreementOf(
   caseId: ReturnType<typeof asCaseId>,
+  topic: string | null,
 ): Promise<{ topic: string; summary: string } | null> {
   const { listAgreementItems } = await import(
     "@/infra-adapters/firestore/repositories/caseRepository"
   );
   const items = await listAgreementItems(caseId);
-  const agreed = items.find((i) => i.status === "AGREED" && i.payload);
+  // ★話題に対応する合意を選ぶ。最古の1件しか見ないと、別の論点で問いが消える
+  const agreed = items.find((i) => i.status === "AGREED" && i.payload && (!topic || i.topic === topic));
   if (!agreed) return null;
 
   const p = agreed.payload!;
@@ -59,6 +62,8 @@ export async function postMessage(input: {
   caseId: string;
   partyId: PartyId;
   text: string;
+  /** ★「今回だけ」「今後も」の選択。判定できないうちは未指定 */
+  effect?: string | null;
 }): Promise<TurnResult> {
   const caseId = asCaseId(input.caseId);
   // ★当事者であることを先に確かめる（A-1）
@@ -75,11 +80,12 @@ export async function postMessage(input: {
   });
 
   // ★現在の取り決めを渡す。これがあるからこそ「今回だけ？」と問える（C3）
+  // ★先に分類して、その話題の合意を渡す
   const r = await respondTo({
     caseId,
     consultationId,
     text: input.text,
-    currentAgreement: await currentAgreementOf(caseId),
+    resolveAgreement: (topic) => currentAgreementOf(caseId, topic),
   });
   await appendMessage(caseId, consultationId, {
     partyId: input.partyId,
@@ -94,6 +100,7 @@ export async function postMessage(input: {
     raw: input.text,
     intents: r.intents,
     topic: r.topic,
+    effect: parseEffect(input.effect),
   });
 
   return { reply: r.reply, choices: r.choices, effectQuestion: r.effectQuestion, relayed };
@@ -107,6 +114,7 @@ async function relayIfNeeded(input: {
   raw: string;
   intents: Parameters<typeof buildRelay>[0]["intents"];
   topic: string | null;
+  effect: "ONE_TIME" | "PERMANENT" | null;
 }): Promise<string | null> {
   try {
     const relay = await buildRelay({
@@ -128,6 +136,7 @@ async function relayIfNeeded(input: {
       context: relay.context,
       contextCategories: relay.categories,
       status: "PENDING",
+      effect: input.effect,
     });
 
     await appendMediationEvent(input.caseId, {

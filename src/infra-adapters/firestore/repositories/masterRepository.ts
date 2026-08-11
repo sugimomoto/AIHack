@@ -103,3 +103,13 @@ export async function findKnowledgeArticle(id: string): Promise<KnowledgeArticle
   const a = { id: d.id, ...d.data() } as KnowledgeArticle;
   return isPublishable(a) ? a : null;
 }
+
+import type { Scenario } from "@/domain/topic/selection";
+
+/** 相談シナリオ。★選ばなくても始められるため、取得の失敗で止めない */
+export async function listScenarios(): Promise<Scenario[]> {
+  const snap = await getDb().collection("masters/scenarios/items").get();
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as Scenario)
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+}

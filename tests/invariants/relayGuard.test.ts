@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { requiresAgreement } from "@/domain/topic/level";
+import { needsRelayForTopic } from "@/domain/dialogue/intent";
 import {
   CONTEXT_CATEGORIES,
   assertWhitelisted,
@@ -153,5 +155,26 @@ describe("★機械的な検査の限界", () => {
     const raw = "月3万が限界。仕事切られて必死なんだよ";
     expect(hasVerbatimRun(raw, "月額3万円までを希望されているそうです")).toBe(false);
     expect(hasVerbatimRun(raw, "収入を3万円以内にしてほしいとのことです")).toBe(false);
+  });
+});
+
+/**
+ * ★L3（日常連絡）にも C1 の規約が適用される
+ *
+ * 合意を求めないだけで、扱いは同一である。
+ *   父の入力：「子どもが熱出したって連絡くらいしろよ、母親だろ」
+ *   母に届く：「お子さんの体調について、連絡がほしいというご要望が来ています」
+ */
+describe("★日常連絡の扱い", () => {
+  it("★合意を求めない論点では提案を作らない", () => {
+    expect(requiresAgreement("DAILY_CONTACT")).toBe(false);
+  });
+
+  it("★しかし取次ぎは起きる（連絡は届く）", () => {
+    expect(needsRelayForTopic("DAILY_CONTACT", ["REQUEST"])).toBe(true);
+  });
+
+  it("★感情表現だけなら、日常連絡でも取次ぎは起きない", () => {
+    expect(needsRelayForTopic("DAILY_CONTACT", ["EMOTIONAL_EXPRESSION"])).toBe(false);
   });
 });

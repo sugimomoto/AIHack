@@ -5,6 +5,7 @@ import Image from "next/image";
 import { OwnMessage } from "./OwnMessage";
 import { AiMessage } from "./AiMessage";
 import { RelayMessage } from "./RelayMessage";
+import { TopicSheet } from "@/components/topic/TopicSheet";
 
 /**
  * ケースに接続された対話
@@ -173,6 +174,9 @@ export function CaseChat({
         )}
         <div ref={endRef} />
       </div>
+
+      {/* ★入力欄より前に置かない。選ばずに書き始められることが必須要件 */}
+      <TopicSheet onPick={(sc) => setText((t) => t || `${sc.title}について相談したいです。`)} />
 
       <div
         className="flex shrink-0 items-end gap-2 px-3 pb-3 pt-2"

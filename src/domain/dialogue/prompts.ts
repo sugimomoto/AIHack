@@ -62,10 +62,12 @@ export const INTENT_SYSTEM_PROMPT = [
   "CHILD_SUPPORT … 養育費。金額・支払い・入金に関する話",
   "VISITATION    … 面会交流。会う頻度・方法・場所",
   "SCHEDULE      … 日程・時間の調整（受け渡しの時刻、予定の変更）",
-  "DAILY_CONTACT … 日常の連絡（体調、学校、持ち物）",
+  "DAILY_CONTACT … 日常の連絡（体調、学校、持ち物、写真の共有）",
+  "                 例：「子どもが熱を出した」「学校で行事がある」「連絡がほしい」",
   "OTHER         … 上記のいずれでもない",
   "",
   "★topic は入力の内容から選んでください。",
   "  金額の話が出ていなければ CHILD_SUPPORT ではありません。",
+  "  お子さんの体調・学校・持ち物の話は DAILY_CONTACT です。",
   "  迷ったら OTHER を選んでください。",
 ].join("\n");

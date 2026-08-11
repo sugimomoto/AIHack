@@ -53,6 +53,18 @@ export function needsRelay(intents: readonly Intent[]): boolean {
   return intents.some((i) => RELAY_INTENTS.includes(i));
 }
 
+/**
+ * ★論点を含めた判定。
+ *
+ *   日常連絡（L3）は合意を求めないが、**取次ぎは起きる。**
+ *   合意を求めないことと、相手に届かないことは別である。
+ */
+export function needsRelayForTopic(_topic: string | null, intents: readonly Intent[]): boolean {
+  // ★現状、論点で取次ぎの有無は変わらない。
+  //   変えたくなったら、ここに書く場所があることが重要である。
+  return needsRelay(intents);
+}
+
 /** 構造化出力のスキーマ */
 export const INTENT_SCHEMA: { name: string; schema: Record<string, unknown> } = {
   name: "intent_classification",

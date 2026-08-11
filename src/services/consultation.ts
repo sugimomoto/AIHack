@@ -11,6 +11,7 @@ import {
 } from "@/infra-adapters/firestore/repositories/caseRepository";
 import { assertOwnParty, scopedInbound, scopedMessages } from "@/domain/case/scope";
 import { parseEffect } from "@/domain/adjustment/flow";
+import { requiresAgreement } from "@/domain/topic/level";
 
 /**
  * 相談の1往復
@@ -129,21 +130,30 @@ async function relayIfNeeded(input: {
     const to = await findOtherPartyId(input.caseId, input.partyId);
     if (!to) return null;
 
-    const proposalId = await appendProposal(input.caseId, {
-      byPartyId: input.partyId,
-      topic: input.topic ?? "OTHER",
-      payload: relay.payload,
-      context: relay.context,
-      contextCategories: relay.categories,
-      status: "PENDING",
-      effect: input.effect,
-    });
+    // ★日常連絡（L3）は合意を求めない。提案を作らない。
+    //   作ると、連絡のたびに承諾を求めることになる。
+    //   ただし取次ぎは起きる。**C1 の扱いは変わらない。**
+    //
+    // ★payload が無ければ、合意する内容が無い。
+    //   分類を誤って L1 になっても、中身の無い提案を作らない。
+    //   承諾を求める対象が空になり、片側の承諾で確定しうる。
+    const proposalId = requiresAgreement(input.topic ?? "OTHER") && relay.payload
+      ? await appendProposal(input.caseId, {
+          byPartyId: input.partyId,
+          topic: input.topic ?? "OTHER",
+          payload: relay.payload,
+          context: relay.context,
+          contextCategories: relay.categories,
+          status: "PENDING",
+          effect: input.effect,
+        })
+      : undefined;
 
     await appendMediationEvent(input.caseId, {
       fromPartyId: input.partyId,
       toPartyId: to, // ★宛先。scopedInbound の拠り所
       content: relay.content,
-      proposalId,
+      ...(proposalId ? { proposalId } : {}),
     });
 
     return relay.content;

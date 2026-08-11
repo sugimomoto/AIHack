@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CaseChat } from "@/components/chat/CaseChat";
 import { AgreementPanel } from "@/components/agreement/AgreementPanel";
 import { DocumentPanel } from "@/components/document/DocumentPanel";
+import { SchedulePanel } from "@/components/schedule/SchedulePanel";
 
 /**
  * 両当事者を並べて確認する画面
@@ -58,6 +59,7 @@ export function DemoPanes() {
               <CaseChat caseId={CASE_ID} partyId={p.partyId} label={p.label} onChanged={bump} reloadKey={key} />
             </div>
             <AgreementPanel caseId={CASE_ID} partyId={p.partyId} reloadKey={key} onChanged={bump} />
+            <SchedulePanel caseId={CASE_ID} partyId={p.partyId} reloadKey={key} />
             <DocumentPanel caseId={CASE_ID} partyId={p.partyId} reloadKey={key} />
           </div>
         ))}

@@ -321,3 +321,23 @@ export async function listAgreementItems(
     .sort((a, b) => a.agreedAt.localeCompare(b.agreedAt))
     .map(({ agreedAt: _ignored, ...rest }) => rest);
 }
+
+/** 履行の申告。★自己申告であり、アプリは入金を観測しない */
+export async function reportFulfillment(
+  caseId: CaseId,
+  key: string,
+  partyId: PartyId,
+  kind: "PAID" | "RECEIVED",
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("fulfillments")
+    .doc(key)
+    .set({ [kind === "PAID" ? "paidBy" : "receivedBy"]: partyId, updatedAt: new Date().toISOString() }, { merge: true });
+}
+
+export async function loadFulfillments(
+  caseId: CaseId,
+): Promise<Record<string, { paidBy?: string; receivedBy?: string }>> {
+  const snap = await caseRef(caseId).collection("fulfillments").get();
+  return Object.fromEntries(snap.docs.map((d) => [d.id, d.data() as { paidBy?: string; receivedBy?: string }]));
+}

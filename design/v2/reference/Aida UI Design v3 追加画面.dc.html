@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#F0E7D6; font-family:"Zen Kaku Gothic New", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#3F6B49; text-decoration:none; }
+  a:hover { color:#2E5236; text-decoration:underline; }
+</style>
+</helmet>
+
+<div style="padding:64px 72px 120px; display:flex; flex-direction:column; gap:88px; background:#F0E7D6; color:#3A342E; min-width:5200px;">
+
+  <section style="display:flex; flex-direction:column; gap:88px;">
+
+    <div id="2a" style="display:flex; flex-direction:column; gap:14px; max-width:940px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:24px; padding:0 9px; border-radius:6px; background:#3A342E; color:#FDF8EF; font-size:12px; font-weight:500; letter-spacing:.06em;">2a</span>
+        <span style="font-size:12px; letter-spacing:.14em; color:#6F675E;">AIDA ／ 追加画面（第2弾）</span>
+      </div>
+      <h1 style="margin:0; font-size:38px; font-weight:500; letter-spacing:.02em; line-height:1.4;">やりすぎないための設計</h1>
+      <p style="margin:0; font-size:15px; line-height:2; color:#655C53; text-wrap:pretty;">第1弾のトークン・原則・文言規約はそのまま踏襲しています。再設計はしていません。<br>今回の中心は2つです。<a href="#A">招待</a>という行為が相手を怖がらせないこと。<a href="#G">気づいていること</a>を、踏み込まずに伝えること。どちらも足し算ではなく引き算で解いています。Gは方向性の3案を並べたので、議論のうえで決めさせてください。</p>
+    </div>
+
+    <!-- ============ A 招待 ============ -->
+    <div id="A" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#6F675E;">A</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">招待とケースの成立</h2>
+        <span style="font-size:13px; color:#6F675E;">作成 ／ メール文面 ／ 受け取り側 ／ 待機中</span>
+      </div>
+
+      <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:22px 26px; max-width:1140px;">
+        <div style="font-size:13px; font-weight:500; margin-bottom:8px;">この画面が背負っていること</div>
+        <p style="margin:0; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">招待という行為そのものが、相手を刺激しうる。だからこの一連の画面では、アプリが勝手に何かをしないことを繰り返し示します。渡し方は本人が決める。文面は事前に全文を見せる。相手が応じなくても催促しない。<br>「安全な渡し方」を推奨はしますが、選択肢の見た目は同じ重さにしています。誘導すると、選ばなかった側を責める形になるためです。</p>
+      </div>
+
+      <div style="display:flex; gap:40px; flex-wrap:wrap; align-items:flex-start;">
+
+        <!-- A-1 招待の作成 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-1 ／ 招待の作成</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">お相手を招待する</span>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:12px; overflow:hidden;">
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="background:#FBF0DA; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.95;">お渡しの方法を、選んでください。<br><span style="font-size:13.5px; color:#6F675E;">どちらでも、あとから変えられます。</span></div>
+              </div>
+
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="font-size:16px;">リンクをコピーして、自分で渡す</div>
+                <div style="margin-top:8px; font-size:12.5px; line-height:1.9; color:#655C53;">アプリはお相手に連絡しません。いつ、どの手段で渡すかを、ご自身で決められます。</div>
+                <div style="margin-top:14px; display:flex; align-items:center; gap:10px; background:#F7EFE1; border-radius:16px; padding:12px 14px;">
+                  <span style="flex:1; font-size:13px; color:#655C53; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">aida.app/i/8fk2-9dq1</span>
+                  <span style="font-size:13px; color:#3F6B49;">コピー</span>
+                </div>
+              </div>
+
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="font-size:16px;">メールで送る</div>
+                <div style="margin-top:8px; font-size:12.5px; line-height:1.9; color:#655C53;">アプリが送信します。文面は決まっていて、書き換えられません。送る前に、そのままお見せします。</div>
+                <div style="margin-top:14px; min-height:44px; background:#F7EFE1; border-radius:16px; padding:12px 14px; font-size:14px; color:#6F675E;">お相手のメールアドレス</div>
+                <div style="margin-top:12px; font-size:13.5px; color:#3F6B49;">送られる文面を見る ▸</div>
+              </div>
+
+              <div style="flex:none; border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                リンクをご自身で渡すほうが、お相手が急に連絡を受け取ることにはなりません。ただ、どちらが良いかは事情によります。
+              </div>
+            </div>
+            <div style="flex:none; padding:16px 20px 24px;">
+              <div style="border:1px solid #E0D5C4; border-radius:16px; padding:14px; text-align:center; font-size:15px; color:#6F675E;">あとにする</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">2つのカードは面積・枠線・角丸をそろえ、どちらも推奨ボタンにしていません。安全性の情報は、選択肢の外側に破線の注記として置き、「ただ、どちらが良いかは事情によります」で判断を本人に戻しています。</div>
+        </div>
+
+        <!-- A-2 メール文面 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-2 ／ 送信前のプレビュー</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">送られる文面</span>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:11px; overflow:hidden;">
+              <div style="flex:none; font-size:12.5px; line-height:1.85; color:#655C53;">これがそのまま届きます。ここから書き換えることはできません。</div>
+
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; overflow:hidden;">
+                <div style="padding:11px 16px; background:#FBF3E6; border-bottom:1px dashed #E2D7C6; font-size:11.5px; letter-spacing:.06em; color:#6F675E;">件名</div>
+                <div style="padding:12px 16px; font-size:15px; line-height:1.8;">お手続きのご案内（Aida）</div>
+                <div style="padding:10px 16px; background:#FBF3E6; border-top:1px dashed #E2D7C6; border-bottom:1px dashed #E2D7C6; font-size:11.5px; letter-spacing:.06em; color:#6F675E;">本文</div>
+                <div style="padding:15px 16px; font-size:13.5px; line-height:1.95; color:#3A342E;">Aida は、お子さまに関する取り決めを、おふたりが直接やりとりせずに進めるためのサービスです。<br><br>このご案内は、○○さまからのご依頼でお送りしています。ご参加の場合も、直接メッセージをやりとりすることはありません。<br><br>お返事の期限はありません。<br>▸ 内容を確認する</div>
+              </div>
+
+              <div style="flex:none; font-size:12px; line-height:1.85; color:#655C53;">離婚・養育費・調停といった語は入りません。自由に書き足せる欄もありません。</div>
+            </div>
+            <div style="flex:none; padding:10px 20px 24px; display:flex; flex-direction:column; gap:10px;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:14px 16px;">
+                <div style="display:flex; align-items:center;">
+                  <div style="flex:1;"><div style="font-size:15px;">お名前を出す</div><div style="margin-top:5px; font-size:12px; line-height:1.8; color:#655C53;">出さない場合は「ご関係の方からのご依頼で」となります。</div></div>
+                  <span style="flex:none; width:44px; height:26px; border-radius:13px; background:#5B8A63; display:flex; align-items:center; justify-content:flex-end; padding:0 3px;"><span style="width:20px; height:20px; border-radius:50%; background:#FFFCF5;"></span></span>
+                </div>
+              </div>
+              <div style="border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:15px; text-align:center; font-size:15.5px; color:#3F6B49;">この文面で送る</div>
+              <div style="text-align:center; font-size:13.5px; color:#6F675E;">戻る</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">自由文の欄がないことを「制限」ではなく「この経路では罵倒も脅迫も送れない」という保証として書いています。実名の有無はトグル1つ。既定はONですが、OFFの文面も同じ画面で確認できます。</div>
+        </div>
+
+        <!-- A-3 受け取り側 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-3 ／ 受け取った側の最初の画面</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:1; padding:20px 24px 0; display:flex; flex-direction:column; gap:22px; overflow:hidden;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:16px; padding-top:8px;">
+                <img src="assets/capybara-sit.png" alt="" width="76" height="76" style="width:76px; height:76px; border-radius:22px; object-fit:cover;">
+                <div style="font-size:20px; line-height:1.7; text-align:center;">Aida は、おふたりのあいだに<br>立つためのサービスです。</div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:6px 18px;">
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px; line-height:1.85;">おふたりが直接やりとりすることには、なりません。</div>
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px; line-height:1.85;">書いた言葉は、お相手には届きません。合意できた事項だけが共有されます。</div>
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px; line-height:1.85;">連絡先も、入力した内容も、お相手には見えません。</div>
+                <div style="padding:15px 0; font-size:14.5px; line-height:1.85;">参加しない選択もできます。期限はありません。</div>
+              </div>
+
+              <div style="font-size:12.5px; line-height:1.95; color:#655C53;">いま決めなくてかまいません。このご案内は残ります。</div>
+            </div>
+            <div style="flex:none; padding:16px 24px 28px; display:flex; flex-direction:column; gap:12px;">
+              <div style="border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:15px; text-align:center; font-size:15.5px; color:#3F6B49;">内容を見てみる</div>
+              <div style="border:1px solid #E0D5C4; border-radius:16px; padding:15px; text-align:center; font-size:15px; color:#655C53;">いまは決めない</div>
+              <div style="text-align:center; font-size:12.5px; color:#6F675E; margin-top:4px;">お断りになった場合、その旨はお相手に伝わりません。</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">構えている人が最初に見る画面なので、勧誘の言葉を置いていません。4つの箇条書きはすべて「〜しません／〜見えません」で、機能の説明ではなく安全の説明になっています。断ったことが相手に伝わらないことも明記しました。</div>
+        </div>
+
+        <!-- A-4 待機中 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-4 ／ お相手が参加していない状態</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 20px; display:flex; align-items:center; gap:12px;">
+              <img src="assets/capybara-sit.png" alt="" width="44" height="44" style="flex:none; width:44px; height:44px; border-radius:50%; object-fit:cover;">
+              <div style="font-size:13px; line-height:1.8; color:#6F675E;">8月11日（月）<br><span style="color:#3A342E; font-size:15px;">いまは、ひとりで進めています</span></div>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="font-size:15px;">ご案内をお渡しした状態です</div>
+                <div style="margin-top:10px; font-size:12.5px; line-height:1.95; color:#655C53;">お相手が見たかどうかは、こちらでは分かりません。<br>催促のご連絡はしません。期限もありません。</div>
+                <div style="margin-top:14px; padding-top:14px; border-top:1px solid #F1E9DC; font-size:13px; color:#3F6B49;">お渡しの方法を変える ▸</div>
+              </div>
+
+              <div style="flex:none; background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <img src="assets/capybara.png" alt="" width="40" height="40" style="flex:none; width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                  <div style="font-size:15px; line-height:1.8;">待っているあいだに、<br>できることがあります。</div>
+                </div>
+                <div style="margin-top:14px; font-size:13px; line-height:1.95; color:#655C53;">考えを整理して、伝えたいことを下書きにしておけます。お相手が参加したとき、そのまま提案として出せます。</div>
+                <div style="margin-top:14px; border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:13px; text-align:center; font-size:15px; color:#3F6B49;">ひとりで準備する</div>
+              </div>
+
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="font-size:15px;">制度のことを知っておく</div>
+                <div style="margin-top:10px; font-size:12.5px; line-height:1.95; color:#655C53;">養育費の決め方、公正証書とは何か。一般的な説明を読めます。</div>
+              </div>
+            </div>
+            <div style="flex:none; height:78px; border-top:1px solid #F1E9DC; background:#FFFCF5; display:flex; padding-top:8px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#8A6212" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#8A6212;">ホーム</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">相談</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">取り決め</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="3.5" y="5" width="15" height="13" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M3.5 9h15M7.5 3v4M14.5 3v4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">これから</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#6F675E" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">設定</span></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">「招待中」「未承諾」といった進行状態の語を使っていません。見出しは「いまは、ひとりで進めています」。相手の不作為ではなく、自分の現在地として書いています。再送ボタンも経過日数も出しません。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ B 準備モード ============ -->
+    <div id="B" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#6F675E;">B</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">準備モード</h2>
+        <span style="font-size:13px; color:#6F675E;">相手の参加前に、ひとりで使う</span>
+      </div>
+
+      <div style="display:flex; gap:40px; flex-wrap:wrap; align-items:flex-start;">
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">B-1 ／ 準備モードの対話</div>
+          <div style="width:390px; height:844px; background:#F7EFE1; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; margin:0 16px 12px; background:#FFFCF5; border:1px solid #DCC7A6; border-radius:16px; padding:11px 14px; display:flex; align-items:center; gap:9px;">
+              <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M3 5.2V4a3 3 0 0 1 6 0v1.2" stroke="#8A6212" stroke-width="1.1"/><rect x="2.2" y="5.2" width="7.6" height="5.2" rx="1.4" stroke="#8A6212" stroke-width="1.1"/></svg>
+              <span style="font-size:12px; line-height:1.7; color:#655C53;">ここに書いたことは、まだ誰にも共有されていません</span>
+            </div>
+            <div style="flex:1; padding:4px 20px 8px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="align-self:center; font-size:11px; color:#6F675E; letter-spacing:.06em;">準備 ／ 養育費のこと</div>
+              <div style="display:flex; align-items:flex-start; gap:9px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="max-width:82%; background:#FBF0DA; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.95;">いま、いちばん心配なことから伺えますか。</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px; margin-top:6px;">
+                <div style="max-width:78%; background:#F2E8D9; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.9;">塾の費用をどうするか、まだ何も決まってない</div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:9px; margin-top:4px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="max-width:82%; background:#FBF0DA; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.95;">下書きにしておきますね。<br><span style="font-size:13.5px; color:#655C53;">お相手が参加されたとき、そのままお出しできます。</span></div>
+              </div>
+
+              <div style="flex:none; margin-top:6px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:14px;">下書きにしたこと</span><span style="margin-left:auto; font-size:12.5px; color:#6F675E;">3件</span></div>
+                <div style="margin-top:12px; display:flex; flex-direction:column; gap:9px;">
+                  <div style="display:flex; align-items:center; gap:9px; font-size:13.5px; color:#655C53;"><span style="width:6px; height:6px; border-radius:50%; background:#C08F3C;"></span>塾・習い事の費用の分担</div>
+                  <div style="display:flex; align-items:center; gap:9px; font-size:13.5px; color:#655C53;"><span style="width:6px; height:6px; border-radius:50%; background:#C08F3C;"></span>面会の頻度についての希望</div>
+                  <div style="display:flex; align-items:center; gap:9px; font-size:13.5px; color:#655C53;"><span style="width:6px; height:6px; border-radius:50%; background:#C08F3C;"></span>受け渡しの場所</div>
+                </div>
+              </div>
+            </div>
+            <div style="flex:none; padding:8px 16px 12px; display:flex; align-items:flex-end; gap:10px; border-top:1px solid #E9DECB;">
+              <div style="flex:1; min-height:44px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:16px; padding:12px 14px; font-size:15px; color:#6F675E;">思っていることを書く</div>
+              <div style="width:44px; height:44px; flex:none; border-radius:16px; background:#C08F3C; display:flex; align-items:center; justify-content:center;"><svg width="17" height="17" viewBox="0 0 18 18" fill="none"><path d="M2.5 15.5 15.5 9 2.5 2.5v5L11 9l-8.5 1.5z" fill="#FFFCF5"/></svg></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">通常の相談画面との差は3点。地の色が面2（#F7EFE1）で一段沈む、上部に鍵つきの帯が常設される、封書カードが一度も現れない。<br>「相手に届いた」と誤解される余地を、画面の地から消しています。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">B-2 ／ 下書きの一覧と、参加後の遷移</div>
+          <div style="width:390px; height:844px; background:#F7EFE1; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 18px;">
+              <div style="font-size:22px; font-weight:500;">準備していること</div>
+              <div style="margin-top:8px; font-size:13px; color:#655C53;">まだ誰にも共有されていません</div>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:10px; overflow:hidden;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:16px;">養育費</span><span style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; border:1px solid #DCC7A6; background:#FBF0DA; border-radius:11px; padding:4px 9px;"><span style="font-size:11.5px; color:#8A6212;">下書き</span></span></div>
+                <div style="margin-top:8px; font-size:13px; line-height:1.85; color:#655C53;">月50,000円を希望／塾の費用は別に相談したい</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:16px;">面会交流</span><span style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; border:1px solid #DCC7A6; background:#FBF0DA; border-radius:11px; padding:4px 9px;"><span style="font-size:11.5px; color:#8A6212;">下書き</span></span></div>
+                <div style="margin-top:8px; font-size:13px; line-height:1.85; color:#655C53;">月1回・土曜／受け渡しは駅前を希望</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:16px;">受け渡しの場所</span><span style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; border:1px dashed #C4B8A7; border-radius:11px; padding:4px 9px;"><span style="font-size:11.5px; color:#6F675E;">書きかけ</span></span></div>
+              </div>
+
+              <div style="margin-top:10px; border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                そろえる必要はありません。ひとつだけでも、お相手が参加されたときに出せます。
+              </div>
+
+              <div style="margin-top:auto; margin-bottom:16px; background:#FFFCF5; border:1px solid #5B8A63; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <img src="assets/capybara-sit.png" alt="" width="34" height="34" style="flex:none; width:34px; height:34px; border-radius:50%; object-fit:cover;">
+                  <div style="font-size:15px; line-height:1.75;">お相手が参加されました。</div>
+                </div>
+                <div style="margin-top:10px; font-size:12.5px; line-height:1.95; color:#655C53;">準備された3件を、いつでもお出しできます。どれから始めるかは、ご自身で決められます。</div>
+                <div style="margin-top:14px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:13px; text-align:center; font-size:15px; color:#3F6B49;">下書きを見ながら始める</div>
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">相手が参加した瞬間も、通知やバッジで知らせません。次に開いたときに、画面下部にカードが1枚増えているだけです。<br>下書きは自動では送られません。「どれから始めるかは、ご自身で決められます」を明記しています。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ G 危険検知 ============ -->
+    <div id="G" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#6F675E;">G</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">危険を検知したときの窓口提示</h2>
+        <span style="font-size:13px; color:#6F675E;">方向性 3案 ／ 要議論</span>
+      </div>
+
+      <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:22px 26px; max-width:1140px;">
+        <p style="margin:0; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">3案に共通して守ったこと。AIは何も判定しません。「あなたは危険です」とも「そのような表現は不適切です」とも言いません。検知したことを本人に告げず、窓口の存在だけを置きます。無視しても、次に同じものが出てきません。<br>差は「どこに置くか」と「検知に反応するかどうか」です。</p>
+      </div>
+
+      <div style="display:flex; gap:40px; flex-wrap:wrap; align-items:flex-start;">
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:baseline; gap:10px;"><span style="font-size:15px; font-weight:500;">G案1 ／ 会話の末尾に、小さく置く</span></div>
+          <div style="width:390px; height:640px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:1; padding:12px 20px 8px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="display:flex; justify-content:flex-end;"><div style="max-width:78%; background:#F2E8D9; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.9;">こわい。前みたいに殴られるかもしれない</div></div>
+              <div style="display:flex; align-items:flex-start; gap:9px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="max-width:82%; background:#FBF0DA; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.95;">そのお気持ち、受け止めました。<br>日程の話は、こちらで預かります。</div>
+              </div>
+              <div style="margin-left:37px; border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:13px 15px;">
+                <div style="font-size:13px; line-height:1.85; color:#655C53;">お話しできる公的な窓口の一覧が、いつでもご覧いただけます。</div>
+                <div style="margin-top:9px; font-size:13px; color:#3F6B49;">窓口を見る ▸</div>
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">AIの発言の下に、発言ではない小さなカードを1枚だけ置く。吹き出しにしないので「AIが言った」ことにはなりません。<br>見落とされにくい一方、検知に反応していることが伝わるため、監視感がわずかに残ります。一度閉じたら同じ会話では二度と出しません。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:baseline; gap:10px;"><span style="font-size:15px; font-weight:500;">G案2 ／ 入力欄の脇に、常設する</span></div>
+          <div style="width:390px; height:640px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:1; padding:12px 20px 8px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="display:flex; justify-content:flex-end;"><div style="max-width:78%; background:#F2E8D9; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.9;">こわい。前みたいに殴られるかもしれない</div></div>
+              <div style="display:flex; align-items:flex-start; gap:9px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="max-width:82%; background:#FBF0DA; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.95;">そのお気持ち、受け止めました。<br>日程の話は、こちらで預かります。</div>
+              </div>
+            </div>
+            <div style="flex:none; padding:0 20px 8px; display:flex; align-items:center; gap:8px;">
+              <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 1.2 10.6 3v3.4c0 2.4-2 3.9-4.6 4.4C3.4 10.3 1.4 8.8 1.4 6.4V3L6 1.2z" stroke="#6F675E" stroke-width="1.1" stroke-linejoin="round"/></svg>
+              <span style="font-size:12.5px; color:#655C53;">相談できる公的な窓口</span>
+            </div>
+            <div style="flex:none; padding:0 16px 12px; display:flex; align-items:flex-end; gap:10px;">
+              <div style="flex:1; min-height:44px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:16px; padding:12px 14px; font-size:15px; color:#6F675E;">思っていることを書く</div>
+              <div style="width:44px; height:44px; flex:none; border-radius:16px; background:#C08F3C; display:flex; align-items:center; justify-content:center;"><svg width="17" height="17" viewBox="0 0 18 18" fill="none"><path d="M2.5 15.5 15.5 9 2.5 2.5v5L11 9l-8.5 1.5z" fill="#FFFCF5"/></svg></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">検知に一切反応しません。入力欄の上に、最初から最後まで同じ1行が置かれているだけです。<br>監視感はゼロ。ただし常にあるものは見えなくなるため、いちばん必要なときに気づかれない危険があります。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:baseline; gap:10px;"><span style="font-size:15px; font-weight:500;">G案3 ／ 次に開いたとき、ホームに1枚</span></div>
+          <div style="width:390px; height:640px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 20px; display:flex; align-items:center; gap:12px;">
+              <img src="assets/capybara-sit.png" alt="" width="44" height="44" style="flex:none; width:44px; height:44px; border-radius:50%; object-fit:cover;">
+              <div style="font-size:13px; line-height:1.8; color:#6F675E;">8月12日（火）<br><span style="color:#3A342E; font-size:15px;">今日はひとつ、お預かりしています</span></div>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:20px; padding:18px;">
+                <div style="font-size:15px; line-height:1.85;">お住まいの地域の相談窓口</div>
+                <div style="margin-top:10px; font-size:12.5px; line-height:1.95; color:#655C53;">どなたでもご利用いただけます。ご相談の内容が、こちらに伝わることはありません。</div>
+                <div style="margin-top:14px; font-size:13px; color:#3F6B49;">一覧を見る ▸</div>
+              </div>
+              <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:20px; padding:18px; opacity:.5;">
+                <div style="font-size:15px;">取り決め</div>
+                <div style="margin-top:12px; display:flex; gap:3px;"><div style="flex:1; height:3px; background:#5B8A63;"></div><div style="flex:1; height:3px; background:#5B8A63;"></div><div style="flex:1; height:3px; background:#E8DCCB;"></div><div style="flex:1; height:3px; background:#E8DCCB;"></div><div style="flex:1; height:3px; background:#E8DCCB;"></div><div style="flex:1; height:3px; background:#E8DCCB;"></div><div style="flex:1; height:3px; background:#E8DCCB;"></div><div style="flex:1; height:3px; background:#E8DCCB;"></div></div>
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">その場では何も起きません。次に開いたときのホームに、他のカードと同じ形で1枚だけ増えます。「どなたでもご利用いただけます」と書き、本人に向けたものだと明示しません。<br>時間差があるぶん、書いた直後の羞恥や反発を避けられます。</div>
+        </div>
+
+        <div style="width:360px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:22px;">
+          <div style="font-size:13px; font-weight:500; margin-bottom:10px;">現時点の私の見立て</div>
+          <p style="margin:0 0 14px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">案2と案3の併用を推しています。案2で常に手が届く場所を確保し、検知したときだけ案3で時間差の1枚を足す。会話の流れには一切触れません。</p>
+          <p style="margin:0 0 14px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">案1は、その場で気づいてもらえる強さがある一方、「読まれている」感覚が最も強く出ます。緊急性の高い記述に限って使う、という切り分けはありえます。</p>
+          <div style="padding-top:14px; border-top:1px solid #F1E9DC; font-size:12.5px; line-height:2; color:#655C53;">議論したい点：検知の閾値をどこに置くか。誤検知したときにユーザーが受ける印象は、案1が最も大きく、案3が最も小さくなります。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ D ナレッジ ============ -->
+    <div id="D" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#6F675E;">D</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">ナレッジ</h2>
+        <span style="font-size:13px; color:#6F675E;">一覧 ／ 記事 ／ 配置の提案</span>
+      </div>
+
+      <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:22px 26px; max-width:1140px;">
+        <div style="font-size:13px; font-weight:500; margin-bottom:8px;">配置の提案：タブは増やしません</div>
+        <p style="margin:0; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">6つ目のタブを置くと、常時見えるところに「勉強するもの」が並びます。消耗している人にとって、開くたびに宿題が見えている状態は負担です。<br>入口は3か所に分散させます。<b style="font-weight:500;">①対話の中でAIが記事へ渡す</b>（これが主経路。個別の助言ができない場面を、一般的な説明で引き取る）／<b style="font-weight:500;">②取り決めの各項目から、その項目に関係する記事へ</b>（養育費の項目から算定表の読み方へ、など）／<b style="font-weight:500;">③設定の中に一覧の入口</b>。<br>準備モード（B）では例外的にホームにも置きます。相手を待つあいだは、読むことが数少ないできることだからです。</p>
+      </div>
+
+      <div style="display:flex; gap:40px; flex-wrap:wrap; align-items:flex-start;">
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">D-1 ／ 一覧</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 18px;">
+              <div style="font-size:22px; font-weight:500;">制度のこと</div>
+              <div style="margin-top:8px; font-size:12.5px; line-height:1.9; color:#655C53;">一般的な説明です。個別のご事情への助言ではありません。</div>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:18px; overflow:hidden;">
+              <div>
+                <div style="font-size:11.5px; letter-spacing:.08em; color:#6F675E; margin-bottom:9px;">手続き</div>
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:2px 16px;">
+                  <div style="padding:13px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;">協議離婚とは</div>
+                  <div style="padding:13px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;">公正証書とは</div>
+                  <div style="padding:13px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;">公証役場の使い方</div>
+                  <div style="padding:13px 0; font-size:14.5px;">調停とは</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11.5px; letter-spacing:.08em; color:#6F675E; margin-bottom:9px;">お金</div>
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:2px 16px;">
+                  <div style="padding:13px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;">養育費の決め方</div>
+                  <div style="padding:13px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;">算定表の読み方</div>
+                  <div style="padding:13px 0; font-size:14.5px;">特別費用とは</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11.5px; letter-spacing:.08em; color:#6F675E; margin-bottom:9px;">制度</div>
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:2px 16px;">
+                  <div style="padding:13px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;">2026年4月の改正で変わったこと</div>
+                  <div style="padding:13px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;">法定養育費</div>
+                  <div style="padding:13px 0; font-size:14.5px;">先取特権</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11.5px; letter-spacing:.08em; color:#6F675E; margin-bottom:9px;">用語</div>
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:2px 16px;">
+                  <div style="padding:13px 0; font-size:14.5px;">債務名義・監護者・基準日 ほか</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">記事の要約も、所要時間も、既読の印も出しません。読み進めさせるための仕掛けを置かないことで、「宿題」に見えないようにしています。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">D-2 ／ 記事</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 14px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:14px; color:#6F675E;">お金</span>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:16px; overflow:hidden;">
+              <div style="font-size:22px; font-weight:500; line-height:1.6;">算定表の読み方</div>
+              <div style="background:#F7EFE1; border:1px solid #EFE3D0; border-radius:16px; padding:13px 15px; font-size:12px; line-height:1.9; color:#655C53;">一般的な説明です。個別のご事情への助言ではありません。実際の取り扱いは、ご事情によって変わる可能性があります。</div>
+              <div style="font-size:15px; line-height:2.1;">養育費の目安は、家庭裁判所が公表している算定表から求められるとされています。表は、支払う側と受け取る側の年収、子どもの人数と年齢の組み合わせでできています。</div>
+              <div style="font-size:15px; line-height:2.1;">縦軸と横軸が交わるセルに、月額の幅が書かれています。この幅の中で、実際の金額を話し合って決めることになります。</div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:12px; letter-spacing:.06em; color:#6F675E;">監修</div>
+                <div style="margin-top:8px; font-size:13.5px; line-height:1.85; color:#655C53;">弁護士 ○○ ○○（第二東京弁護士会）<br><span style="font-size:12px;">2026年8月 確認</span></div>
+              </div>
+            </div>
+            <div style="flex:none; padding:12px 20px 24px; display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px; border:1px solid #EFE3D0; background:#FBF0DA; border-radius:16px; padding:14px 16px;">
+                <img src="assets/capybara.png" alt="" width="30" height="30" style="flex:none; width:30px; height:30px; border-radius:50%; object-fit:cover;">
+                <span style="font-size:14.5px; color:#3A342E;">このことについて相談する</span>
+                <span style="margin-left:auto; font-size:13px; color:#3F6B49;">▸</span>
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">断定を避ける文体（「〜とされています」）で統一。冒頭の注記は常時表示で、スクロールしても消えません。記事の末尾に相談への導線を置き、読んで終わりにしない一方、途中に差し込んで読書を中断させることはしません。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ C / F / E ============ -->
+    <div id="CFE" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#6F675E;">C ／ F ／ E</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">前提情報の登録・設定・ログイン</h2>
+      </div>
+
+      <div style="display:flex; gap:40px; flex-wrap:wrap; align-items:flex-start;">
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">C ／ 年収の登録</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:10px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <div style="flex:1; display:flex; gap:4px;"><div style="flex:1; height:3px; background:#5B8A63;"></div><div style="flex:1; height:3px; background:#5B8A63;"></div><div style="flex:1; height:3px; background:#E8DCCB;"></div></div>
+            </div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:18px; overflow:hidden;">
+              <div style="font-size:22px; font-weight:500; line-height:1.6;">ご自身の年収</div>
+              <div style="font-size:13.5px; line-height:2; color:#655C53;">養育費の目安を出すために使います。源泉徴収票の「支払金額」をご覧ください。</div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="font-size:12px; color:#6F675E;">年収</div>
+                <div style="margin-top:10px; display:flex; align-items:baseline; gap:8px; border-bottom:1px solid #EFE3D0; padding-bottom:12px;">
+                  <span style="font-size:26px; letter-spacing:.02em;">4,380,000</span><span style="font-size:15px; color:#655C53;">円</span>
+                </div>
+              </div>
+
+              <div style="background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                  <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:2px;">
+                  <div style="font-size:14.5px; line-height:1.9;">この金額そのものは、<br>お相手には見えません。</div>
+                </div>
+                <div style="margin-top:16px; background:#FFFCF5; border-radius:16px; padding:16px;">
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="flex:1;"><div style="font-size:11.5px; color:#6F675E;">入力した金額</div><div style="margin-top:5px; font-size:16px;">4,380,000円</div></div>
+                    <span style="font-size:15px; color:#6F675E;">→</span>
+                    <div style="flex:1;"><div style="font-size:11.5px; color:#3F6B49;">お相手に見えるのは</div><div style="margin-top:5px; font-size:16px; color:#3F6B49;">400〜425万円</div></div>
+                  </div>
+                </div>
+                <div style="margin-top:14px; font-size:12.5px; line-height:1.95; color:#655C53;">算定表のどのマスにあたるか、という幅だけが伝わります。正確に入れていただくほど、目安が実情に近づきます。</div>
+              </div>
+            </div>
+            <div style="flex:none; padding:12px 20px 24px; display:flex; flex-direction:column; gap:10px;">
+              <div style="border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:15px; text-align:center; font-size:15.5px; color:#3F6B49;">次へ</div>
+              <div style="text-align:center; font-size:13.5px; color:#6F675E;">あとで入力する</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">第1弾の「ここに書いたことは、お相手には届きません」と同じ役割の一文を、入力欄の直下ではなく、実際の変換を見せる形で置きました。文だけでは信じにくい種類の約束だからです。<br>「あとで入力する」を必ず残します。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">F ／ 設定</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 18px;"><div style="font-size:22px; font-weight:500;">設定</div></div>
+            <div style="flex:1; padding:0 20px; display:flex; flex-direction:column; gap:11px; overflow:hidden;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:11.5px; color:#6F675E;">お相手の呼び方</div>
+                <div style="margin-top:8px; display:flex; align-items:center;"><span style="font-size:16px;">お相手</span><span style="margin-left:auto; font-size:13px; color:#3F6B49;">変更する</span></div>
+                <div style="margin-top:9px; font-size:12px; line-height:1.85; color:#655C53;">画面に出る呼び方を、ご自身が落ち着くものに変えられます。</div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:0 18px;">
+                <div style="padding:16px 0; border-bottom:1px solid #F1E9DC;">
+                  <div style="display:flex; align-items:center; font-size:14.5px;">通知に本文を出す<span style="margin-left:auto; width:44px; height:26px; border-radius:13px; background:#EFE3D0; display:flex; align-items:center; padding:0 3px;"><span style="width:20px; height:20px; border-radius:50%; background:#FFFCF5;"></span></span></div>
+                  <div style="margin-top:8px; font-size:12px; line-height:1.85; color:#655C53;">切ると、ロック画面には「お知らせがあります」とだけ表示されます。</div>
+                </div>
+                <div style="padding:14px 0; border-bottom:1px solid #F1E9DC; display:flex; align-items:center; font-size:14.5px;">通知の時間帯<span style="margin-left:auto; font-size:13px; color:#655C53;">9:00–21:00</span></div>
+                <div style="padding:14px 0; display:flex; align-items:center; font-size:14.5px;">制度のこと<span style="margin-left:auto; font-size:13px; color:#655C53;">▸</span></div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:0 18px;">
+                <div style="padding:14px 0; border-bottom:1px solid #F1E9DC; display:flex; align-items:center; font-size:14.5px;">相談できる公的な窓口<span style="margin-left:auto; font-size:13px; color:#655C53;">▸</span></div>
+                <div style="padding:14px 0; display:flex; align-items:center; font-size:14.5px;">アカウント<span style="margin-left:auto; font-size:13px; color:#655C53;">▸</span></div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:14.5px;">ご利用をやめたいとき</div>
+                <div style="margin-top:10px; font-size:12.5px; line-height:1.95; color:#655C53;">取り決めた内容は、法的な文書のもとになっている場合があります。そのため、お手続きの前に、何がどうなるかをご説明します。</div>
+                <div style="margin-top:14px; font-size:13.5px; color:#3F6B49;">やめたいと伝える ▸</div>
+              </div>
+            </div>
+            <div style="flex:none; height:78px; border-top:1px solid #F1E9DC; background:#FFFCF5; display:flex; padding-top:8px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">ホーム</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">相談</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">取り決め</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="3.5" y="5" width="15" height="13" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M3.5 9h15M7.5 3v4M14.5 3v4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">これから</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#8A6212" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#8A6212" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#8A6212;">設定</span></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">退会は「やめたいと伝える」という導線にしました。ボタンではなく相談の入口です。赤字にも、警告アイコンにもしていません。設定の最下部に置きますが、隠してもいません。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">E ／ ログイン</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:1; padding:0 24px; display:flex; flex-direction:column; justify-content:center; gap:26px;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:6px;">
+                <div style="box-sizing:border-box; width:76px; height:76px; border-radius:22px; background:#FFFCF5; border:1px solid #EFE3D0; overflow:hidden;"><img src="assets/capybara.png" alt="" width="76" height="76" style="width:76px; height:76px; object-fit:cover;"></div>
+                <div style="font-size:24px; letter-spacing:.3em; padding-left:.3em;">Aida</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="min-height:44px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:16px; padding:13px 15px; font-size:15px; color:#6F675E;">メールアドレス</div>
+                <div style="min-height:44px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:16px; padding:13px 15px; font-size:15px; color:#6F675E;">パスワード</div>
+              </div>
+              <div style="border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:15px; text-align:center; font-size:15.5px; color:#3F6B49;">はじめる</div>
+              <div style="display:flex; justify-content:center; gap:24px; font-size:13.5px; color:#6F675E;">
+                <span>はじめて使う</span><span>パスワードを忘れた</span>
+              </div>
+            </div>
+            <div style="flex:none; padding:0 24px 32px; font-size:11.5px; line-height:1.9; color:#6F675E; text-align:center;">この画面には、用途が分かる説明を出していません。</div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">起動画面（第1弾）とほぼ同じ見た目にし、そのまま入力欄が生えてくる形にしました。サービス説明も、キャッチコピーも、利用規約の長文も置きません。人に覗かれても、何のアプリか分からない状態を保ちます。</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

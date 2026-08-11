@@ -14,6 +14,16 @@
 
 set -euo pipefail
 
+# --- gcloud の場所を解決（.zshrc に依存しない） ---
+if ! command -v gcloud >/dev/null 2>&1; then
+  for _p in "$HOME/google-cloud-sdk/bin" \
+            /opt/homebrew/share/google-cloud-sdk/bin \
+            /usr/local/share/google-cloud-sdk/bin \
+            /opt/homebrew/bin /usr/local/bin; do
+    [ -x "$_p/gcloud" ] && { PATH="$_p:$PATH"; break; }
+  done
+fi
+
 PROJECT_ID="${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}"
 REGION="${REGION:-asia-northeast1}"
 

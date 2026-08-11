@@ -9,6 +9,16 @@
 
 set -uo pipefail
 
+# --- gcloud の場所を解決（.zshrc に依存しない） ---
+if ! command -v gcloud >/dev/null 2>&1; then
+  for _p in "$HOME/google-cloud-sdk/bin" \
+            /opt/homebrew/share/google-cloud-sdk/bin \
+            /usr/local/share/google-cloud-sdk/bin \
+            /opt/homebrew/bin /usr/local/bin; do
+    [ -x "$_p/gcloud" ] && { PATH="$_p:$PATH"; break; }
+  done
+fi
+
 ok()   { printf '  \033[32m✓\033[0m %s\n' "$1"; }
 ng()   { printf '  \033[31m✗\033[0m %s\n' "$1"; }
 warn() { printf '  \033[33m△\033[0m %s\n' "$1"; }

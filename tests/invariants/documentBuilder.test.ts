@@ -147,7 +147,36 @@ describe("値の書式", () => {
     expect(formatValue("payDay", "UNKNOWN_CODE")).toBeNull();
   });
 
-  it("定義の無いキーは文字列化する", () => {
-    expect(formatValue("frequency", "月1回")).toBe("月1回");
+  /**
+   * ★実機で欠陥を検出した。
+   *
+   *   面会交流は{{frequency}}とし、時間は{{timeRange}}、…
+   *     → 「面会交流はMONTHLY_1とし、時間は[object Object]、…」
+   *
+   * コード値がそのまま出て、オブジェクトが [object Object] になった。
+   * **空欄と同じくらい危険である。**これが公証役場に持ち込まれる。
+   *
+   * 原因は「定義の無いキーは文字列化する」としたこと。
+   * 文字列化してよいのは、**当事者が自由入力した値だけ**である。
+   */
+  it("★オブジェクトを文字列化しない", () => {
+    expect(formatValue("timeRange", { from: "10:00", to: "17:00" })).toBeNull();
+  });
+
+  it("★配列を文字列化しない", () => {
+    expect(formatValue("whatever", ["a", "b"])).toBeNull();
+  });
+
+  it("★コード値らしい文字列（英大文字とアンダースコア）は通さない", () => {
+    expect(formatValue("frequency", "MONTHLY_1")).toBeNull();
+    expect(formatValue("anything", "SOME_CODE")).toBeNull();
+  });
+
+  it("自由入力の文字列はそのまま使う", () => {
+    expect(formatValue("handoverPlace", "○○駅の改札前")).toBe("○○駅の改札前");
+  });
+
+  it("時間帯は定義された表記になる", () => {
+    expect(formatValue("timeRange", "10:00-17:00")).toBe("10時00分から17時00分まで");
   });
 });

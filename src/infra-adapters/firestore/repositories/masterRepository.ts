@@ -55,3 +55,13 @@ export async function findSupportTable(
   const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as SupportTableMaster);
   return rows.sort((a, b) => Number(b.verified) - Number(a.verified) || b.version - a.version)[0];
 }
+
+import type { ClauseTemplate } from "@/domain/document/builder";
+
+/** 条項ひな形。★order の順に返す */
+export async function listClauseTemplates(): Promise<ClauseTemplate[]> {
+  const snap = await getDb().collection("masters/clauseTemplates/items").get();
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as ClauseTemplate)
+    .sort((a, b) => a.order - b.order);
+}

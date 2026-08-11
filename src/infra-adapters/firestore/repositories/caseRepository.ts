@@ -299,3 +299,15 @@ export async function loadIncomeBands(caseId: CaseId): Promise<Record<string, st
   const snap = await caseRef(caseId).collection("parties").get();
   return Object.fromEntries(snap.docs.map((d) => [d.id, (d.get("incomeBand") ?? null) as string | null]));
 }
+
+/** 合意項目の一覧。★status と payload のみ */
+export async function listAgreementItems(
+  caseId: CaseId,
+): Promise<{ topic: string; status: string; payload: Record<string, unknown> | null }[]> {
+  const snap = await caseRef(caseId).collection("agreementItems").get();
+  return snap.docs.map((d) => ({
+    topic: (d.get("topic") ?? d.id) as string,
+    status: (d.get("status") ?? "PENDING") as string,
+    payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
+  }));
+}

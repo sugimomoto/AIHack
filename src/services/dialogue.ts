@@ -3,6 +3,8 @@ import { saveCallLog } from "@/infra-adapters/firestore/repositories/llmCallLogR
 import { INTENT_SCHEMA, normalizeIntents, type Intent } from "@/domain/dialogue/intent";
 import { INTENT_SYSTEM_PROMPT, RECEPTION_SYSTEM_PROMPT } from "@/domain/dialogue/prompts";
 import { sanitizeReception } from "@/domain/dialogue/vocabulary";
+import { detectInjection } from "@/domain/security/guard";
+import { redactPii } from "@/domain/security/guard";
 import { choicesFor } from "@/domain/dialogue/choices";
 import { ADJUSTMENT_QUESTION, needsEffectQuestion } from "@/domain/adjustment/flow";
 import { EFFECT_LABEL } from "@/domain/adjustment/effect";
@@ -33,6 +35,11 @@ export async function respondTo(input: {
   /** 分類後の話題に対応する取り決めを引く。★これがあるからこそ「今回だけ？」と問える */
   resolveAgreement?: (topic: string | null) => Promise<{ topic: string; summary: string } | null>;
 }): Promise<DialogueResult> {
+  // ★検知は記録であって拒否ではない。
+  //   そして止めなくても、コンテキストに無いものは出ない（二重の防御の外側）。
+  const hit = detectInjection(input.text);
+  if (hit) console.warn(`[security] インジェクションらしい入力を検知: ${hit.pattern}`);
+
   const { intents, topic } = await classify(input);
 
   const res = await callLlm({
@@ -48,7 +55,8 @@ export async function respondTo(input: {
 
   // ★プロンプトで指示するだけでは漏れる。生成後に言い換える。
   //   語彙の問題で応答を捨てると、当事者を待たせることになる。
-  const reply = sanitizeReception(res.content.trim());
+  // ★最後の網。ContextBuilder が渡していない以上、本来は何も引っかからない
+  const reply = redactPii(sanitizeReception(res.content.trim()));
 
   // ★C3：合意を参照しているからこそ立てられる問い
   const agreement = input.resolveAgreement ? await input.resolveAgreement(topic) : null;

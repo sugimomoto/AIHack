@@ -18,11 +18,14 @@ import {
 import { asCaseId, type PartyId } from "@/domain/case/types";
 import { assertOwnParty } from "@/domain/case/scope";
 import { applyAdjustment, parseEffect } from "@/domain/adjustment/flow";
+import { createHash } from "node:crypto";
 import {
   appendException,
   appendRevision,
   finalizeAgreement,
   loadAgreementItem,
+  loadMediationDraft,
+  saveMediationDraft,
   listProposalsByTopic,
   loadConsents,
   loadForLlm,
@@ -193,7 +196,17 @@ export async function loadAgreementView(input: {
     b: (consents[parties[1]] ?? "PENDING") as "PENDING" | "ACCEPTED" | "REJECTED",
   };
 
-  const draft = ready
+  // ★同じ提案の組み合わせなら作り直さない。
+  //   画面を開くたびに LARGE を呼んでおり、CT-1 が想定の4倍になっていた。
+  const draftKey = ready
+    ? `${input.topic}_${createHash("sha256").update(JSON.stringify(parties.map((id) => byParty.get(id)))).digest("hex").slice(0, 16)}`
+    : null;
+
+  const cached = draftKey ? await loadMediationDraft(caseId, draftKey) : null;
+
+  const draft = cached
+    ? (cached as unknown as MediationDraft)
+    : ready
     ? await buildMediationDraft({
         caseId: input.caseId,
         topic: input.topic,
@@ -207,6 +220,10 @@ export async function loadAgreementView(input: {
         })),
       })
     : null;
+
+  if (draftKey && draft && !cached) {
+    await saveMediationDraft(caseId, draftKey, draft as unknown as Record<string, unknown>);
+  }
 
   const payloads = parties.map((id) => byParty.get(id) ?? null);
 

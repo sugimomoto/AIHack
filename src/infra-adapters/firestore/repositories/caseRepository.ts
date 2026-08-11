@@ -429,3 +429,26 @@ export async function listCaseIds(): Promise<string[]> {
   const snap = await getDb().collection("cases").select().get();
   return snap.docs.map((d) => d.id);
 }
+
+/**
+ * 調停案のキャッシュ
+ *
+ * ★同じ提案の組み合わせに対して、毎回 LARGE を呼び直さない。
+ *   画面を開くたびに再生成しており、実測で CT-1 が想定の4倍になっていた。
+ *   説明文が毎回変わることも、当事者から見れば不安の材料になる。
+ */
+export async function loadMediationDraft(
+  caseId: CaseId,
+  key: string,
+): Promise<Record<string, unknown> | null> {
+  const d = await caseRef(caseId).collection("mediationDrafts").doc(key).get();
+  return d.exists ? (d.data() as Record<string, unknown>) : null;
+}
+
+export async function saveMediationDraft(
+  caseId: CaseId,
+  key: string,
+  draft: Record<string, unknown>,
+): Promise<void> {
+  await caseRef(caseId).collection("mediationDrafts").doc(key).set(draft);
+}

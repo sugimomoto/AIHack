@@ -87,6 +87,17 @@ describe("★招待メールの制約", () => {
     for (const w of SUBJECT_FORBIDDEN_WORDS) expect(subject).not.toContain(w);
   });
 
+  /**
+   * ★画面（A-2）は「離婚・養育費・調停といった語も使いません」と本文についても約束している。
+   *   画面の約束は、テストで担保されていなければ嘘になる。
+   */
+  it("★本文にも禁止語が含まれない", () => {
+    for (const w of SUBJECT_FORBIDDEN_WORDS) {
+      expect(mail().body).not.toContain(w);
+      expect(mail({ revealSenderName: true }).body).not.toContain(w);
+    }
+  });
+
   it("★当事者が自由文を差し込めない（引数に本文がない）", () => {
     expect(buildInvitationMail.length).toBe(1);
     const keys = Object.keys({ url: "", senderName: "", revealSenderName: false });

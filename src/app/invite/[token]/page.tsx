@@ -30,7 +30,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
 
   return (
     <PhoneFrame>
-      <InviteLanding view={view} />
+      <InviteLanding view={view} token={token} />
     </PhoneFrame>
   );
 }

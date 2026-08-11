@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import type { InvitationPublicView } from "@/domain/invitation/publicView";
 
@@ -22,8 +23,30 @@ const ASSURANCES = [
   "参加しない選択もできます。期限はありません。",
 ];
 
-export function InviteLanding({ view }: { view: InvitationPublicView }) {
+export function InviteLanding({ view, token }: { view: InvitationPublicView; token: string }) {
+  const [busy, setBusy] = useState(false);
+  const [declined, setDeclined] = useState(false);
+
   if (view.state !== "OPEN") return <Unavailable />;
+  if (declined) return <Declined />;
+
+  const respond = async (action: "ACCEPT" | "DECLINE") => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/invite/${token}/accept`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (!res.ok) return;
+      // ★受諾でセッションが発行される。以降は通常の画面へ
+      if (action === "ACCEPT") window.location.href = "/app";
+      else setDeclined(true);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col overflow-y-auto px-5 pb-6 pt-8">
@@ -68,6 +91,9 @@ export function InviteLanding({ view }: { view: InvitationPublicView }) {
       <div className="mt-6 flex flex-col gap-2.5">
         <button
           type="button"
+          disabled={busy}
+          onClick={() => void respond("ACCEPT")}
+          className="disabled:opacity-50"
           style={{
             background: "var(--agree-bg)",
             border: "1px solid var(--agree)",
@@ -82,6 +108,9 @@ export function InviteLanding({ view }: { view: InvitationPublicView }) {
         </button>
         <button
           type="button"
+          disabled={busy}
+          onClick={() => void respond("DECLINE")}
+          className="disabled:opacity-50"
           style={{
             border: "1px solid var(--border-strong)",
             borderRadius: "var(--r-full)",
@@ -113,6 +142,19 @@ function Unavailable() {
         このリンクは、現在ご利用いただけません。
         <br />
         お心当たりのある方にご確認ください。
+      </p>
+    </div>
+  );
+}
+
+/** ★辞退したことは相手に伝わらない。そのことを本人に伝える */
+function Declined() {
+  return (
+    <div className="grid h-full place-items-center px-8 text-center">
+      <p style={{ fontSize: 14, lineHeight: 1.95, color: "var(--text-sub)" }}>
+        承知しました。
+        <br />
+        このことが、お相手に伝わることはありません。
       </p>
     </div>
   );

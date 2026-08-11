@@ -44,6 +44,9 @@ infra/terraform/*.tfvars
 infra/terraform/*.tfplan
 crash.log
 
+# === Vercel ===
+.vercel
+
 # === OS / エディタ ===
 .DS_Store
 Thumbs.db

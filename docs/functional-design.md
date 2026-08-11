@@ -136,6 +136,10 @@ graph LR
 
 ```mermaid
 graph LR
+    Z0["⓪ 登録・招待"] --> Z1{"相手は<br/>参加したか"}
+    Z1 -->|"まだ"| Z2["準備モード<br/>一人で下書きを作る"]
+    Z2 --> Z1
+    Z1 -->|"参加した"| A
     A["① 合意形成<br/>L1・協議離婚の段階"] --> B["② 文書化<br/>公正証書原案"]
     B --> C["③ 運用"]
     subgraph Ope["③ 運用（継続的・大半の利用時間）"]
@@ -268,6 +272,9 @@ erDiagram
     PayloadSchema ||--o{ AgreementItem : "定義"
     PayloadSchema ||--o{ ClauseTemplate : "定義"
     PayloadSchema ||--o{ Adjustment : "定義"
+    Case ||--o{ Invitation : ""
+    Party ||--o{ SafetyEvent : "検知対象"
+    SafetyEvent }o--o{ SupportResource : "提示"
     Case ||--o{ Party : "2名"
     Case ||--o{ Child : ""
     Case ||--|| Agreement : ""
@@ -320,15 +327,52 @@ erDiagram
     }
     Party {
         string id PK
+        string authUid "Firebase Authentication"
         enum role "CUSTODIAL|NON_CUSTODIAL"
         string displayNameForOther "相手が付けた表示名"
-        int annualIncome "算定表参照用"
+        string incomeBand "★算定表の帯。これだけが越える"
+        enum state "PREPARING|ACTIVE|WITHDRAWN"
     }
     ContactInfo {
-        string partyId FK
+        string partyId FK "★SELF_ONLY。ケース配下に置かない"
         string address "非開示"
         string phone "非開示"
         string employer "非開示"
+        int annualIncome "★非開示。精密な額は越えない"
+    }
+    Invitation {
+        string id PK
+        string caseId FK
+        string createdByPartyId FK
+        string token "招待リンク"
+        enum method "LINK|EMAIL"
+        boolean revealSenderName "送信者名を出すか"
+        enum status "PENDING|ACCEPTED|DECLINED|EXPIRED"
+        datetime expiresAt
+    }
+    KnowledgeArticle {
+        string id PK
+        string category
+        string slug
+        string title
+        text body
+        string reviewedBy "監修者"
+        datetime updatedAt
+    }
+    SafetyEvent {
+        string id PK
+        string partyId FK "検知対象の本人"
+        enum kind "HARMFUL|VICTIM_REPORT|CHILD_RISK"
+        string messageId FK
+        enum action "BLOCKED_RELAY|RESOURCES_SHOWN|NONE"
+        datetime detectedAt
+    }
+    SupportResource {
+        string id PK
+        string name "DV相談ナビ 等"
+        string url
+        string phone
+        enum scope "DV|CHILD|LEGAL"
     }
     Child {
         string id PK
@@ -593,7 +637,8 @@ P1 を「守るつもり」ではなく「破れない」ものにするため�
 | # | 不変条件 |
 | --- | --- |
 | **INV-1** | `Message.content` は、`partyId` が一致するセッション以外のLLMコンテキストに**決して含まれない** |
-| **INV-2** | `ContactInfo` の各フィールドは、**いかなるLLMコンテキストにも含まれない** |
+| **INV-2** | `ContactInfo` の各フィールド（住所・電話・勤務先・**年収**）は、**いかなるLLMコンテキストにも含まれない** |
+| **INV-2a** | **精密な年収は、いかなる経路でも他方に越えない。**越えてよいのは `Party.incomeBand`（算定表の帯）のみ（→ Z-5） |
 | **INV-3** | 当事者間を越えられるのは次の5つのみ（→ §5.1a）<br/>`AgreementItem.payload` / `Proposal.payload` / **`Proposal.context`** / `MediationEvent.content` / `Notification.content` |
 
 #### INV-4｜越境テキストへの原文混入の防止
@@ -902,6 +947,141 @@ function assessEnforceability(item: AgreementItem, childCount: number) {
 
 ---
 
+## 5.7 招待とケースの成立（F15）
+
+### 状態遷移
+
+```mermaid
+stateDiagram-v2
+    [*] --> SOLO : 一方が登録
+    SOLO --> INVITED : 招待を発行
+    INVITED --> ACTIVE : 相手が受諾
+    INVITED --> DECLINED : 相手が辞退
+    INVITED --> EXPIRED : 期限切れ
+    SOLO --> SOLO : 準備モードで下書きを作る
+    INVITED --> INVITED : 準備モードを継続
+    DECLINED --> SOLO
+    EXPIRED --> SOLO
+```
+
+**`ACTIVE` になるまで、相手側のデータは一切存在しない。**したがって C1 の不変条件は招待前から自明に成立する。
+
+### 招待の渡し方
+
+| 方式 | アプリの動作 |
+| --- | --- |
+| `LINK` | **招待URLを発行するだけ。アプリは相手に接触しない** |
+| `EMAIL` | アプリが送信する（下記の制約つき） |
+
+#### メール送信時の制約
+
+| # | 制約 | 実装 |
+| --- | --- | --- |
+| 1 | **当事者は自由文を書けない** | 本文テンプレートを固定。差し込みは宛先と送信者名の有無のみ |
+| 2 | 件名・本文から内容が推測されない | 件名に「離婚」「養育費」「調停」を含めない |
+| 3 | 送信者名の露出を選べる | `Invitation.revealSenderName` |
+| 4 | **催促の再送をしない** | 再送APIを作らない（U-5） |
+
+> **この経路では罵倒や脅迫を送れない。**結果として通常のメールより安全な連絡手段になる。
+
+### 準備モード（F16）
+
+**相手の参加前でも一人で使える。**新しいエンティティは作らず、既存の `Proposal` を下書き状態で保持する。
+
+```
+Proposal.status = DRAFT     ← 相手がいないあいだ
+        ↓ 相手が参加
+Proposal.status = PENDING   ← 提案として提示される
+```
+
+| 設計判断 | 理由 |
+| --- | --- |
+| 専用エンティティを作らない | 参加後にそのまま提案になるため。変換処理が不要 |
+| 対話は通常どおり行える | AIとの壁打ちに相手の存在は不要 |
+| **取次ぎ（MediationEvent）は生成しない** | 宛先が存在しない |
+
+---
+
+## 5.8 年収の扱い（F17 / FR-16a）
+
+**精密な年収は `ContactInfo`（SELF_ONLY）に置き、越えるのは帯だけ。**
+
+```
+ContactInfo.annualIncome: 4,380,000   ← ケース配下に置かない。越えない
+          ↓ toIncomeBand()
+Party.incomeBand: "400-425"           ← 算定表のセルが特定できる粒度。越える
+```
+
+| 規約 |
+| --- |
+| `ContextBuilder` は `ContactInfo` を参照しない（INV-2） |
+| 算定表の参照には `incomeBand` を使う |
+| **AIは年収の真偽を検証しない。**「お相手の申告によれば」と伝聞形式で扱う |
+| 虚偽が疑われる場合は FR-11（調停・専門家への導線）を提示する |
+
+---
+
+## 5.9 安全の確保（F19 / FR-18）
+
+### 検知と処理
+
+**誰が危険なのかで処理が変わる。**
+
+```mermaid
+graph TD
+    M["メッセージ"] --> C["意図分類・危険検知【SMALL】"]
+    C --> K{"種別"}
+    K -->|"個人情報の照会"| R1["拒否する"]
+    K -->|"加害的表現"| R2["相手に越えない<br/>原文は保全<br/>★説教しない"]
+    K -->|"被害の訴え"| R3["★公的な相談窓口を<br/>静かに提示する"]
+    K -->|"子への危害の示唆"| R4["⚠️ 未確定<br/>弁護士に確認中"]
+    R2 --> S["SafetyEvent に記録"]
+    R3 --> S
+```
+
+| 種別 | 処理 | 記録 |
+| --- | --- | --- |
+| `INFO_QUERY` | 拒否（NFR-01 S-1） | — |
+| `HARMFUL` | **相手に越えないことを保証。**原文は保全（FR-10） | `SafetyEvent` |
+| `VICTIM_REPORT` | **`SupportResource` から公的窓口を提示** | `SafetyEvent` |
+| `CHILD_RISK` | **未確定**（→ product-requirements.md U-08） | `SafetyEvent` |
+
+### ★ AIは説教しない
+
+| ❌ 実装してはならない | 理由 |
+| --- | --- |
+| 「そのような表現は不適切です」と返す | **C1の「何を書いてもいい」という約束が壊れる** |
+| 大きな警告を出す | 監視されている感覚を生む |
+| 「あなたは危険な状態です」と判定する | AIが判定してよい事柄ではない |
+
+**受け止めたうえで、届けない。**それだけでよい。
+
+窓口の提示は**押しつけない**。無視しても責められた感じがしないこと。案内先を公的窓口に限ることで、情報提供に留まり非弁にならない。
+
+---
+
+## 5.10 ナレッジ（F18 / FR-17）
+
+### 位置づけ：非弁対策の構造
+
+```
+【個別の助言】AIが「あなたはこうすべき」と言う   → NFR-03 L-2 により不可
+        ↓ 画面として分離する
+【一般的な情報】KnowledgeArticle で制度を説明     → 可
+【個別の対話】AIは「一般的な説明はこちら」と誘導  → 可
+```
+
+**AIが説明を抱え込まずに済む。**
+
+| 要件 |
+| --- |
+| 対話から記事へ、記事から相談へ、**双方向の導線** |
+| 「これは一般的な説明であり、個別の助言ではありません」の明示 |
+| **監修者の表示**（`KnowledgeArticle.reviewedBy`） |
+| 記事はマスタとして運営が管理する（シナリオと同じ運用） |
+
+---
+
 ## 6. 画面設計
 
 ### 6.1 画面一覧
@@ -1136,6 +1316,27 @@ graph TD
 | `recordFulfillment` | `obligationId`, `status` | `Fulfillment` |
 | `listDeviations` | `caseId` | `Deviation[]`（`legalAssessment` を含む） |
 
+### 7.4a 招待・オンボーディング（F14〜F17）
+
+| 操作 | 入力 | 出力 |
+| --- | --- | --- |
+| `createInvitation` | `caseId`, `method`, `recipientEmail?`, `revealSenderName` | `Invitation`（`LINK` なら招待URL） |
+| `previewInvitationMail` | `invitationId` | **送信前に相手へ届く文面をそのまま返す** |
+| `sendInvitationMail` | `invitationId` | — （**再送APIは作らない**） |
+| `getInvitationPublic` | `token` | 招待の概要（**送信者名は `revealSenderName` に従う**） |
+| `acceptInvitation` / `declineInvitation` | `token`, `authUid` | `Case`（`ACTIVE` へ遷移） |
+| `savePrivateProfile` | `partyId`, `annualIncome` ほか | — （**`annualIncome` は返さない**） |
+| `getIncomeBand` | `partyId` | `incomeBand` のみ |
+
+### 7.4b ナレッジ・安全・退会（F18〜F20）
+
+| 操作 | 入力 | 出力 |
+| --- | --- | --- |
+| `listKnowledge` | `category?` | `KnowledgeArticle[]`（本文を除く） |
+| `getKnowledge` | `slug` | `KnowledgeArticle` |
+| `listSupportResources` | `scope` | `SupportResource[]` |
+| `requestWithdrawal` | `partyId`, `reason?` | 手続きの説明と次の手順（**即時削除はしない**） |
+
 ### 7.5 設定
 
 | 操作 | 入力 | 出力 |
@@ -1150,7 +1351,9 @@ graph TD
 | **A-1** | **すべての読み取りAPIは呼び出し元の `partyId` でスコープされる。**他者のIDを指定しても他者のデータは返らない |
 | **A-2** | `Message` を返すAPIは、**呼び出し元自身のものしか返さない**（INV-1） |
 | **A-3** | `ContactInfo` を返すAPIは**本人にしか存在しない** |
-| **A-4** | 当事者間を越えるレスポンスは `AgreementItem.payload` / `Proposal.payload` / `MediationEvent.content` に限る（INV-3） |
+| **A-4** | 当事者間を越えるレスポンスは `AgreementItem.payload` / `Proposal.payload` / `Proposal.context` / `MediationEvent.content` / `Notification.content` に限る（INV-3） |
+| **A-5** | **`annualIncome` を返すAPIは本人にしか存在しない。**他者向けには `incomeBand` のみ（INV-2a） |
+| **A-6** | 招待の公開API（`getInvitationPublic`）は**未認証で呼ばれる**。返す情報を最小化し、`revealSenderName` を必ず尊重する |
 
 ---
 
@@ -1160,6 +1363,9 @@ graph TD
 | --- | --- | --- |
 | D-01 | 養育費算定表のデータ化範囲と出典表記 | §5.4 |
 | D-02 | 条項ひな形の文面、および **payload スキーマの enum 値が実務に合っているか**（`until` の選択肢、`payDay` の指定方法、特別費用の分担方法など）。**弁護士の確認が必須** | §4.9 / §5.5 |
-| D-03 | 招待・本人確認のフロー（eKYCの要否） | §6.2 |
+| D-03 | 本人確認の方式（招待コードのみか eKYC を要するか） | §5.7 |
+| **D-06** | **退会時のデータ削除範囲**（合意は法的文書の基礎であり単純削除できない可能性）。弁護士に確認中 | §7.4b |
+| **D-07** | **子への危害が示唆された場合の処理**。弁護士に確認中 | §5.9 |
+| **D-08** | ナレッジのタブ配置（5タブが埋まっているため） | §6.1 |
 | D-04 | 通知基盤（Web Push / ネイティブ通知） | §6.1 設定 |
 | D-05 | AIキャラクターの表現（対話画面での配置・表情の有無） | §6.3 |

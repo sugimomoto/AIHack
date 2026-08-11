@@ -66,28 +66,28 @@ describe("★先取特権の範囲判定", () => {
   const table = { perChildYen: 80000, verified: false, sourceNote: "未検証" };
 
   it("範囲内なら超過が0", () => {
-    const r = assessEnforceability({ monthlyAmountYen: 60000, childCount: 1 }, table);
+    const r = assessEnforceability({ monthlyAmountYen: 60000, childCount: 1 }, table)!;
     expect(r.withinPriorityClaim).toBe(true);
     expect(r.excessYen).toBe(0);
   });
 
   it("★上限は子の人数に比例する", () => {
-    expect(assessEnforceability({ monthlyAmountYen: 150000, childCount: 2 }, table).withinPriorityClaim).toBe(true);
-    expect(assessEnforceability({ monthlyAmountYen: 150000, childCount: 1 }, table).withinPriorityClaim).toBe(false);
+    expect(assessEnforceability({ monthlyAmountYen: 150000, childCount: 2 }, table)!.withinPriorityClaim).toBe(true);
+    expect(assessEnforceability({ monthlyAmountYen: 150000, childCount: 1 }, table)!.withinPriorityClaim).toBe(false);
   });
 
   it("超過分が算出される", () => {
-    const r = assessEnforceability({ monthlyAmountYen: 100000, childCount: 1 }, table);
+    const r = assessEnforceability({ monthlyAmountYen: 100000, childCount: 1 }, table)!;
     expect(r.excessYen).toBe(20000);
   });
 
   it("★未検証の閾値では注記が必ず付く（算定表と同じ扱い）", () => {
-    const r = assessEnforceability({ monthlyAmountYen: 60000, childCount: 1 }, table);
+    const r = assessEnforceability({ monthlyAmountYen: 60000, childCount: 1 }, table)!;
     expect(r.caveat).toBe(PRIORITY_CLAIM_CAVEAT);
   });
 
   it("検証済みなら注記が付かない", () => {
-    const r = assessEnforceability({ monthlyAmountYen: 60000, childCount: 1 }, { ...table, verified: true });
+    const r = assessEnforceability({ monthlyAmountYen: 60000, childCount: 1 }, { ...table, verified: true })!;
     expect(r.caveat).toBeUndefined();
   });
 

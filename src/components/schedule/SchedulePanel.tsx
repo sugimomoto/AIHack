@@ -22,6 +22,8 @@ type View = {
     canReport: "PAID" | "RECEIVED" | null;
   }[];
   reminders: { dueDate: string; amountYen: number }[];
+  deviations: { key: string; dueDate: string; amountYen: number; daysPast: number }[];
+  enforceability: { explanation: string; caveat?: string } | null;
 };
 
 const md = (d: string) => `${Number(d.slice(5, 7))}月${Number(d.slice(8, 10))}日`;
@@ -97,6 +99,36 @@ export function SchedulePanel({
           {md(r.dueDate)}に {r.amountYen.toLocaleString()}円のお支払いの予定があります。
         </p>
       ))}
+
+      {/* ★「支払われていません」ではない。行き違いの可能性を先に置く */}
+      {v.deviations.length > 0 && (
+        <div
+          style={{
+            background: "var(--attention-bg)",
+            border: "1px solid var(--attention)",
+            borderRadius: "var(--r-sm)",
+            padding: "9px 11px",
+            marginBottom: 8,
+          }}
+        >
+          <p style={{ fontSize: 12, lineHeight: 1.85, color: "var(--attention-text)" }}>
+            {md(v.deviations[0].dueDate)}分の お支払いの記録が確認できていません。
+            <br />
+            行き違いの可能性もあります。まずは記録をご確認ください。
+          </p>
+          {v.enforceability && (
+            <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub-2)", marginTop: 7 }}>
+              {v.enforceability.explanation}
+              {v.enforceability.caveat && (
+                <>
+                  <br />
+                  <span style={{ color: "var(--muted)" }}>{v.enforceability.caveat}</span>
+                </>
+              )}
+            </p>
+          )}
+        </div>
+      )}
 
       {v.rows.slice(0, 4).map((r) => (
         <div

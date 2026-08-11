@@ -361,3 +361,9 @@ export async function createCase(seed: {
   }
   await batch.commit();
 }
+
+/** 全ケースのID。★日次ジョブ用 */
+export async function listCaseIds(): Promise<string[]> {
+  const snap = await getDb().collection("cases").select().get();
+  return snap.docs.map((d) => d.id);
+}

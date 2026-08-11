@@ -7,12 +7,34 @@ import {
   type FulfillmentState,
 } from "@/domain/obligation/schedule";
 import { remindersFor } from "@/domain/obligation/reminder";
+import { assessEnforceability, detectDeviations } from "@/domain/obligation/deviation";
 import {
   listAgreementItems,
   loadForLlm,
   loadFulfillments,
   reportFulfillment,
 } from "@/infra-adapters/firestore/repositories/caseRepository";
+
+/**
+ * ★先取特権の基準額。R-19 として未検証。
+ *   検証が済むまで、判定の出力に注記が付く（→ assessEnforceability）。
+ */
+/** さかのぼる月数。逸脱の検知に必要 */
+const PAST_MONTHS = 6;
+const FUTURE_MONTHS = 6;
+
+/** YYYY-MM-DD から n ヶ月前の月初 */
+function monthsBefore(date: string, n: number): string {
+  const [y, m] = date.split("-").map(Number);
+  const total = y * 12 + (m - 1) - n;
+  return `${Math.floor(total / 12)}-${String((total % 12) + 1).padStart(2, "0")}-01`;
+}
+
+const PRIORITY_CLAIM_TABLE = {
+  perChildYen: 80_000,
+  verified: false,
+  sourceNote: "★未検証。弁護士へのヒアリングに基づく暫定値であり、一次資料での確認が必要（R-19）。",
+};
 
 /**
  * 予定と履行
@@ -43,10 +65,21 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
   const items = await listAgreementItems(caseId);
   const fulfillments = await loadFulfillments(caseId);
 
-  const from = `${input.today.slice(0, 7)}-01`;
-  const obligations = generateObligations({ items, from, months: 6, obligorPartyId: obligor });
+  // ★過去にさかのぼって生成する。
+  //   当月以降しか作らないと、期日を過ぎた分が存在せず、
+  //   **逸脱を永遠に検知できない**（実機で発覚した）。
+  const from = monthsBefore(input.today, PAST_MONTHS);
+  const obligations = generateObligations({
+    items,
+    from,
+    months: PAST_MONTHS + FUTURE_MONTHS,
+    obligorPartyId: obligor,
+  });
 
-  const rows: ScheduleRow[] = obligations.map((o) => {
+  const rows: ScheduleRow[] = obligations
+    // ★画面には、これから来る分と、直近で記録の無い分だけを出す
+    .filter((o) => o.dueDate >= monthsBefore(input.today, 1))
+    .map((o) => {
     const key = `${o.topic}_${o.dueDate}`;
     const f = fulfillments[key] ?? {};
     const state = fulfillmentStateOf({
@@ -65,6 +98,17 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
     };
   });
 
+  const keyed = obligations.map((o) => ({ ...o, key: `${o.topic}_${o.dueDate}` }));
+  const deviations = detectDeviations(keyed, fulfillments, { today: input.today });
+
+  // ★先取特権の判定。閾値が未検証のあいだは注記が付く
+  const monthly = obligations[0]?.amountYen ?? 0;
+  const childCount = snap.children.length;
+  const enforceability =
+    deviations.length > 0 && monthly > 0
+      ? assessEnforceability({ monthlyAmountYen: monthly, childCount }, PRIORITY_CLAIM_TABLE)
+      : null;
+
   return {
     rows,
     // ★自分の義務のぶんだけ。相手には出さない
@@ -72,6 +116,9 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
       dueDate: o.dueDate,
       amountYen: o.amountYen,
     })),
+    // ★逸脱は双方に見える。片方だけが知る状態にしない
+    deviations,
+    enforceability,
   };
 }
 

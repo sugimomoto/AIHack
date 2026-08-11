@@ -13,13 +13,15 @@ type View = {
   ready: boolean;
   proposals: { isOwn: boolean; payload: Record<string, unknown> | null }[];
   draft: { rangeText: string | null; explanation: string; unverified: boolean } | null;
-  state: "WAITING_BOTH" | "WAITING_OTHER" | "AGREED" | "REJECTED";
+  converged: boolean;
+  state: "WAITING_BOTH" | "WAITING_OTHER" | "NEEDS_CONVERGENCE" | "AGREED" | "REJECTED";
   ownConsent: "PENDING" | "ACCEPTED" | "REJECTED";
 };
 
 const STATE_LABEL: Record<View["state"], string> = {
   WAITING_BOTH: "おふたりのご意向を待っています",
   WAITING_OTHER: "お相手のご意向を待っています",
+  NEEDS_CONVERGENCE: "内容がまだ揃っていません",
   AGREED: "合意しました",
   REJECTED: "見直しが必要です",
 };
@@ -127,7 +129,16 @@ export function AgreementPanel({
         </div>
       )}
 
-      {v.ready && v.state !== "AGREED" && (
+      {/* ★提案が一致していないときは承諾させない。
+             何に承諾したのかが定まらないまま合意にすると、
+             誰も合意していない内容が確定する。 */}
+      {v.ready && !v.converged && (
+        <p style={{ fontSize: 12, lineHeight: 1.85, color: "var(--attention-text)", marginTop: 8 }}>
+          おふたりのご提案の内容が異なっています。同じ内容になったときに、お進みいただけます。
+        </p>
+      )}
+
+      {v.ready && v.converged && v.state !== "AGREED" && (
         <div className="mt-2.5 flex gap-2">
           <button
             type="button"

@@ -3,7 +3,12 @@ import { saveCallLog } from "@/infra-adapters/firestore/repositories/llmCallLogR
 import { findSupportTable } from "@/infra-adapters/firestore/repositories/masterRepository";
 import { lookupChildSupport, formatRange, type SupportRange } from "@/domain/support/table";
 import { MEDIATION_SYSTEM_PROMPT, buildMediationInput } from "@/domain/support/mediation";
-import { canFinalize, consentStateOf, type Consents } from "@/domain/agreement/consent";
+import {
+  canFinalizeAgreement,
+  consentStateOf,
+  payloadsAgree,
+  type Consents,
+} from "@/domain/agreement/consent";
 
 import { asCaseId, type PartyId } from "@/domain/case/types";
 import { assertOwnParty } from "@/domain/case/scope";
@@ -111,8 +116,14 @@ export type AgreementView = {
   canFinalize: boolean;
 };
 
-export function viewOfConsents(c: Consents): AgreementView {
-  return { state: consentStateOf(c), canFinalize: canFinalize(c) };
+export function viewOfConsents(
+  c: Consents,
+  payloads?: (Record<string, unknown> | null)[],
+): AgreementView {
+  return {
+    state: consentStateOf(c, payloads),
+    canFinalize: payloads ? canFinalizeAgreement(c, payloads) : false,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -166,6 +177,8 @@ export async function loadAgreementView(input: {
       })
     : null;
 
+  const payloads = parties.map((id) => byParty.get(id) ?? null);
+
   return {
     topic: input.topic,
     ready,
@@ -174,7 +187,9 @@ export async function loadAgreementView(input: {
       payload: byParty.get(id) ?? null,
     })),
     draft,
-    ...viewOfConsents(c),
+    // ★提案が一致しているかも状態に含める
+    converged: payloadsAgree(payloads),
+    ...viewOfConsents(c, payloads),
     ownConsent: consents[input.partyId] ?? "PENDING",
   };
 }
@@ -211,13 +226,18 @@ export async function recordConsent(input: {
     b: (consents[parties[1]] ?? "PENDING") as Consents["b"],
   };
 
-  if (canFinalize(c)) {
-    const proposals = await listProposalsByTopic(caseId, input.topic);
+  // ★提案が一致していなければ確定しない。
+  //   合成すると、誰も合意していない内容が確定する。
+  const proposals = await listProposalsByTopic(caseId, input.topic);
+  const byParty = new Map<string, Record<string, unknown>>();
+  for (const p of proposals) if (p.payload) byParty.set(p.byPartyId, p.payload);
+  const payloads = parties.map((id) => byParty.get(id) ?? null);
+
+  if (canFinalizeAgreement(c, payloads)) {
     const master = await findPublishedPayloadSchema(input.topic);
-    // ★合意した内容と、その版のスキーマIDを残す
-    const merged = proposals.reduce<Record<string, unknown>>((acc, p) => ({ ...acc, ...(p.payload ?? {}) }), {});
-    await finalizeAgreement(caseId, input.topic, merged, master?.id ?? "unknown");
+    // ★一致しているので、どれを取っても同じ
+    await finalizeAgreement(caseId, input.topic, payloads[0]!, master?.id ?? "unknown");
   }
 
-  return viewOfConsents(c);
+  return viewOfConsents(c, payloads);
 }

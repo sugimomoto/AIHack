@@ -341,3 +341,23 @@ export async function loadFulfillments(
   const snap = await caseRef(caseId).collection("fulfillments").get();
   return Object.fromEntries(snap.docs.map((d) => [d.id, d.data() as { paidBy?: string; receivedBy?: string }]));
 }
+
+/** ケースを作る。★冪等ではない。呼ぶたびに新しいケースになる */
+export async function createCase(seed: {
+  case: { id: string; status: string };
+  parties: { id: string; role: string; state: string; displayNameForOther: string; incomeBand: string | null }[];
+}): Promise<void> {
+  const db = getDb();
+  const root = db.collection("cases").doc(seed.case.id);
+  const batch = db.batch();
+  batch.set(root, { status: seed.case.status, createdAt: new Date().toISOString() });
+  for (const p of seed.parties) {
+    batch.set(root.collection("parties").doc(p.id), {
+      role: p.role,
+      state: p.state,
+      displayNameForOther: p.displayNameForOther,
+      incomeBand: p.incomeBand,
+    });
+  }
+  await batch.commit();
+}

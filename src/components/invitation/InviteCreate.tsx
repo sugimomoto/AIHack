@@ -25,7 +25,34 @@ const CARD: React.CSSProperties = {
   padding: 18,
 };
 
-export function InviteCreate({ senderName, url }: { senderName: string; url: string }) {
+export function InviteCreate({ senderName: initialName }: { senderName?: string }) {
+  const [senderName, setSenderName] = useState(initialName ?? "");
+  const [url, setUrl] = useState<string | null>(null);
+  const [issuing, setIssuing] = useState(false);
+
+  /**
+   * ★リンクは発行して初めて存在する。
+   *   画面を開いただけでは招待を作らない。
+   *   作った時点で、相手に渡りうるものが生まれる。
+   */
+  const issue = async (method: "LINK" | "EMAIL", recipientEmail?: string) => {
+    if (issuing) return null;
+    setIssuing(true);
+    try {
+      const res = await fetch("/api/invitations", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ method, recipientEmail, revealSenderName: reveal, senderName }),
+      });
+      if (!res.ok) return null;
+      const d = (await res.json()) as { url: string };
+      setUrl(d.url);
+      return d.url;
+    } finally {
+      setIssuing(false);
+    }
+  };
+
   const [email, setEmail] = useState("");
   const [preview, setPreview] = useState(false);
   const [reveal, setReveal] = useState(true); // 既定 ON
@@ -34,8 +61,8 @@ export function InviteCreate({ senderName, url }: { senderName: string; url: str
   if (preview) {
     return (
       <MailPreview
-        senderName={senderName}
-        url={url}
+        senderName={senderName || "ご関係の方"}
+        url={url ?? ""}
         reveal={reveal}
         onReveal={setReveal}
         onBack={() => setPreview(false)}
@@ -67,6 +94,21 @@ export function InviteCreate({ senderName, url }: { senderName: string; url: str
           </div>
         </div>
 
+        {/* ★名乗りは任意。実名でなくてよい */}
+        <div className="mt-4" style={CARD}>
+          <h2 style={{ fontSize: 15, fontWeight: 600 }}>お相手に伝えるお名前</h2>
+          <p style={{ fontSize: 13, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 6 }}>
+            実名でなくても構いません。空欄なら「ご関係の方」となります。
+          </p>
+          <input
+            value={senderName}
+            onChange={(e) => setSenderName(e.target.value)}
+            placeholder="例：太郎"
+            className="mt-3 w-full"
+            style={{ background: "var(--surface-2)", borderRadius: "var(--r-md)", padding: "12px 14px", minHeight: 44, fontSize: 14 }}
+          />
+        </div>
+
         {/* ★2枚は同じ寸法・同じ枠線。主従を作らない */}
         <div className="mt-4 flex flex-col gap-3">
           <section style={CARD}>
@@ -79,17 +121,20 @@ export function InviteCreate({ senderName, url }: { senderName: string; url: str
               style={{ background: "var(--surface-2)", borderRadius: "var(--r-md)", padding: "12px 14px" }}
             >
               <span className="min-w-0 flex-1 truncate" style={{ fontSize: 12.5, color: "var(--text-sub-2)" }}>
-                {url}
+                {url ?? "まだ発行していません"}
               </span>
               <button
                 type="button"
-                onClick={() => {
-                  void navigator.clipboard?.writeText(url);
+                disabled={issuing}
+                onClick={async () => {
+                  const u = url ?? (await issue("LINK"));
+                  if (!u) return;
+                  void navigator.clipboard?.writeText(u);
                   setCopied(true);
                 }}
                 style={{ fontSize: 13, color: "var(--agree-text)", fontWeight: 600 }}
               >
-                {copied ? "コピー済み" : "コピー"}
+                {copied ? "コピー済み" : url ? "コピー" : "リンクを作る"}
               </button>
             </div>
           </section>
@@ -115,7 +160,10 @@ export function InviteCreate({ senderName, url }: { senderName: string; url: str
             />
             <button
               type="button"
-              onClick={() => setPreview(true)}
+              onClick={async () => {
+                if (!url) await issue("EMAIL", email || undefined);
+                setPreview(true);
+              }}
               className="mt-3"
               style={{ fontSize: 13, color: "var(--agree-text)", fontWeight: 600 }}
             >
@@ -140,9 +188,16 @@ export function InviteCreate({ senderName, url }: { senderName: string; url: str
         </div>
 
         <div className="mt-5 text-center">
-          <button type="button" style={{ fontSize: 13.5, color: "var(--text-sub)" }}>
+          <button
+            type="button"
+            onClick={() => (window.location.href = "/app")}
+            style={{ fontSize: 13.5, color: "var(--text-sub)" }}
+          >
             あとにする
           </button>
+          <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 6 }}>
+            お相手を待つあいだも、ひとりで進められます。
+          </p>
         </div>
       </div>
     </div>
@@ -240,9 +295,11 @@ function MailPreview({
           </span>
         </label>
 
+        {/* ★送信基盤は未接続（C-02）。作れていない機能を、動くように見せない */}
         <button
           type="button"
-          className="mt-3 w-full"
+          disabled
+          className="mt-3 w-full disabled:opacity-45"
           style={{
             background: "var(--agree-bg)",
             border: "1px solid var(--agree)",
@@ -255,6 +312,9 @@ function MailPreview({
         >
           この内容で送る
         </button>
+        <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub-2)", marginTop: 6, textAlign: "center" }}>
+          メールの送信はまだご利用いただけません。上のリンクをご自身でお渡しください。
+        </p>
         <button type="button" onClick={onBack} className="mt-2 w-full" style={{ fontSize: 13.5, color: "var(--text-sub)", minHeight: 40 }}>
           戻る
         </button>

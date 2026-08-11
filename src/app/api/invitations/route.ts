@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { authenticate, UnauthenticatedError } from "@/lib/auth";
+import { resolveParty } from "@/lib/resolveParty";
+import { UnauthenticatedError } from "@/lib/auth";
+import { loadForLlm } from "@/infra-adapters/firestore/repositories/caseRepository";
+import { assertOwnParty, ScopeViolationError } from "@/domain/case/scope";
+import { asCaseId, type PartyId } from "@/domain/case/types";
 import { buildInvitationMail } from "@/domain/invitation/mail";
 import { expiresAt, generateInvitationToken } from "@/domain/invitation/token";
 import type { InvitationMethod, InvitationRecord } from "@/domain/invitation/types";
@@ -17,11 +21,22 @@ import { saveInvitation } from "@/infra-adapters/firestore/repositories/invitati
  */
 
 export async function POST(req: Request) {
-  let party;
+  let partyId: PartyId;
+  let caseId: string;
+  let senderName: string;
   try {
-    party = await authenticate(req);
+    partyId = await resolveParty(req);
+    // ★当事者であることを確かめてから招待を作る
+    const { readSession } = await import("@/lib/session");
+    const s = await readSession();
+    caseId = s?.caseId ?? "";
+    if (!caseId) throw new UnauthenticatedError();
+    const snap = await loadForLlm(asCaseId(caseId));
+    assertOwnParty(snap, partyId);
+    senderName = snap.parties.find((p) => p.id === partyId)?.displayNameForOther ?? "ご関係の方";
   } catch (e) {
     if (e instanceof UnauthenticatedError) return NextResponse.json({ error: e.message }, { status: 401 });
+    if (e instanceof ScopeViolationError) return NextResponse.json({ error: e.message }, { status: 403 });
     throw e;
   }
 
@@ -29,6 +44,7 @@ export async function POST(req: Request) {
     method?: string;
     recipientEmail?: string;
     revealSenderName?: boolean;
+    senderName?: string;
   };
 
   const method = body.method as InvitationMethod;
@@ -43,12 +59,13 @@ export async function POST(req: Request) {
   const now = new Date();
   const inv: InvitationRecord = {
     id: `inv_${token.slice(0, 12)}`,
-    caseId: party.caseId,
-    createdByPartyId: party.id,
+    caseId,
+    createdByPartyId: partyId,
     token,
     method,
     ...(method === "EMAIL" ? { recipientEmail: body.recipientEmail } : {}),
-    senderName: party.displayNameForOther,
+    // ★当事者が名乗った名前。露出するかは revealSenderName で決まる
+    senderName: body.senderName?.trim() || senderName,
     revealSenderName: body.revealSenderName === true,
     status: "PENDING",
     expiresAt: expiresAt(now),
@@ -70,5 +87,5 @@ export async function POST(req: Request) {
 }
 
 function baseUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL ?? "https://aida.example";
+  return process.env.NEXT_PUBLIC_APP_URL || "https://aida-4n47tjpp2a-an.a.run.app";
 }

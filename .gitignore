@@ -1,0 +1,57 @@
+# === 機密・非公開情報 ===
+# ヒアリング議事録、法律事務所から提供された資料など。
+# 実名・提供資料を含むため、公開リポジトリには含めない。
+.meetings/
+
+# === 環境変数・認証情報 ===
+.env
+.env.local
+.env.*.local
+.env.production
+*.pem
+*-key.json
+service-account*.json
+
+# === 依存関係 ===
+node_modules/
+.pnpm-store/
+
+# === ビルド生成物 ===
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# === テスト・カバレッジ ===
+coverage/
+test-results/
+playwright-report/
+.nyc_output/
+
+# === Firestore Emulator ===
+*-debug.log
+firebase-debug.log
+firestore-debug.log
+.firebase/
+
+# === Terraform ===
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.*
+infra/terraform/*.tfvars
+!infra/terraform/*.tfvars.example
+infra/terraform/*.tfplan
+crash.log
+
+# === OS / エディタ ===
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# === 一時ファイル ===
+*.log
+tmp/
+.cache/

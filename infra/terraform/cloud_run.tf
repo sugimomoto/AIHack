@@ -13,6 +13,11 @@ resource "google_cloud_run_v2_service" "app" {
   deletion_protection = false
   ingress             = "INGRESS_TRAFFIC_ALL"
 
+  # サービス全体のスケーリング（API 側が既定で設定するため明示して差分をなくす）
+  scaling {
+    min_instance_count = 0
+  }
+
   template {
     service_account = google_service_account.run.email
 

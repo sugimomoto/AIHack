@@ -55,17 +55,28 @@
 
 ## 残タスク
 
-### T7｜Terraform の適用 〔要対応〕
+### T7｜Terraform の適用 ✅
 
-- [ ] **Terraform をインストールする**（未インストール）
-      `brew install terraform`
-- [ ] `terraform init`（GCS バックエンド）
-- [ ] **既存リソースを import する**
-      Cloud Run サービスは Cloud Build 経由で先に作成済みのため
-- [ ] `terraform plan` に差分がないことを確認
-- [ ] `terraform.tfvars` を作成（`.gitignore` 済み）
+- [x] Terraform v1.15.8 をインストール（`brew tap hashicorp/tap`）
+- [x] `terraform init`（GCS バックエンド）
+- [x] **既存リソースを import**（Cloud Run / サービスアカウント）
+- [x] **`terraform plan` の差分ゼロを確認** → AC-04 達成
+- [x] `terraform.tfvars` を作成（`.gitignore` 済み）
 
-> **現状、Cloud Run は Terraform 管理外。**AC-04（Terraform で再現できる）が未達。
+> **Homebrew core から Terraform が削除されていた**（BUSL ライセンス化のため）。
+> `brew tap hashicorp/tap && brew install hashicorp/tap/terraform` で解決。
+>
+> import 後に**サービスレベルの `scaling` ブロックで差分が残った**（API が既定値を設定するため）。
+> 設定に明示して解消した。
+
+### T8｜シークレットの投入 ✅
+
+- [x] Secret Manager に `orcarouter-api-key` を作成（Terraform）
+- [x] **値を投入**（`gcloud secrets versions add`。**値を画面に出さずに実行**）
+- [x] Cloud Run の環境変数 `ORCAROUTER_API_KEY` が Secret Manager 参照になっている
+
+> **値は Terraform state に残さない。**シークレット本体は Terraform で管理せず、
+> `gcloud` で投入する方針とした。
 
 ### T8｜シークレットの投入
 
@@ -73,12 +84,25 @@
 - [ ] 値を投入（`gcloud secrets versions add`。**コマンド履歴に残さない**）
 - [ ] Cloud Run から読めることを確認
 
-### T9｜自動デプロイ
+### T9｜自動デプロイ 〔要対応・手動ステップあり〕
 
-- [ ] Cloud Build トリガーを作成（`main` への push）
-- [ ] `_TAG=$SHORT_SHA` を substitution に設定
-- [ ] **CI が通らないとデプロイされない**構成にする
+- [ ] **⚠️ GitHub リポジトリを Cloud Build に接続する**（コンソールでの OAuth 認可が必要）
+      https://console.cloud.google.com/cloud-build/triggers;region=asia-northeast1?project=aida-505206
+      → 「リポジトリを接続」→ GitHub → `sugimomoto/AIHack` を選択
+- [ ] トリガーを作成（接続後に以下を実行）
+      ```
+      gcloud builds triggers create github \
+        --name=aida-deploy-main \
+        --repo-owner=sugimomoto --repo-name=AIHack \
+        --branch-pattern='^main$' \
+        --build-config=infra/cloudbuild/deploy.yaml \
+        --substitutions=_TAG='$SHORT_SHA' \
+        --region=asia-northeast1 --project=aida-505206
+      ```
 - [ ] push で自動デプロイされることを確認
+
+> **CLI からトリガーを作ろうとしたが `INVALID_ARGUMENT` で失敗した。**
+> Cloud Build の GitHub App による接続が先に必要で、これはコンソールでの認可を伴う。
 
 ### T10｜予算アラート 〔要対応〕
 
@@ -92,13 +116,13 @@
 | # | 条件 | 状態 |
 | --- | --- | --- |
 | AC-01 | **Cloud Run の本番URLでモックが表示される** | ✅ |
-| AC-02 | `main` への push で自動デプロイされる | ⬜ T9 |
+| AC-02 | `main` への push で自動デプロイされる | ⬜ **T9（GitHub接続が必要）** |
 | AC-03 | CI が通らないとデプロイされない | ⬜ T9 |
-| AC-04 | **Terraform で再現できる** | ⬜ **T7（Terraform 未インストール）** |
+| AC-04 | **Terraform で再現できる** | ✅ **差分ゼロを確認** |
 | AC-05 | サービスアカウント鍵をリポジトリに置いていない | ✅ |
-| AC-06 | APIキーが Secret Manager から読まれる | ⬜ T8 |
+| AC-06 | APIキーが Secret Manager から読まれる | ✅ |
 | AC-07 | ヘルスチェックが 200 を返す | ✅ |
-| AC-08 | **最小インスタンス数が 0** | ✅（既定値0。Terraform 適用で明示化） |
+| AC-08 | **最小インスタンス数が 0** | ✅ Terraform で明示 |
 
 ---
 

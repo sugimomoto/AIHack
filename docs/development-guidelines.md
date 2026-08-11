@@ -254,7 +254,7 @@ export type AgreementRepository = {
 | --- | --- | --- | --- |
 | **不変条件テスト** | INV-1〜INV-4 | `tests/invariants/` | **必須・ブロッキング** |
 | ルールテスト | Firestore の default deny | `tests/rules/` | **必須・ブロッキング** |
-| スキーマ整合テスト | G-3（ひな形とスキーマ） | `tests/schema/` | **必須・ブロッキング** |
+| スキーマ整合テスト | G-3（ひな形とスキーマ）／**G-3b（enum の表記）** | `tests/schema/` | **必須・ブロッキング** |
 | 単体テスト | `domain/` 配下 | 各ファイル隣接 | 必須 |
 | E2E | 主要導線 | `tests/e2e/` | 主要導線のみ |
 

@@ -300,14 +300,24 @@ export async function loadIncomeBands(caseId: CaseId): Promise<Record<string, st
   return Object.fromEntries(snap.docs.map((d) => [d.id, (d.get("incomeBand") ?? null) as string | null]));
 }
 
-/** 合意項目の一覧。★status と payload のみ */
+/**
+ * 合意項目の一覧。★status と payload のみ
+ *
+ * ★同じ論点に複数の項目があると、文書に入る内容が不定になる。
+ *   合意時刻の昇順で返し、後のものが採用されるようにする。
+ *   （改訂を重ねた場合、最新の合意が文書になる）
+ */
 export async function listAgreementItems(
   caseId: CaseId,
 ): Promise<{ topic: string; status: string; payload: Record<string, unknown> | null }[]> {
   const snap = await caseRef(caseId).collection("agreementItems").get();
-  return snap.docs.map((d) => ({
-    topic: (d.get("topic") ?? d.id) as string,
-    status: (d.get("status") ?? "PENDING") as string,
-    payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
-  }));
+  return snap.docs
+    .map((d) => ({
+      topic: (d.get("topic") ?? d.id) as string,
+      status: (d.get("status") ?? "PENDING") as string,
+      payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
+      agreedAt: (d.get("agreedAt") ?? "") as string,
+    }))
+    .sort((a, b) => a.agreedAt.localeCompare(b.agreedAt))
+    .map(({ agreedAt: _ignored, ...rest }) => rest);
 }

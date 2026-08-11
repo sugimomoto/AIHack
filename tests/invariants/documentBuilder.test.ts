@@ -86,7 +86,7 @@ describe("★合意した論点だけが入る", () => {
   it("AGREED 以外は文書に入らない", () => {
     const d = buildDocument({
       templates: TEMPLATES,
-      items: [AGREED_CS, { topic: "VISITATION", status: "PENDING", payload: { frequency: "月1回" } }],
+      items: [AGREED_CS, { topic: "VISITATION", status: "PENDING", payload: { frequency: "MONTHLY_1" } }],
     });
     expect(d.clauses).toHaveLength(1);
     expect(d.clauses[0].title).toBe("養育費");
@@ -100,7 +100,7 @@ describe("★合意した論点だけが入る", () => {
     const d = buildDocument({
       templates: TEMPLATES,
       items: [
-        { topic: "VISITATION", status: "AGREED", payload: { frequency: "月1回" } },
+        { topic: "VISITATION", status: "AGREED", payload: { frequency: "MONTHLY_1" } },
         AGREED_CS,
       ],
     });
@@ -110,7 +110,7 @@ describe("★合意した論点だけが入る", () => {
   it("条項番号が振られる", () => {
     const d = buildDocument({
       templates: TEMPLATES,
-      items: [AGREED_CS, { topic: "VISITATION", status: "AGREED", payload: { frequency: "月1回" } }],
+      items: [AGREED_CS, { topic: "VISITATION", status: "AGREED", payload: { frequency: "MONTHLY_1" } }],
     });
     expect(d.clauses.map((c) => c.number)).toEqual([1, 2]);
   });
@@ -167,9 +167,13 @@ describe("値の書式", () => {
     expect(formatValue("whatever", ["a", "b"])).toBeNull();
   });
 
-  it("★コード値らしい文字列（英大文字とアンダースコア）は通さない", () => {
-    expect(formatValue("frequency", "MONTHLY_1")).toBeNull();
+  it("★表記の定義があるコード値は変換される", () => {
+    expect(formatValue("frequency", "MONTHLY_1")).toBe("月1回");
+  });
+
+  it("★表記の定義が無いコード値は通さない", () => {
     expect(formatValue("anything", "SOME_CODE")).toBeNull();
+    expect(formatValue("frequency", "MONTHLY_9")).toBeNull();
   });
 
   it("自由入力の文字列はそのまま使う", () => {

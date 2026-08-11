@@ -61,6 +61,7 @@ async function main() {
 
     console.log(`\n相手に届くもの:\n  ${r.content.split("\n").join("\n  ")}`);
     console.log(`\nカテゴリ: [${r.categories.join(", ")}]`);
+    console.log(`payload : ${r.payload ? JSON.stringify(r.payload) : "なし"}`);
     if (r.droppedReason) console.log(`★検査で落ちたため事情を落としました: ${r.droppedReason}`);
 
     // 検証

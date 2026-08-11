@@ -5,6 +5,8 @@ import { sanitizeReception } from "@/domain/dialogue/vocabulary";
 import { EXTRACTION_SCHEMA } from "@/domain/relay/schema";
 import { EXTRACTION_SYSTEM_PROMPT, buildRelayText } from "@/domain/relay/prompts";
 import { hasVerbatimRun, verifyRelay, type ContextCategory } from "@/domain/relay/guard";
+import { stripUnstated, toProposalSchema } from "@/domain/relay/payload";
+import { findPublishedPayloadSchema } from "@/infra-adapters/firestore/repositories/masterRepository";
 
 /**
  * 取次ぎの生成 ★C1 の実装本体
@@ -26,6 +28,8 @@ export type RelayResult = {
   summary: string;
   context: string;
   categories: ContextCategory[];
+  /** ★構造化された提案。書かれた項目のみを持つ */
+  payload: Record<string, unknown> | null;
   /** 検査で落ちた理由。落ちても取次ぎ自体は成立する */
   droppedReason?: "VERBATIM" | "CATEGORY" | "ASSERTION";
   attempts: number;
@@ -68,8 +72,10 @@ export async function buildRelay(input: {
 
   const v = verification!;
   const summary = safeSummary(last!.summary, input.raw, topicLabel);
+  const payload = await structurePayload(input);
 
   return {
+    payload,
     content: sanitizeReception(buildRelayText({ topicLabel, summary, context: v.context })),
     summary,
     context: v.context,
@@ -88,6 +94,54 @@ function safeSummary(summary: string, raw: string, topicLabel: string): string {
   const s = summary.trim();
   if (!s || hasVerbatimRun(raw, s)) return "ご相談が来ています。";
   return s;
+}
+
+/**
+ * 提案の構造化
+ *
+ * ★合意用スキーマの required を外して使う。
+ *   そのまま使うと、書かれていない支払日や終期をLLMが埋める（P3違反）。
+ *
+ * ★スキーマが無い論点では payload を作らない。
+ *   構造が定義されていないものを、その場で作り出さない。
+ */
+async function structurePayload(input: {
+  caseId: string;
+  consultationId: string;
+  raw: string;
+  topic: string | null;
+}): Promise<Record<string, unknown> | null> {
+  if (!input.topic) return null;
+  try {
+    const master = await findPublishedPayloadSchema(input.topic);
+    if (!master) return null;
+
+    const res = await callLlmStructured<Record<string, unknown>>({
+      tier: "SMALL",
+      purpose: "PROPOSAL_STRUCTURING",
+      system: [
+        "入力に書かれている項目だけを取り出してください。",
+        "★書かれていない項目は含めないでください。推測して埋めないでください。",
+        "金額は数値で、単位を含めずに返してください（「月3万」→ 30000）。",
+      ].join("\n"),
+      user: input.raw,
+      caseId: input.caseId,
+      consultationId: input.consultationId,
+      schema: {
+        name: "proposal_payload",
+        schema: toProposalSchema(master.schema) as Record<string, unknown>,
+      },
+      maxOutputTokens: 300,
+    });
+    await saveCallLog(res.log);
+
+    const payload = stripUnstated(res.content);
+    return Object.keys(payload).length > 0 ? payload : null;
+  } catch (e) {
+    // ★構造化に失敗しても取次ぎは成立する。文章は既に検査を通っている
+    console.warn("[relay] 提案の構造化に失敗しました。payload なしで続行します", e);
+    return null;
+  }
 }
 
 async function extract(

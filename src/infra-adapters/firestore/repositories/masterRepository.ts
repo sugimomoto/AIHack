@@ -65,3 +65,17 @@ export async function listClauseTemplates(): Promise<ClauseTemplate[]> {
     .map((d) => ({ id: d.id, ...d.data() }) as ClauseTemplate)
     .sort((a, b) => a.order - b.order);
 }
+
+import type { KnowledgeArticle } from "@/domain/knowledge/article";
+
+/** ナレッジ記事。★人が書いたものだけがここに入る */
+export async function listKnowledgeArticles(topic?: string): Promise<KnowledgeArticle[]> {
+  const col = getDb().collection("masters/knowledgeArticles/items");
+  const snap = await (topic ? col.where("topics", "array-contains", topic).get() : col.get());
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as KnowledgeArticle);
+}
+
+export async function findKnowledgeArticle(id: string): Promise<KnowledgeArticle | null> {
+  const d = await getDb().collection("masters/knowledgeArticles/items").doc(id).get();
+  return d.exists ? ({ id: d.id, ...d.data() } as KnowledgeArticle) : null;
+}

@@ -23,8 +23,8 @@ const BY_INTENT: Partial<Record<Intent, Choice[]>> = {
     { id: "think_more", label: "もう少し考える" },
   ],
   PROPOSAL: [{ id: "make_proposal", label: "提案としてまとめる" }],
-  REVISION_REQUEST: [{ id: "start_revision", label: "取り決めの見直しを始める" }],
   INFO_QUERY: [{ id: "open_knowledge", label: "取り決めについて調べる" }],
+  REVISION_REQUEST: [{ id: "start_revision", label: "取り決めの見直しを始める" }],
   OUT_OF_SCOPE: [{ id: "consult_expert", label: "専門家への相談を検討する" }],
 };
 

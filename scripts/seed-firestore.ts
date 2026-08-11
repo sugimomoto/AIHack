@@ -23,6 +23,8 @@ const COLLECTIONS = [
   ["masters/clauseTemplates/items", "firestore/seeds/clauseTemplates.json"],
   // ★未検証のサンプル表（R-18）。verified: false により出力に注記が付く
   ["masters/supportTables/items", "firestore/seeds/supportTables.json"],
+  // ★記事は人が書く。LLMに書かせない（非弁対策の構造）
+  ["masters/knowledgeArticles/items", "firestore/seeds/knowledgeArticles.json"],
 ] as const;
 
 async function main() {

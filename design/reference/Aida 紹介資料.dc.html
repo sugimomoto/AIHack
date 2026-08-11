@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#F0E7D6; font-family:"Zen Kaku Gothic New", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#3F6B49; text-decoration:none; }
+  a:hover { color:#2E5236; text-decoration:underline; }
+</style>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <section data-label="表紙" data-screen-label="01" data-speaker-notes="離婚・共同養育の当事者が使うスマートフォンアプリ、AidaのUI設計です。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:56px;">
+    <div style="display:flex; align-items:center; gap:36px;">
+      <img src="assets/capybara.png" alt="" width="140" height="140" style="width:140px; height:140px; border-radius:36px; object-fit:cover;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div style="font-size:76px; letter-spacing:.24em; padding-left:.24em;">Aida</div>
+        <div style="font-size:26px; letter-spacing:.3em; padding-left:.3em; color:#6F675E;">あいだ</div>
+      </div>
+    </div>
+    <div style="height:1px; background:#E0D5C4; width:560px;"></div>
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <div style="font-size:44px; font-weight:500; line-height:1.5;">あいだに立つUI</div>
+      <div style="font-size:26px; line-height:2; color:#655C53; max-width:1100px; text-wrap:pretty;">離婚・共同養育の当事者が使うスマートフォンアプリ。UI設計のご紹介。</div>
+    </div>
+    <div style="position:absolute; right:160px; bottom:96px; font-size:25px; letter-spacing:.1em; color:#6F675E;">2026.08</div>
+  </section>
+
+  <section data-label="このアプリ" data-screen-label="02" data-speaker-notes="決定的な特徴はメッセージを転送しないこと。父はAIと話し、母もAIと話す。合意した内容だけが共有されます。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:64px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">01 ／ このアプリは何か</div>
+    <div style="font-size:60px; font-weight:500; line-height:1.6;">二人を直接やりとりさせずに、<br>合意をつくり、守り続ける。</div>
+    <div style="display:flex; gap:32px;">
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:26px; padding:44px;">
+        <div style="font-size:25px; letter-spacing:.1em; color:#8A6212; margin-bottom:22px;">やらないこと</div>
+        <div style="font-size:32px; line-height:1.8; font-weight:500;">メッセージを<br>転送しません</div>
+        <div style="margin-top:22px; font-size:25px; line-height:2; color:#655C53;">相手が書いた言葉そのものは、一度も相手に届きません。</div>
+      </div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:26px; padding:44px;">
+        <div style="font-size:25px; letter-spacing:.1em; color:#3F6B49; margin-bottom:22px;">やること</div>
+        <div style="font-size:32px; line-height:1.8; font-weight:500;">AIが両者のあいだで<br>着地点を探す</div>
+        <div style="margin-top:22px; font-size:25px; line-height:2; color:#655C53;">合意した内容だけが共有され、それが基準になります。</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="前提" data-screen-label="03" data-speaker-notes="これを外すとデザイン全体が失敗します。相手の存在を感じさせないことが、機能そのものです。" style="background:#3A342E; color:#FDF8EF; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:56px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#C6B9A6;">02 ／ 最優先の前提</div>
+    <div style="font-size:58px; font-weight:500; line-height:1.6;">このアプリを開く人は、<br>人生でもっとも消耗している時期にいます。</div>
+    <div style="display:flex; gap:56px; font-size:25px; line-height:2.1; color:#E4DBCB;">
+      <div style="flex:1;">相手への強い怒り、あるいは恐怖を抱えている。相手の名前が画面に出るだけで動揺する。アプリを開くこと自体が心理的な負担になる。</div>
+      <div style="flex:1;">国の調査では、養育費や面会交流の取り決めをしない理由の第1位が「相手と関わりたくない」でした。</div>
+    </div>
+    <div style="border-left:3px solid #C08F3C; padding-left:32px; font-size:30px; line-height:1.9;">「相手の存在を感じさせないこと」が、<br>このプロダクトの機能そのものです。</div>
+  </section>
+
+  <section data-label="原則" data-screen-label="04" data-speaker-notes="通常のアプリでは正解の設計が、このプロダクトでは逆効果になります。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:52px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">03 ／ デザイン原則</div>
+    <div style="display:flex; gap:18px;">
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:26px; padding:30px 26px; display:flex; flex-direction:column; gap:14px;">
+        <div style="font-size:25px; color:#8A6212; letter-spacing:.08em;">U-1</div>
+        <div style="font-size:27px; font-weight:500; line-height:1.6;">相手の存在を<br>最小化する</div>
+        <div style="font-size:24px; line-height:1.95; color:#655C53;">アイコン・実名・顔写真は出さない。呼称は「お相手」、表示名は変更できる。</div>
+      </div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:26px; padding:30px 26px; display:flex; flex-direction:column; gap:14px;">
+        <div style="font-size:25px; color:#8A6212; letter-spacing:.08em;">U-2</div>
+        <div style="font-size:27px; font-weight:500; line-height:1.6;">二人を色で<br>対立させない</div>
+        <div style="font-size:24px; line-height:1.95; color:#655C53;">赤と青に分けない。最も目立つのは当事者ではなく、AIと合意。</div>
+      </div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:26px; padding:30px 26px; display:flex; flex-direction:column; gap:14px;">
+        <div style="font-size:25px; color:#8A6212; letter-spacing:.08em;">U-3</div>
+        <div style="font-size:27px; font-weight:500; line-height:1.6;">愚痴を<br>投げられる相手</div>
+        <div style="font-size:24px; line-height:1.95; color:#655C53;">空白のテキストボックスには、人は本音を書きません。</div>
+      </div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:26px; padding:30px 26px; display:flex; flex-direction:column; gap:14px;">
+        <div style="font-size:25px; color:#8A6212; letter-spacing:.08em;">U-4</div>
+        <div style="font-size:27px; font-weight:500; line-height:1.6;">「合意」が<br>主役</div>
+        <div style="font-size:24px; line-height:1.95; color:#655C53;">唯一のポジティブな進捗表現。ただし祝いすぎない。</div>
+      </div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:26px; padding:30px 26px; display:flex; flex-direction:column; gap:14px;">
+        <div style="font-size:25px; color:#8A6212; letter-spacing:.08em;">U-5</div>
+        <div style="font-size:27px; font-weight:500; line-height:1.6;">急かさない</div>
+        <div style="font-size:24px; line-height:1.95; color:#655C53;">未読バッジ・赤ドット・入力中・既読は使いません。</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="対話画面" data-screen-label="05" data-speaker-notes="最重要の設計課題。登場する要素は3種類だけです。" style="background:#FDF8EF; color:#3A342E; display:flex; padding:0 160px; align-items:center; gap:96px;">
+    <img src="assets/shots/f1-dialogue.png" alt="対話画面" style="width:392px; height:846px; border-radius:30px; object-fit:contain; flex:none;">
+    <div style="flex:1; display:flex; flex-direction:column; gap:40px;">
+      <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">04 ／ 最重要の設計課題</div>
+      <div style="font-size:52px; font-weight:500; line-height:1.6;">3種別の描き分け</div>
+      <div style="display:flex; flex-direction:column; gap:22px;">
+        <div style="display:flex; gap:24px; align-items:flex-start;">
+          <span style="flex:none; width:44px; height:44px; border-radius:50%; background:#3A342E; color:#FDF8EF; font-size:25px; display:flex; align-items:center; justify-content:center;">1</span>
+          <div><div style="font-size:27px; font-weight:500;">自分の発言</div><div style="margin-top:8px; font-size:25px; line-height:1.9; color:#655C53;">右寄せ・幅78%・塗りのみ。ここには何を書いてもいい。誰にも届かない。</div></div>
+        </div>
+        <div style="display:flex; gap:24px; align-items:flex-start;">
+          <span style="flex:none; width:44px; height:44px; border-radius:50%; background:#8A6212; color:#FFFCF5; font-size:25px; display:flex; align-items:center; justify-content:center;">2</span>
+          <div><div style="font-size:27px; font-weight:500;">AI自身の発言</div><div style="margin-top:8px; font-size:25px; line-height:1.9; color:#655C53;">左寄せ・カピバラのマーク付き。落ち着いた第三者。</div></div>
+        </div>
+        <div style="display:flex; gap:24px; align-items:flex-start;">
+          <span style="flex:none; width:44px; height:44px; border-radius:50%; background:#3F6B49; color:#FFFCF5; font-size:25px; display:flex; align-items:center; justify-content:center;">3</span>
+          <div><div style="font-size:27px; font-weight:500;">AIによる取次ぎ</div><div style="margin-top:8px; font-size:25px; line-height:1.9; color:#655C53;">吹き出しではなく、幅いっぱいの封書カード。相手の言葉ではなく、AIの言葉。</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="③の表現" data-screen-label="06" data-speaker-notes="①と③が明らかに別種のものに見えれば、この課題は解けています。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:48px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">05 ／ ①と③はなぜ別種に見えるか</div>
+    <div style="display:flex; gap:56px; align-items:center;">
+      <div style="flex:1; display:flex; flex-direction:column; gap:20px;">
+        <div style="font-size:25px; color:#6F675E;">① 自分の発言</div>
+        <div style="align-self:flex-end; max-width:78%; background:#F2E8D9; border-radius:22px; padding:26px 30px; font-size:27px; line-height:1.85;">また勝手に土曜に決めやがって</div>
+        <div style="align-self:flex-end; font-size:24px; color:#6F675E;">ここに書いたことは、お相手には届きません</div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:20px;">
+        <div style="font-size:25px; color:#6F675E;">③ AIによる取次ぎ</div>
+        <div style="border:1px solid #EFE3D0; border-radius:22px; overflow:hidden; background:#FFFCF5;">
+          <div style="display:flex; align-items:center; gap:12px; padding:18px 24px; background:#FBF3E6; border-bottom:1px dashed #E2D7C6;">
+            <span style="font-size:24px; letter-spacing:.06em; color:#3F6B49;">お相手からのご相談</span>
+            <span style="margin-left:auto; font-size:24px; color:#6F675E;">AIが要約しました</span>
+          </div>
+          <div style="padding:26px 24px;"><div style="font-size:25px; line-height:1.85;">土曜の日程について、別案のご相談が来ています。</div></div>
+          <div style="padding:16px 24px 20px; border-top:1px solid #F1E9DC; font-size:24px; color:#6F675E;">お相手が書いた言葉そのものは含まれていません。</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; gap:20px; font-size:25px; color:#655C53;">
+      <span style="border:1px solid #E0D5C4; border-radius:999px; padding:12px 18px;">寄せ：右 ↔ 幅いっぱい</span>
+      <span style="border:1px solid #E0D5C4; border-radius:999px; padding:12px 18px;">形：吹き出し ↔ 見出し付きカード</span>
+      <span style="border:1px solid #E0D5C4; border-radius:999px; padding:12px 18px;">面：塗りのみ ↔ 枠線＋仕切り</span>
+      <span style="border:1px solid #E0D5C4; border-radius:999px; padding:12px 18px;">署名：なし ↔ AIが要約しました</span>
+    </div>
+  </section>
+
+  <section data-label="キャラクター" data-screen-label="07" data-speaker-notes="争わない。他の動物に背中を貸す。表情が動かない。カピバラはこの題材に合っています。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:48px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">06 ／ AIキャラクター</div>
+    <div style="display:flex; gap:72px; align-items:center;">
+      <div style="display:flex; gap:24px; flex:none;">
+        <img src="assets/capybara.png" alt="" width="240" height="240" style="width:240px; height:240px; border-radius:32px; object-fit:cover;">
+        <img src="assets/capybara-sit.png" alt="" width="240" height="240" style="width:240px; height:240px; border-radius:32px; object-fit:cover;">
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:26px;">
+        <div style="font-size:46px; font-weight:500; line-height:1.6;">表情を、持たせない。</div>
+        <div style="font-size:25px; line-height:2.05; color:#655C53; text-wrap:pretty;">感情に反応して表情が変われば「見抜かれた」という監視感が生まれ、相手の相談を取り次ぐ場面で中立に見えなくなります。<br>カピバラはもともと表情筋が動きません。「無表情である」ことに説明が要らないのが、この題材を選ぶ最大の利点です。</div>
+        <div style="display:flex; gap:16px; font-size:24px; color:#655C53;">
+          <span style="border:1px solid #E0D5C4; border-radius:999px; padding:12px 18px;">表情差分なし</span>
+          <span style="border:1px solid #E0D5C4; border-radius:999px; padding:12px 18px;">ポーズは2種のみ</span>
+          <span style="border:1px solid #E0D5C4; border-radius:999px; padding:12px 18px;">動きは呼吸だけ・3.2秒</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="配色" data-screen-label="08" data-speaker-notes="彩度が最も高いのはAIと合意の2色だけ。当事者を指す色は存在しません。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:48px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">07 ／ デザインシステム</div>
+    <div style="font-size:46px; font-weight:500; line-height:1.6;">彩度を持つのは、AIと合意だけ。</div>
+    <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:24px;">
+      <div style="display:flex; flex-direction:column; gap:14px;"><div style="height:120px; border-radius:20px; background:#FDF8EF; border:1px solid #EFE3D0;"></div><div style="font-size:24px; color:#655C53; line-height:1.7;">背景<br>#FDF8EF</div></div>
+      <div style="display:flex; flex-direction:column; gap:14px;"><div style="height:120px; border-radius:20px; background:#FFFCF5; border:1px solid #EFE3D0;"></div><div style="font-size:24px; color:#655C53; line-height:1.7;">面<br>#FFFCF5</div></div>
+      <div style="display:flex; flex-direction:column; gap:14px;"><div style="height:120px; border-radius:20px; background:#C08F3C;"></div><div style="font-size:24px; color:#655C53; line-height:1.7;">AI<br>#C08F3C</div></div>
+      <div style="display:flex; flex-direction:column; gap:14px;"><div style="height:120px; border-radius:20px; background:#5B8A63;"></div><div style="font-size:24px; color:#655C53; line-height:1.7;">合意<br>#5B8A63</div></div>
+      <div style="display:flex; flex-direction:column; gap:14px;"><div style="height:120px; border-radius:20px; background:#A76A4E;"></div><div style="font-size:24px; color:#655C53; line-height:1.7;">注意<br>#A76A4E</div></div>
+    </div>
+    <div style="font-size:25px; line-height:2; color:#655C53; max-width:1300px; text-wrap:pretty;">赤は使いません。逸脱も入金の未確認も、責める色ではなくくすんだクレイで静かに示します。角丸は3段階、余白は4の倍数、モーションは240〜480msに収めています。</div>
+  </section>
+
+  <section data-label="6状態" data-screen-label="09" data-speaker-notes="色覚特性への配慮も兼ねて、線種・地の明度・記号の形・文字の4点で判別できるようにしています。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:48px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">08 ／ 合意ステータス</div>
+    <div style="font-size:46px; font-weight:500; line-height:1.6;">6つの状態を、色に頼らずに描き分ける。</div>
+    <div style="display:flex; gap:14px;">
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:22px; padding:26px 20px;"><div style="display:inline-flex; align-items:center; gap:10px; border:1px dashed #C4B8A7; border-radius:12px; padding:9px 14px; font-size:25px; color:#6F675E;">未着手</div><div style="margin-top:20px; font-size:24px; line-height:1.9; color:#655C53;">破線の枠。輪郭の弱さで示す。</div></div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:22px; padding:26px 20px;"><div style="display:inline-flex; align-items:center; gap:10px; border:1px solid #DCC0AB; background:#FAEDE3; border-radius:12px; padding:9px 14px; font-size:25px; color:#834B32;">係争中</div><div style="margin-top:20px; font-size:24px; line-height:1.9; color:#655C53;">唯一の傾いた記号＝三角。</div></div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:22px; padding:26px 20px;"><div style="display:inline-flex; align-items:center; gap:10px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:12px; padding:9px 14px; font-size:25px; color:#3F6B49;">合意済</div><div style="margin-top:20px; font-size:24px; line-height:1.9; color:#655C53;">唯一、実線の枠と合意色を持つ。</div></div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:22px; padding:26px 20px;"><div style="display:inline-flex; align-items:center; gap:10px; border:1px solid #C6D3C1; background:#F1F5EE; border-radius:12px; padding:9px 14px; font-size:25px; color:#3F6B49;">変更申請中</div><div style="margin-top:20px; font-size:24px; line-height:1.9; color:#655C53;">合意済の枠を薄めた形。</div></div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:22px; padding:26px 20px;"><div style="display:inline-flex; align-items:center; gap:10px; border:1px solid #DCC0AB; border-radius:12px; padding:9px 14px; font-size:25px; color:#834B32;">逸脱</div><div style="margin-top:20px; font-size:24px; line-height:1.9; color:#655C53;">強い赤は使わない。責めない。</div></div>
+      <div style="flex:1; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:22px; padding:26px 20px;"><div style="display:inline-flex; align-items:center; gap:10px; border:1px solid #A99D8C; background:#F6EFE5; border-radius:12px; padding:9px 14px; font-size:25px; color:#655C53;">調停へ</div><div style="margin-top:20px; font-size:24px; line-height:1.9; color:#655C53;">彩度ゼロ。制度の手に渡った状態。</div></div>
+    </div>
+  </section>
+
+  <section data-label="画面一覧" data-screen-label="10" data-speaker-notes="起動画面には名前とアイコンだけ。ホーム画面から順に。" style="background:#FDF8EF; color:#3A342E; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:44px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#6F675E;">09 ／ 画面</div>
+    <div style="display:flex; gap:40px; align-items:flex-start;">
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center;"><img src="assets/shots/f2-splash.png" alt="起動画面" style="width:300px; height:648px; border-radius:24px; object-fit:contain;"><span style="font-size:24px; color:#655C53;">起動</span></div>
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center;"><img src="assets/shots/f3-home.png" alt="ホーム" style="width:300px; height:648px; border-radius:24px; object-fit:contain;"><span style="font-size:24px; color:#655C53;">ホーム</span></div>
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center;"><img src="assets/shots/f4-topic.png" alt="相談の開始" style="width:300px; height:648px; border-radius:24px; object-fit:contain;"><span style="font-size:24px; color:#655C53;">相談の開始</span></div>
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center;"><img src="assets/shots/f5-scope.png" alt="今回だけ・今後も" style="width:300px; height:648px; border-radius:24px; object-fit:contain;"><span style="font-size:24px; color:#655C53;">今回だけ・今後も</span></div>
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center;"><img src="assets/shots/f6-agreements.png" alt="取り決め" style="width:300px; height:648px; border-radius:24px; object-fit:contain;"><span style="font-size:24px; color:#655C53;">取り決め</span></div>
+    </div>
+  </section>
+
+  <section data-label="まとめ" data-screen-label="11" data-speaker-notes="使いたくて使っているわけではない。目指すのは、身構えなくていい静けさです。" style="background:#3A342E; color:#FDF8EF; display:flex; flex-direction:column; justify-content:center; padding:0 160px; gap:56px;">
+    <div style="font-size:24px; letter-spacing:.16em; color:#C6B9A6;">10 ／ 成功条件</div>
+    <div style="font-size:66px; font-weight:500; line-height:1.55;">手に取ったときに、<br>心拍数が上がらないこと。</div>
+    <div style="font-size:24px; line-height:2.1; color:#E4DBCB; max-width:1200px; text-wrap:pretty;">このアプリを使う人は、使いたくて使っているわけではありません。子どものために、必要だから、我慢して開いています。<br>目指すべきは「楽しいUI」でも「便利そうなUI」でもなく、「ここでは身構えなくていい」と感じてもらえる静けさです。</div>
+    <img src="assets/capybara.png" alt="" width="120" height="120" style="width:120px; height:120px; border-radius:30px; object-fit:cover;">
+  </section>
+
+</x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

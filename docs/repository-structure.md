@@ -37,12 +37,18 @@ AIHack/
 │       ├── design.md
 │       └── tasklist.md
 │
+├── design/                       # ★デザインリファレンス（納品物）
+│   ├── README.md                     # 実装仕様の正（トークン・全画面）
+│   ├── reference/                    # HTMLデザインリファレンス（流用しない）
+│   └── shots/                        # 主要画面のスクリーンショット
+│
 ├── src/                          # アプリケーション本体
 ├── prisma/ または firestore/     # スキーマ・ルール・シード
 ├── infra/                        # Terraform / Cloud Build
 ├── tests/                        # E2E・ルールテスト
 ├── scripts/                      # 運用スクリプト
 └── public/                       # 静的アセット
+    └── character/                    # AIキャラクター（カピバラ）
 ```
 
 ---

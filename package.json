@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run tests/rules\"",
     "emulator": "firebase emulators:start --only firestore",
-    "seed": "tsx scripts/seed-firestore.ts"
+    "seed": "tsx scripts/seed-firestore.ts",
+    "seed:dev": "tsx scripts/seed-dev-case.ts"
   },
   "dependencies": {
     "firebase-admin": "^14.2.0",

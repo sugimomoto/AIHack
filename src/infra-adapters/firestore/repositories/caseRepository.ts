@@ -171,3 +171,75 @@ export async function patchParty(
   if (Object.keys(patch).length === 0) return;
   await caseRef(caseId).collection("parties").doc(partyId).set(patch, { merge: true });
 }
+
+// ---------------------------------------------------------------------------
+// 書き込み
+// ---------------------------------------------------------------------------
+
+/**
+ * ★メッセージは相談のサブコレクションに置く。
+ *   `partyId` を必ず持たせる。これが `scopedMessages` の拠り所になる。
+ */
+export async function appendMessage(
+  caseId: CaseId,
+  consultationId: ConsultationId,
+  m: { partyId: PartyId; role: "USER" | "AI"; content: string },
+): Promise<string> {
+  const ref = await caseRef(caseId)
+    .collection("consultations")
+    .doc(consultationId)
+    .collection("messages")
+    .add({ ...m, createdAt: new Date().toISOString() });
+  return ref.id;
+}
+
+/** 相談が無ければ作る。★当事者ごとに1つ（セッションが分かれている） */
+export async function ensureConsultation(
+  caseId: CaseId,
+  consultationId: ConsultationId,
+  partyId: PartyId,
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("consultations")
+    .doc(consultationId)
+    .set({ partyId, updatedAt: new Date().toISOString() }, { merge: true });
+}
+
+/**
+ * ★取次ぎ。`toPartyId` が宛先である。
+ *   これが `scopedInbound` の拠り所になる。
+ */
+export async function appendMediationEvent(
+  caseId: CaseId,
+  e: { fromPartyId: PartyId; toPartyId: PartyId; content: string; proposalId?: string },
+): Promise<string> {
+  const ref = await caseRef(caseId)
+    .collection("mediationEvents")
+    .add({ ...e, createdAt: new Date().toISOString() });
+  return ref.id;
+}
+
+/** 提案。★payload と context を分けて保存する */
+export async function appendProposal(
+  caseId: CaseId,
+  p: {
+    byPartyId: PartyId;
+    topic: string;
+    payload: Record<string, unknown> | null;
+    context: string;
+    contextCategories: string[];
+    status: string;
+  },
+): Promise<string> {
+  const ref = await caseRef(caseId)
+    .collection("proposals")
+    .add({ ...p, createdAt: new Date().toISOString() });
+  return ref.id;
+}
+
+/** ★相手の当事者ID。取次ぎの宛先を決めるために使う */
+export async function findOtherPartyId(caseId: CaseId, partyId: PartyId): Promise<PartyId | null> {
+  const snap = await caseRef(caseId).collection("parties").get();
+  const other = snap.docs.find((d) => d.id !== partyId);
+  return other ? asPartyId(other.id) : null;
+}

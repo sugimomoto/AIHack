@@ -243,3 +243,59 @@ export async function findOtherPartyId(caseId: CaseId, partyId: PartyId): Promis
   const other = snap.docs.find((d) => d.id !== partyId);
   return other ? asPartyId(other.id) : null;
 }
+
+/** ★論点ごとの提案。合意形成に使う */
+export async function listProposalsByTopic(
+  caseId: CaseId,
+  topic: string,
+): Promise<{ id: string; byPartyId: PartyId; payload: Record<string, unknown> | null }[]> {
+  const snap = await caseRef(caseId).collection("proposals").where("topic", "==", topic).get();
+  return snap.docs.map((d) => ({
+    id: d.id,
+    byPartyId: asPartyId(d.get("byPartyId")),
+    payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
+  }));
+}
+
+/** 合意項目の承諾状態 */
+export async function setConsent(
+  caseId: CaseId,
+  topic: string,
+  partyId: PartyId,
+  status: "ACCEPTED" | "REJECTED",
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("agreementItems")
+    .doc(topic)
+    .set({ topic, consents: { [partyId]: status }, updatedAt: new Date().toISOString() }, { merge: true });
+}
+
+export async function loadConsents(
+  caseId: CaseId,
+  topic: string,
+): Promise<Record<string, "ACCEPTED" | "REJECTED">> {
+  const d = await caseRef(caseId).collection("agreementItems").doc(topic).get();
+  return (d.get("consents") ?? {}) as Record<string, "ACCEPTED" | "REJECTED">;
+}
+
+/** ★合意の確定。payloadSchemaId を必ず記録する（どの版のスキーマで合意したか） */
+export async function finalizeAgreement(
+  caseId: CaseId,
+  topic: string,
+  payload: Record<string, unknown>,
+  payloadSchemaId: string,
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("agreementItems")
+    .doc(topic)
+    .set(
+      { status: "AGREED", payload, payloadSchemaId, agreedAt: new Date().toISOString() },
+      { merge: true },
+    );
+}
+
+/** 当事者の年収帯。★これだけが越える（INV-2a） */
+export async function loadIncomeBands(caseId: CaseId): Promise<Record<string, string | null>> {
+  const snap = await caseRef(caseId).collection("parties").get();
+  return Object.fromEntries(snap.docs.map((d) => [d.id, (d.get("incomeBand") ?? null) as string | null]));
+}

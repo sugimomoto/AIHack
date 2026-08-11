@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CaseChat } from "@/components/chat/CaseChat";
+import { AgreementPanel } from "@/components/agreement/AgreementPanel";
 
 /**
  * 両当事者を並べて確認する画面
@@ -52,7 +53,10 @@ export default function Page() {
               border: "1px solid var(--border-strong)",
             }}
           >
-            <CaseChat caseId={CASE_ID} partyId={p.partyId} label={p.label} onChanged={bump} reloadKey={key} />
+            <div className="flex min-h-0 flex-1 flex-col">
+              <CaseChat caseId={CASE_ID} partyId={p.partyId} label={p.label} onChanged={bump} reloadKey={key} />
+            </div>
+            <AgreementPanel caseId={CASE_ID} partyId={p.partyId} reloadKey={key} onChanged={bump} />
           </div>
         ))}
       </div>

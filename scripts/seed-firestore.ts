@@ -21,6 +21,8 @@ const COLLECTIONS = [
   ["masters/scenarios/items", "firestore/seeds/scenarios.json"],
   ["masters/payloadSchemas/items", "firestore/seeds/payloadSchemas.json"],
   ["masters/clauseTemplates/items", "firestore/seeds/clauseTemplates.json"],
+  // ★未検証のサンプル表（R-18）。verified: false により出力に注記が付く
+  ["masters/supportTables/items", "firestore/seeds/supportTables.json"],
 ] as const;
 
 async function main() {

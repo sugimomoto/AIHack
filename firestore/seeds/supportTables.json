@@ -1,0 +1,3853 @@
+[
+  {
+    "id": "st_child_support_1child_0_14_v0",
+    "targetKey": "CHILD_SUPPORT",
+    "tableRef": "表1（子1人・0〜14歳）",
+    "version": 0,
+    "status": "DRAFT",
+    "verified": false,
+    "sourceNote": "★未検証。裁判所公表の令和元年改定標準算定表と照合していないサンプル値である。一次資料からのデータ化は R-18 として未着手（→ .steering/roadmap.md）。実際の取り決めに使用してはならない。",
+    "rows": [
+      {
+        "payerBand": "200-225",
+        "payeeBand": "0-25",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "25-50",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "50-75",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "75-100",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "100-125",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "125-150",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "150-175",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "175-200",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "200-225",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "225-250",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "200-225",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "0-25",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "25-50",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "50-75",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "75-100",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "100-125",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "125-150",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "150-175",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "175-200",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "200-225",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "225-250",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "225-250",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "0-25",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "25-50",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "50-75",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "75-100",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "100-125",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "125-150",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "150-175",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "175-200",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "200-225",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "225-250",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "250-275",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "0-25",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "25-50",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "50-75",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "75-100",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "100-125",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "125-150",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "150-175",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "175-200",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "200-225",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "225-250",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "275-300",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "0-25",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "25-50",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "50-75",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "75-100",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "100-125",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "125-150",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "150-175",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "175-200",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "200-225",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "225-250",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "300-325",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "0-25",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "25-50",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "50-75",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "75-100",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "100-125",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "125-150",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "150-175",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "175-200",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "200-225",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "225-250",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "325-350",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "0-25",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "25-50",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "50-75",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "75-100",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "100-125",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "125-150",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "150-175",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "175-200",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "200-225",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "225-250",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "350-375",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "0-25",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "25-50",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "50-75",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "75-100",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "100-125",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "125-150",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "150-175",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "175-200",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "200-225",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "225-250",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "250-275",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "375-400",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "0-25",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "25-50",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "50-75",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "75-100",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "100-125",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "125-150",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "150-175",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "175-200",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "200-225",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "225-250",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "250-275",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "275-300",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "300-325",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "400-425",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "0-25",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "25-50",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "50-75",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "75-100",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "100-125",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "125-150",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "150-175",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "175-200",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "200-225",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "225-250",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "250-275",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "275-300",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "300-325",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "325-350",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "425-450",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "0-25",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "25-50",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "50-75",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "75-100",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "100-125",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "125-150",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "150-175",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "175-200",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "200-225",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "225-250",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "250-275",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "275-300",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "300-325",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "325-350",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "350-375",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "450-475",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "0-25",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "25-50",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "50-75",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "75-100",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "100-125",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "125-150",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "150-175",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "175-200",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "200-225",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "225-250",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "250-275",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "275-300",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "300-325",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "325-350",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "350-375",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "375-400",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "400-425",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "475-500",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "0-25",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "25-50",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "50-75",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "75-100",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "100-125",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "125-150",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "150-175",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "175-200",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "200-225",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "225-250",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "250-275",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "275-300",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "300-325",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "325-350",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "350-375",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "375-400",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "400-425",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "425-450",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "500-525",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "0-25",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "25-50",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "50-75",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "75-100",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "100-125",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "125-150",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "150-175",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "175-200",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "200-225",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "225-250",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "250-275",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "275-300",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "300-325",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "325-350",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "350-375",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "375-400",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "400-425",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "425-450",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "450-475",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "525-550",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "0-25",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "25-50",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "50-75",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "75-100",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "100-125",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "125-150",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "150-175",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "175-200",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "200-225",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "225-250",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "250-275",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "275-300",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "300-325",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "325-350",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "350-375",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "375-400",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "400-425",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "425-450",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "450-475",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "550-575",
+        "payeeBand": "475-500",
+        "minYen": 0,
+        "maxYen": 20000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "0-25",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "25-50",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "50-75",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "75-100",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "100-125",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "125-150",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "150-175",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "175-200",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "200-225",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "225-250",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "250-275",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "275-300",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "300-325",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "325-350",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "350-375",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "375-400",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "400-425",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "425-450",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "450-475",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "575-600",
+        "payeeBand": "475-500",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "0-25",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "25-50",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "50-75",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "75-100",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "100-125",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "125-150",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "150-175",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "175-200",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "200-225",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "225-250",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "250-275",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "275-300",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "300-325",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "325-350",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "350-375",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "375-400",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "400-425",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "425-450",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "450-475",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "600-625",
+        "payeeBand": "475-500",
+        "minYen": 10000,
+        "maxYen": 30000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "0-25",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "25-50",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "50-75",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "75-100",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "100-125",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "125-150",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "150-175",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "175-200",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "200-225",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "225-250",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "250-275",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "275-300",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "300-325",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "325-350",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "350-375",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "375-400",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "400-425",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "425-450",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "450-475",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "625-650",
+        "payeeBand": "475-500",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "0-25",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "25-50",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "50-75",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "75-100",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "100-125",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "125-150",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "150-175",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "175-200",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "200-225",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "225-250",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "250-275",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "275-300",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "300-325",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "325-350",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "350-375",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "375-400",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "400-425",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "425-450",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "450-475",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "650-675",
+        "payeeBand": "475-500",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "0-25",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "25-50",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "50-75",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "75-100",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "100-125",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "125-150",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "150-175",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "175-200",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "200-225",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "225-250",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "250-275",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "275-300",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "300-325",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "325-350",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "350-375",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "375-400",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "400-425",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "425-450",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "450-475",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "675-700",
+        "payeeBand": "475-500",
+        "minYen": 20000,
+        "maxYen": 40000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "0-25",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "25-50",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "50-75",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "75-100",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "100-125",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "125-150",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "150-175",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "175-200",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "200-225",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "225-250",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "250-275",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "275-300",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "300-325",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "325-350",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "350-375",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "375-400",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "400-425",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "425-450",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "450-475",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "700-725",
+        "payeeBand": "475-500",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "0-25",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "25-50",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "50-75",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "75-100",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "100-125",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "125-150",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "150-175",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "175-200",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "200-225",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "225-250",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "250-275",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "275-300",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "300-325",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "325-350",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "350-375",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "375-400",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "400-425",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "425-450",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "450-475",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "725-750",
+        "payeeBand": "475-500",
+        "minYen": 30000,
+        "maxYen": 50000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "0-25",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "25-50",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "50-75",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "75-100",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "100-125",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "125-150",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "150-175",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "175-200",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "200-225",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "225-250",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "250-275",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "275-300",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "300-325",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "325-350",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "350-375",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "375-400",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "400-425",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "425-450",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "450-475",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "750-775",
+        "payeeBand": "475-500",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "0-25",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "25-50",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "50-75",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "75-100",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "100-125",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "125-150",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "150-175",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "175-200",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "200-225",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "225-250",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "250-275",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "275-300",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "300-325",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "325-350",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "350-375",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "375-400",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "400-425",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "425-450",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "450-475",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "775-800",
+        "payeeBand": "475-500",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "0-25",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "25-50",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "50-75",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "75-100",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "100-125",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "125-150",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "150-175",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "175-200",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "200-225",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "225-250",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "250-275",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "275-300",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "300-325",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "325-350",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "350-375",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "375-400",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "400-425",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "425-450",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "450-475",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "800-825",
+        "payeeBand": "475-500",
+        "minYen": 40000,
+        "maxYen": 60000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "0-25",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "25-50",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "50-75",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "75-100",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "100-125",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "125-150",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "150-175",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "175-200",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "200-225",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "225-250",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "250-275",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "275-300",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "300-325",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "325-350",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "350-375",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "375-400",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "400-425",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "425-450",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "450-475",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "825-850",
+        "payeeBand": "475-500",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "0-25",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "25-50",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "50-75",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "75-100",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "100-125",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "125-150",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "150-175",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "175-200",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "200-225",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "225-250",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "250-275",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "275-300",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "300-325",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "325-350",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "350-375",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "375-400",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "400-425",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "425-450",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "450-475",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "850-875",
+        "payeeBand": "475-500",
+        "minYen": 50000,
+        "maxYen": 70000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "0-25",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "25-50",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "50-75",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "75-100",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "100-125",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "125-150",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "150-175",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "175-200",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "200-225",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "225-250",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "250-275",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "275-300",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "300-325",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "325-350",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "350-375",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "375-400",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "400-425",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "425-450",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "450-475",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "875-900",
+        "payeeBand": "475-500",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "0-25",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "25-50",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "50-75",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "75-100",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "100-125",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "125-150",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "150-175",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "175-200",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "200-225",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "225-250",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "250-275",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "275-300",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "300-325",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "325-350",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "350-375",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "375-400",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "400-425",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "425-450",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "450-475",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "900-925",
+        "payeeBand": "475-500",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "0-25",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "25-50",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "50-75",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "75-100",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "100-125",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "125-150",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "150-175",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "175-200",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "200-225",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "225-250",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "250-275",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "275-300",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "300-325",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "325-350",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "350-375",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "375-400",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "400-425",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "425-450",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "450-475",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "925-950",
+        "payeeBand": "475-500",
+        "minYen": 60000,
+        "maxYen": 80000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "0-25",
+        "minYen": 130000,
+        "maxYen": 150000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "25-50",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "50-75",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "75-100",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "100-125",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "125-150",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "150-175",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "175-200",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "200-225",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "225-250",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "250-275",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "275-300",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "300-325",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "325-350",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "350-375",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "375-400",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "400-425",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "425-450",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "450-475",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "950-975",
+        "payeeBand": "475-500",
+        "minYen": 70000,
+        "maxYen": 90000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "0-25",
+        "minYen": 130000,
+        "maxYen": 150000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "25-50",
+        "minYen": 130000,
+        "maxYen": 150000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "50-75",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "75-100",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "100-125",
+        "minYen": 120000,
+        "maxYen": 140000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "125-150",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "150-175",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "175-200",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "200-225",
+        "minYen": 110000,
+        "maxYen": 130000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "225-250",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "250-275",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "275-300",
+        "minYen": 100000,
+        "maxYen": 120000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "300-325",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "325-350",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "350-375",
+        "minYen": 90000,
+        "maxYen": 110000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "375-400",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "400-425",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "425-450",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "450-475",
+        "minYen": 80000,
+        "maxYen": 100000
+      },
+      {
+        "payerBand": "975-1000",
+        "payeeBand": "475-500",
+        "minYen": 70000,
+        "maxYen": 90000
+      }
+    ]
+  }
+]

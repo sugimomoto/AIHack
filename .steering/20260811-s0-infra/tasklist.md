@@ -53,8 +53,6 @@
 
 ---
 
-## 残タスク
-
 ### T7｜Terraform の適用 ✅
 
 - [x] Terraform v1.15.8 をインストール（`brew tap hashicorp/tap`）
@@ -78,11 +76,9 @@
 > **値は Terraform state に残さない。**シークレット本体は Terraform で管理せず、
 > `gcloud` で投入する方針とした。
 
-### T8｜シークレットの投入
+---
 
-- [ ] Secret Manager に `orcarouter-api-key` を作成
-- [ ] 値を投入（`gcloud secrets versions add`。**コマンド履歴に残さない**）
-- [ ] Cloud Run から読めることを確認
+## 残タスク
 
 ### T9｜自動デプロイ 〔要対応・手動ステップあり〕
 

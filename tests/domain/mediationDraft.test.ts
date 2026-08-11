@@ -35,9 +35,14 @@ describe("★調停案への入力", () => {
     topicLabel: "養育費",
     range: { minYen: 40000, maxYen: 60000, tableRef: "表1（子1人・0〜14歳）", caveat: "未検証のサンプル値です" },
     proposals: [
-      { partyLabel: "Aさん", payload: { monthlyAmount: 30000 } },
-      { partyLabel: "Bさん", payload: { monthlyAmount: 40000 } },
+      { payload: { monthlyAmount: 30000 } },
+      { payload: { monthlyAmount: 40000 } },
     ],
+  });
+
+  it("★閲覧者に依存する語を含まない（キャッシュで立場が入れ替わるため）", () => {
+    expect(input).not.toContain("あなた");
+    expect(input).not.toContain("お相手");
   });
 
   it("★双方の提案とレンジが渡される", () => {

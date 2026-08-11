@@ -49,8 +49,25 @@ export function ContextView({ caseId, partyId }: { caseId: string; partyId: stri
     <div className="flex h-full flex-col overflow-y-auto px-5 pb-8 pt-6">
       <h1 style={{ fontSize: 18, fontWeight: 600 }}>AIに渡しているもの</h1>
       <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}>
-        この画面は、いまAIに渡している内容をそのまま表示しています。加工していません。
+        AIへの依頼は用途ごとに分かれています。それぞれに何を渡しているかを、そのまま示します。
       </p>
+
+      <section
+        className="mt-3"
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r-md)",
+          padding: 14,
+        }}
+      >
+        <Line title="受け止め・意図分類" body="あなたが書いた文章のみ。お相手の情報は渡していません。" />
+        <Line title="取次ぎの作成" body="あなたが書いた文章のみ。生成後、原文の混入を検査してから届きます。" />
+        <Line
+          title="調停案の作成"
+          body="おふたりの提案の内容（金額など）と、算定表から取得した目安のみ。どちらの提案かは渡していません。"
+        />
+      </section>
 
       <section
         className="mt-4"
@@ -81,6 +98,11 @@ export function ContextView({ caseId, partyId }: { caseId: string; partyId: stri
         </p>
       )}
 
+      <p style={{ fontSize: 12.5, fontWeight: 600, marginTop: 18 }}>あなたの側に保持している情報</p>
+      <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub-2)", marginTop: 4 }}>
+        画面の表示に使うもので、そのすべてがAIに渡るわけではありません。
+      </p>
+
       {c && (
         <pre
           className="mt-4 overflow-x-auto"
@@ -96,6 +118,15 @@ export function ContextView({ caseId, partyId }: { caseId: string; partyId: stri
           {JSON.stringify(c, null, 2)}
         </pre>
       )}
+    </div>
+  );
+}
+
+function Line({ title, body }: { title: string; body: string }) {
+  return (
+    <div style={{ padding: "8px 0", borderTop: "1px solid var(--border-subtle)" }}>
+      <p style={{ fontSize: 12.5, fontWeight: 600 }}>{title}</p>
+      <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub-2)", marginTop: 3 }}>{body}</p>
     </div>
   );
 }

@@ -66,16 +66,40 @@ export async function listClauseTemplates(): Promise<ClauseTemplate[]> {
     .sort((a, b) => a.order - b.order);
 }
 
-import type { KnowledgeArticle } from "@/domain/knowledge/article";
+import { isIndividualAdvice, type KnowledgeArticle } from "@/domain/knowledge/article";
 
-/** ナレッジ記事。★人が書いたものだけがここに入る */
+/**
+ * ナレッジ記事
+ *
+ * ★読み取り時にも検査する。
+ *   検査がテストの中にしかないと、DBを直接更新した記事が
+ *   どのガードにも触れずに公開される（レビューで検出）。
+ *   弁護士法72条に触れる文が公開されることの重さに対して、
+ *   一覧から落とすコストは小さい。
+ */
+function isPublishable(a: KnowledgeArticle): boolean {
+  for (const t of [a.title, a.summary, a.body]) {
+    if (t && isIndividualAdvice(t)) {
+      console.warn(`[knowledge] 個別助言にあたる表現のため非公開にしました: ${a.id}`);
+      return false;
+    }
+  }
+  return true;
+}
+
 export async function listKnowledgeArticles(topic?: string): Promise<KnowledgeArticle[]> {
   const col = getDb().collection("masters/knowledgeArticles/items");
   const snap = await (topic ? col.where("topics", "array-contains", topic).get() : col.get());
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as KnowledgeArticle);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as KnowledgeArticle).filter(isPublishable);
 }
 
+/** ★IDの形を制限する。スラッシュを通すと別のパスを読む */
+const ARTICLE_ID = /^[A-Za-z0-9_-]+$/;
+
 export async function findKnowledgeArticle(id: string): Promise<KnowledgeArticle | null> {
+  if (!ARTICLE_ID.test(id)) return null;
   const d = await getDb().collection("masters/knowledgeArticles/items").doc(id).get();
-  return d.exists ? ({ id: d.id, ...d.data() } as KnowledgeArticle) : null;
+  if (!d.exists) return null;
+  const a = { id: d.id, ...d.data() } as KnowledgeArticle;
+  return isPublishable(a) ? a : null;
 }

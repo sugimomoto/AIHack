@@ -15,8 +15,8 @@ async function main() {
     payeeBand: "200-225",
     childAges: [8],
     proposals: [
-      { partyLabel: "Aさん", payload: { monthlyAmount: 30000 } },
-      { partyLabel: "Bさん", payload: { monthlyAmount: 40000 } },
+      { payload: { monthlyAmount: 30000 } },
+      { payload: { monthlyAmount: 40000 } },
     ],
   });
 

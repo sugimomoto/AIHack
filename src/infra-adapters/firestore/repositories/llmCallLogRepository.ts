@@ -19,9 +19,13 @@ export async function saveCallLog(log: LlmCallLog): Promise<void> {
 }
 
 /** CT-1〜CT-4 の集計用 */
+/** ★上限を置く。全件スキャンを外から無制限に起こさせない */
+export const CALL_LOG_SCAN_LIMIT = 2000;
+
 export async function listCallLogs(caseId?: string): Promise<LlmCallLog[]> {
   const col = getDb().collection("llmCallLogs");
-  const snap = await (caseId ? col.where("caseId", "==", caseId).get() : col.get());
+  const q = caseId ? col.where("caseId", "==", caseId) : col;
+  const snap = await q.limit(CALL_LOG_SCAN_LIMIT).get();
   return snap.docs.map((d) => d.data() as LlmCallLog);
 }
 

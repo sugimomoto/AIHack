@@ -23,20 +23,17 @@ describe("★調停案の事後検査", () => {
 
   it("★表にも提案にも無い金額があれば落ちる", () => {
     const r = verifyMediationText("間をとって35,000円ではいかがでしょうか。", ALLOWED);
-    expect(r.ok).toBe(false);
-    expect(r.reason).toBe("UNKNOWN_AMOUNT");
+    expect(r).toMatchObject({ ok: false, reason: "UNKNOWN_AMOUNT" });
   });
 
   it("★禁止語があれば落ちる", () => {
     const r = verifyMediationText("お支払いの遅延を避けるためにも30,000円で。", ALLOWED);
-    expect(r.ok).toBe(false);
-    expect(r.reason).toBe("FORBIDDEN_WORD");
+    expect(r).toMatchObject({ ok: false, reason: "FORBIDDEN_WORD" });
   });
 
   it("★助言になっていれば落ちる", () => {
     const r = verifyMediationText("30,000円にすべきです。", ALLOWED);
-    expect(r.ok).toBe(false);
-    expect(r.reason).toBe("ADVICE");
+    expect(r).toMatchObject({ ok: false, reason: "ADVICE" });
   });
 
   it("年号や表番号は数値として扱わない", () => {

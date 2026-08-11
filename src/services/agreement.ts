@@ -7,7 +7,13 @@ import {
   lookupChildSupport,
   type SupportRange,
 } from "@/domain/support/table";
-import { MEDIATION_SYSTEM_PROMPT, buildMediationInput } from "@/domain/support/mediation";
+import {
+  MEDIATION_SYSTEM_PROMPT,
+  buildMediationInput,
+  verifyMediationText,
+} from "@/domain/support/mediation";
+import { redactPii } from "@/domain/security/guard";
+import { sanitizeReception } from "@/domain/dialogue/vocabulary";
 import {
   canFinalizeAgreement,
   consentStateOf,
@@ -61,7 +67,7 @@ export async function buildMediationDraft(input: {
   payeeBand: string | null;
   /** 子の年齢。★表の選択に使う */
   childAges?: number[];
-  proposals: { partyLabel: string; payload: Record<string, unknown> }[];
+  proposals: { payload: Record<string, unknown> }[];
 }): Promise<MediationDraft> {
   const range = await lookupRange(input.topic, input.payerBand, input.payeeBand, input.childAges ?? []);
 
@@ -118,11 +124,18 @@ async function explain(input: {
   caseId: string;
   topicLabel: string;
   range: SupportRange | null;
-  proposals: { partyLabel: string; payload: Record<string, unknown> }[];
+  proposals: { payload: Record<string, unknown> }[];
 }): Promise<string> {
   if (!input.range) {
     return "算定表の目安をお示しできる情報がまだ揃っていません。おふたりの年収の帯が登録されると、目安をご案内できます。";
   }
+
+  const allowed = {
+    amounts: input.proposals.flatMap((p) =>
+      Object.values(p.payload).filter((v): v is number => typeof v === "number"),
+    ),
+    rangeText: formatRange(input.range),
+  };
 
   const res = await callLlm({
     tier: "LARGE",
@@ -139,7 +152,16 @@ async function explain(input: {
     maxOutputTokens: 3000,
   });
   await saveCallLog(res.log);
-  return res.content.trim();
+
+  // ★生成後に検査する。プロンプトで指示するだけでは漏れる。
+  //   通らなければ、算定表の提示だけを返す（決定的で、誤りようがない）。
+  const text = redactPii(sanitizeReception(res.content.trim()));
+  const v = verifyMediationText(text, allowed);
+  if (!v.ok) {
+    console.warn(`[mediation] 生成文が検査に通りませんでした: ${v.reason} ${v.detail}`);
+    return `${allowed.rangeText}\nおふたりのご提案の差については、この目安を参考にお話し合いください。`;
+  }
+  return text;
 }
 
 // ---------------------------------------------------------------------------
@@ -198,8 +220,20 @@ export async function loadAgreementView(input: {
 
   // ★同じ提案の組み合わせなら作り直さない。
   //   画面を開くたびに LARGE を呼んでおり、CT-1 が想定の4倍になっていた。
+  // ★鍵には、生成結果を変えるものすべてを入れる。
+  //   提案だけを鍵にしていたため、年収帯を後から登録しても
+  //   「情報が揃っていません」が恒久的に残っていた（レビューで検出）。
   const draftKey = ready
-    ? `${input.topic}_${createHash("sha256").update(JSON.stringify(parties.map((id) => byParty.get(id)))).digest("hex").slice(0, 16)}`
+    ? `${input.topic}_${createHash("sha256")
+        .update(
+          JSON.stringify({
+            proposals: parties.map((id) => byParty.get(id)),
+            bands: parties.map((id) => bands[id] ?? null),
+            children: snap.children.map((c) => ageOf(c.birthDate)).sort(),
+          }),
+        )
+        .digest("hex")
+        .slice(0, 16)}`
     : null;
 
   const cached = draftKey ? await loadMediationDraft(caseId, draftKey) : null;
@@ -214,14 +248,14 @@ export async function loadAgreementView(input: {
         payerBand: bands[nonCustodial(snap)] ?? null,
         payeeBand: bands[custodial(snap)] ?? null,
         childAges: snap.children.map((c) => ageOf(c.birthDate)),
-        proposals: parties.map((id) => ({
-          partyLabel: id === input.partyId ? "あなた" : "お相手",
-          payload: byParty.get(id)!,
-        })),
+        // ★閲覧者に依存しない。誰の案かは構造化表示（proposals[].isOwn）が担う
+        proposals: parties.map((id) => ({ payload: byParty.get(id)! })),
       })
     : null;
 
-  if (draftKey && draft && !cached) {
+  // ★目安が出せなかった結果をキャッシュしない。
+  //   年収帯が登録されれば結果が変わるものを、固定してしまわない。
+  if (draftKey && draft && !cached && draft.range !== null) {
     await saveMediationDraft(caseId, draftKey, draft as unknown as Record<string, unknown>);
   }
 

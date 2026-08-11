@@ -2,6 +2,7 @@ import { callLlmStructured } from "@/infra-adapters/llm/router";
 import { saveCallLog } from "@/infra-adapters/firestore/repositories/llmCallLogRepository";
 import { needsRelay, type Intent } from "@/domain/dialogue/intent";
 import { sanitizeReception } from "@/domain/dialogue/vocabulary";
+import { redactPii } from "@/domain/security/guard";
 import { EXTRACTION_SCHEMA } from "@/domain/relay/schema";
 import { EXTRACTION_SYSTEM_PROMPT, buildRelayText } from "@/domain/relay/prompts";
 import { hasVerbatimRun, verifyRelay, type ContextCategory } from "@/domain/relay/guard";
@@ -76,7 +77,10 @@ export async function buildRelay(input: {
 
   return {
     payload,
-    content: sanitizeReception(buildRelayText({ topicLabel, summary, context: v.context })),
+    // ★相手に届くものにも PII フィルタを掛ける。
+    //   言い換えられた電話番号や住所は原文と10文字一致しないため、
+    //   INV-4a では検出できない（レビューで検出）。
+    content: redactPii(sanitizeReception(buildRelayText({ topicLabel, summary, context: v.context }))),
     summary,
     context: v.context,
     categories: v.categories,

@@ -1009,7 +1009,7 @@ Proposal.status = PENDING   ← 提案として提示される
 ```
 ContactInfo.annualIncome: 4,380,000   ← ケース配下に置かない。越えない
           ↓ toIncomeBand()
-Party.incomeBand: "400-425"           ← 算定表のセルが特定できる粒度。越える
+Party.incomeBand: "425-450"           ← 算定表のセルが特定できる粒度。越える
 ```
 
 | 規約 |

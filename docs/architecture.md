@@ -249,7 +249,7 @@ Firestore のトランザクションは同一データベース内で成立す�
 | プラン | **Hacker（無料・永年）** / Team $49/mo / Enterprise |
 | **構造化出力** | **対応。**`response_format` の `json_object` / `json_schema` |
 | レート制限 | **ワークスペース単位**（キー単位ではない）。超過時 `429` ＋ `Retry-After` |
-| 価格カタログ | **公開API：`https://api.orcarouter.ai/api/pricing`** |
+| 価格カタログ | **公開API：`https://api.orcarouter.ai/api/pricing`**。<br>応答は `{ data: [{ model_name, model_ratio, completion_ratio, cache_ratio }, …] }` の**配列**（182件・2026-08-11 実測）。<br>モデル名をキーにした辞書ではない |
 | その他機能 | Auto Router / Fusion / Model Fallbacks / Routing DSL / Guardrails / Agent Firewall |
 
 #### 構造化出力のプロバイダ別対応
@@ -278,6 +278,8 @@ Firestore のトランザクションは同一データベース内で成立す�
 
 既知の公開価格と照合して検算済み（`openai/gpt-5.1` → $1.25 / $10.00、`google/gemini-2.5-flash` → $0.30 / $2.50）。
 
+> **★単価が引けないと原価が黙って0円になり、CT-1 が狂う。**必ず警告を出すこと（S3 で実際に踏んだ）。
+
 > **単価をハードコードせず、`/api/pricing` から取得してキャッシュする。**プロバイダの値下げが自動的に反映され、CT-1〜CT-4 が常に正確になる。
 
 ### 4.1 階層の抽象化
@@ -298,7 +300,7 @@ type TierConfig = {
 | --- | --- | --- | --- | --- | --- |
 | **SMALL** | **`openai/gpt-4.1-nano`** | 0.10 | 0.40 | ✅ | **非推論モデル。**実測で最安（→ §4.1a） |
 | **MEDIUM** | `openai/gpt-4.1-mini` | 0.40 | **1.60** | ✅ | 応答が長いため**出力単価**を重視 |
-| **LARGE** | `openai/gpt-5.1` | 1.25 | 10.00 | ✅ | フロンティア級で最安帯。低頻度のため単価より品質を優先 |
+| **LARGE** | `openai/gpt-5.1`<br>**＋ `reasoning_effort=medium`** | 1.25 | 10.00 | ✅ | フロンティア級で最安帯。低頻度のため単価より品質を優先。<br>★**推論モデルのため effort の明示が必須**（M-2） |
 
 ### 4.1a ★ 推論モデルの罠（2026-08-11 実測）
 
@@ -379,6 +381,30 @@ type TierConfig = {
 | **CT-4** ルーティングなしとの比較 | **同じログの `inputTokens` / `outputTokens` に LARGE の単価を掛け直す**。実測ベースで削減率を出せる |
 
 > **CT-4 が実測で出せることが重要。**「ルーティングにより原価を◯%削減」を推測ではなく計測値として提示できる。
+
+### 4.3a ★ S3 での実測（2026-08-11）
+
+疎通確認スクリプト（`scripts/verify-llm.ts`）による実測値。
+
+| # | 呼び出し | 入力 | 出力 | 原価 |
+| --- | --- | --- | --- | --- |
+| ① | SMALL・素の呼び出し | 47 | 2 | 0.0008円 |
+| ② | **SMALL・構造化出力**（`json_schema`） | 89 | 13 | 0.0021円 |
+
+**CT-4（ルーティングなしとの比較）**
+
+| | |
+| --- | --- |
+| 実際 | **0.0029円** |
+| 全部 LARGE なら | 0.0480円 |
+| **削減率** | **93.9%** |
+
+> **CT-4 が実測で出せることを確認した。**保存されたログの `inputTokens` / `outputTokens` に
+> LARGE の単価を掛け直すだけで算出できる。**推測ではなく計測値として提示できる。**
+
+構造化出力は `openai/gpt-4.1-nano` で正しく動作した（`{"intent":"SCHEDULE_CHANGE","urgency":"MEDIUM"}`）。
+
+---
 
 ### 4.4 事前試算（2026-08-11）
 

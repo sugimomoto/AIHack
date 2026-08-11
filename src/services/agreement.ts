@@ -1,7 +1,12 @@
 import { callLlm } from "@/infra-adapters/llm/router";
 import { saveCallLog } from "@/infra-adapters/firestore/repositories/llmCallLogRepository";
 import { findSupportTable } from "@/infra-adapters/firestore/repositories/masterRepository";
-import { lookupChildSupport, formatRange, type SupportRange } from "@/domain/support/table";
+import {
+  childrenKeyOf,
+  formatRange,
+  lookupChildSupport,
+  type SupportRange,
+} from "@/domain/support/table";
 import { MEDIATION_SYSTEM_PROMPT, buildMediationInput } from "@/domain/support/mediation";
 import {
   canFinalizeAgreement,
@@ -47,9 +52,11 @@ export async function buildMediationDraft(input: {
   topic: string;
   payerBand: string | null;
   payeeBand: string | null;
+  /** 子の年齢。★表の選択に使う */
+  childAges?: number[];
   proposals: { partyLabel: string; payload: Record<string, unknown> }[];
 }): Promise<MediationDraft> {
-  const range = await lookupRange(input.topic, input.payerBand, input.payeeBand);
+  const range = await lookupRange(input.topic, input.payerBand, input.payeeBand, input.childAges ?? []);
 
   const explanation = await explain({
     caseId: input.caseId,
@@ -71,12 +78,29 @@ async function lookupRange(
   topic: string,
   payerBand: string | null,
   payeeBand: string | null,
+  childAges: number[],
 ): Promise<SupportRange | null> {
   // ★年収帯が揃っていなければ引かない。片方だけで推定しない
   if (topic !== "CHILD_SUPPORT" || !payerBand || !payeeBand) return null;
-  const table = await findSupportTable(topic);
+
+  const childrenKey = childrenKeyOf(childAges);
+  if (!childrenKey) return null; // 子の情報が無い／公表された表が無い
+
+  const table = await findSupportTable(topic, childrenKey);
   if (!table) return null;
-  return lookupChildSupport(table, { payerBand, payeeBand });
+
+  // ★帯の下端を代表値として引く（帯は算定表の行そのもの）
+  const payerMan = bandLowerMan(payerBand);
+  const payeeMan = bandLowerMan(payeeBand);
+  if (payerMan === null || payeeMan === null) return null;
+
+  return lookupChildSupport(table, { payerMan, payeeMan });
+}
+
+/** "425-450" → 425 */
+function bandLowerMan(band: string): number | null {
+  const n = Number(band.split("-")[0]);
+  return Number.isFinite(n) ? n : null;
 }
 
 /**
@@ -103,7 +127,9 @@ async function explain(input: {
       proposals: input.proposals,
     }),
     caseId: input.caseId,
-    maxOutputTokens: 900,
+    // ★推論モデルでは、思考トークンも出力枠を消費する（→ architecture.md §4.1a）。
+    //   900 では枠を使い切って本文が空になった。実測して余裕を持たせる。
+    maxOutputTokens: 3000,
   });
   await saveCallLog(res.log);
   return res.content.trim();
@@ -170,6 +196,7 @@ export async function loadAgreementView(input: {
         // ★義務者＝非監護親。C-01 として暫定
         payerBand: bands[nonCustodial(snap)] ?? null,
         payeeBand: bands[custodial(snap)] ?? null,
+        childAges: snap.children.map((c) => ageOf(c.birthDate)),
         proposals: parties.map((id) => ({
           partyLabel: id === input.partyId ? "あなた" : "お相手",
           payload: byParty.get(id)!,
@@ -192,6 +219,17 @@ export async function loadAgreementView(input: {
     ...viewOfConsents(c, payloads),
     ownConsent: consents[input.partyId] ?? "PENDING",
   };
+}
+
+/** ★生年月日から年齢。表の選択にのみ使う */
+function ageOf(birthDate: string | null | undefined): number {
+  if (!birthDate) return 0;
+  const b = new Date(birthDate);
+  const now = new Date();
+  let a = now.getFullYear() - b.getFullYear();
+  const m = now.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) a--;
+  return Math.max(0, a);
 }
 
 function custodial(snap: { parties: { id: string; role: string }[] }): string {

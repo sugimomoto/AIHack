@@ -13,6 +13,7 @@ async function main() {
     topic: "CHILD_SUPPORT",
     payerBand: "425-450",
     payeeBand: "200-225",
+    childAges: [8],
     proposals: [
       { partyLabel: "Aさん", payload: { monthlyAmount: 30000 } },
       { partyLabel: "Bさん", payload: { monthlyAmount: 40000 } },
@@ -24,7 +25,8 @@ async function main() {
 
   console.log("\n② 検証");
   const check = (l: string, ok: boolean) => console.log(`   ${l}: ${ok ? "✓" : "✗"}`);
-  check("★未検証の注記が出力に含まれる  ", (d.rangeText ?? "").includes("未検証"));
+  check("★検証済みの表では注記が付かない", !(d.rangeText ?? "").includes("未検証") && !d.unverified);
+  check("★説明が空でない              ", d.explanation.trim().length > 20);
   check("★出典（表番号）が併記される    ", (d.rangeText ?? "").includes("表1"));
   check("★レンジが算定表由来           ", d.range !== null);
 
@@ -56,6 +58,7 @@ async function main() {
     topic: "CHILD_SUPPORT",
     payerBand: "425-450",
     payeeBand: null,
+    childAges: [8],
     proposals: [],
   });
   console.log(`   ${n.explanation}`);

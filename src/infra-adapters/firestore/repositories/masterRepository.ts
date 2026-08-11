@@ -30,31 +30,28 @@ export async function findPublishedPayloadSchema(
   return rows.sort((a, b) => b.version - a.version)[0];
 }
 
-export type SupportTableRecord = {
-  id: string;
-  targetKey: string;
-  tableRef: string;
-  version: number;
-  status: string;
-  verified: boolean;
-  sourceNote: string;
-  rows: { payerBand: string; payeeBand: string; minYen: number; maxYen: number }[];
-};
+import type { SupportTableMaster } from "@/domain/support/table";
 
 /**
  * 算定表を取る。
  *
- * ★DRAFT でも返す。
- *   未検証であることは `verified` が持ち、参照結果の注記として必ず現れる。
- *   ここで DRAFT を弾くと「表が無い」となり、**未検証であることが伝わらない。**
+ * ★子の構成で表が分かれる。該当が無ければ null。
+ *   公表されていない構成（子4人以上・表8）では引けない。
+ *
+ * ★DRAFT でも返す。未検証であることは `verified` が持ち、
+ *   参照結果の注記として必ず現れる。ここで弾くと「表が無い」となり、
+ *   **未検証であることが伝わらない。**
  */
-export async function findSupportTable(targetKey: string): Promise<SupportTableRecord | null> {
+export async function findSupportTable(
+  targetKey: string,
+  childrenKey: string,
+): Promise<SupportTableMaster | null> {
   const snap = await getDb()
     .collection("masters/supportTables/items")
     .where("targetKey", "==", targetKey)
+    .where("childrenKey", "==", childrenKey)
     .get();
   if (snap.empty) return null;
-  const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as SupportTableRecord);
-  // ★検証済みを優先し、次に版が新しいもの
+  const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as SupportTableMaster);
   return rows.sort((a, b) => Number(b.verified) - Number(a.verified) || b.version - a.version)[0];
 }

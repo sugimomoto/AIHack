@@ -1,35 +1,39 @@
 /**
  * 養育費算定表の参照
  *
- * ★LLMに金額を計算させない（P3）。テーブル参照で決定的に取得する。
+ * ★LLMに金額を計算させない（P3）。表参照で決定的に取得する。
  *
- * ★一次資料からの正確なデータ化ができていない（R-18）。
- *   それらしい数字を算定表の値として提示すると、
- *   **このプロダクトが防ごうとしている害を、自分で起こす。**
- *   当事者は「裁判所の基準」として受け取るためである。
- *
- *   → 未検証であることを、出力から外せない形にする。
+ * ★データは裁判所公表「令和元年改定標準算定表」を、帯グラフのPDFから
+ *   機械的に抽出したものである（scripts/extract-support-tables.py）。
+ *   抽出の検証：
+ *     1. 両端からの独立計数が全セルで一致すること
+ *     2. 義務者年収↑で帯が下がらず、権利者年収↑で帯が上がらないこと
+ *     3. 図中の最上段ラベル（目視）と帯数が一致すること
+ *   通らなかった表は**含めていない**。参照は null を返す。
  *
  * @see docs/functional-design.md §5.4
  */
 
-export type SupportTableRow = {
-  /** 義務者の年収帯（→ domain/income/band.ts） */
-  payerBand: string;
-  /** 権利者の年収帯 */
-  payeeBand: string;
-  minYen: number;
-  maxYen: number;
-};
-
 export type SupportTableMaster = {
   id: string;
-  /** 出典。表番号（例：表1 子1人・0〜14歳） */
+  targetKey: string;
+  /** 子の構成キー（→ childrenKeyOf） */
+  childrenKey: string;
+  /** 出典。表番号 */
   tableRef: string;
+  version: number;
+  status: string;
   /** ★一次資料と照合済みか */
   verified: boolean;
   sourceNote: string;
-  rows: SupportTableRow[];
+  payerStepMan: number;
+  payeeStepMan: number;
+  payerMaxMan: number;
+  payeeMaxMan: number;
+  /** 帯の凡例（"4-6" = 4〜6万円） */
+  bandLegend: string[];
+  /** 1行＝義務者の1段。2文字ずつが権利者の1列の帯index */
+  grid: string[];
 };
 
 export type SupportRange = {
@@ -44,24 +48,49 @@ export const UNVERIFIED_CAVEAT =
   "※この金額は未検証のサンプル値です。裁判所が公表する算定表と照合していません。実際の取り決めには、必ず一次資料をご確認ください。";
 
 /**
+ * 子の構成から表を選ぶキーを作る。
+ *
+ * ★算定表は「子の人数」と「15歳以上かどうか」で分かれる。
+ *   15歳以上を先に並べるのが表の並びである。
+ *
+ * ★4人以上の表は公表されていない。null を返す。
+ */
+export function childrenKeyOf(ages: readonly number[]): string | null {
+  if (ages.length === 0 || ages.length > 3) return null;
+  const flags = ages.map((a) => (a >= 15 ? 1 : 0)).sort((a, b) => b - a);
+  return `${ages.length}:${flags.join("")}`;
+}
+
+/**
  * 算定表を引く。
  *
- * ★表に無い組み合わせでは null を返す。
- *   外挿すると、根拠のない数字になる。
- *   「近い行を使う」も外挿である。
+ * ★表の範囲外では null を返す。
+ *   外挿すると根拠のない数字になる。「近い行を使う」も外挿である。
+ *
+ * ★刻みの途中は下の段を使う（表の読み方に合わせる）。
  */
 export function lookupChildSupport(
   table: SupportTableMaster,
-  input: { payerBand: string; payeeBand: string },
+  input: { payerMan: number; payeeMan: number },
 ): SupportRange | null {
-  const row = table.rows.find(
-    (r) => r.payerBand === input.payerBand && r.payeeBand === input.payeeBand,
-  );
+  const { payerMan, payeeMan } = input;
+  if (payerMan < 0 || payeeMan < 0) return null;
+  if (payerMan > table.payerMaxMan || payeeMan > table.payeeMaxMan) return null;
+
+  const j = Math.floor(payerMan / table.payerStepMan);
+  const i = Math.floor(payeeMan / table.payeeStepMan);
+  const row = table.grid[j];
   if (!row) return null;
 
+  const cell = row.slice(i * 2, i * 2 + 2);
+  if (cell.length !== 2) return null;
+  const legend = table.bandLegend[Number(cell)];
+  if (!legend) return null;
+
+  const [lo, hi] = legend.split("-").map(Number);
   return {
-    minYen: row.minYen,
-    maxYen: row.maxYen,
+    minYen: lo * 10000,
+    maxYen: hi * 10000,
     tableRef: table.tableRef,
     // ★注記は参照結果に含める。呼び出し側に任せると、いつか忘れる
     ...(table.verified ? {} : { caveat: UNVERIFIED_CAVEAT }),

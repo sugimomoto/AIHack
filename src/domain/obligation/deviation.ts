@@ -89,15 +89,20 @@ export function assessEnforceability(
   const excessYen = Math.max(0, input.monthlyAmountYen - limitYen);
   const within = excessYen === 0;
 
-  const explanation = within
+  const base = within
     ? `取り決めた月額は、先取特権の範囲（お子さん1人あたり月${(table.perChildYen / 10000).toFixed(0)}万円）に収まっています。債務名義がなくても手続きに進める場合があります。`
     : `取り決めた月額のうち、月${excessYen.toLocaleString()}円分は先取特権の範囲を超えます。この部分については、公正証書などの債務名義が必要になる場合があります。`;
+
+  const caveat = table.verified ? undefined : PRIORITY_CLAIM_CAVEAT;
 
   return {
     withinPriorityClaim: within,
     limitYen,
     excessYen,
-    explanation,
-    ...(table.verified ? {} : { caveat: PRIORITY_CLAIM_CAVEAT }),
+    // ★注記を explanation に不可分に含める。
+    //   別フィールドにすると、explanation だけを描画した実装で注記が消える
+    //   （レビューで検出）。算定表の formatRange と同じ考え方。
+    explanation: caveat ? `${base}\n${caveat}` : base,
+    ...(caveat ? { caveat } : {}),
   };
 }

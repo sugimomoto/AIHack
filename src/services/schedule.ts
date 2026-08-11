@@ -1,6 +1,7 @@
 import { asCaseId, type PartyId } from "@/domain/case/types";
 import { assertOwnParty } from "@/domain/case/scope";
 import {
+  canReport,
   fulfillmentStateOf,
   generateObligations,
   labelOf,
@@ -55,7 +56,18 @@ export type ScheduleRow = {
   canReport: "PAID" | "RECEIVED" | null;
 };
 
+/** ★不正な日付を通すと、全件が偽の逸脱になる（レビューで検出） */
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+export class InvalidDateError extends Error {
+  constructor() {
+    super("日付の指定が正しくありません");
+    this.name = "InvalidDateError";
+  }
+}
+
 export async function loadSchedule(input: { caseId: string; partyId: PartyId; today: string }) {
+  if (!DATE_RE.test(input.today) || Number.isNaN(Date.parse(input.today))) throw new InvalidDateError();
   const caseId = asCaseId(input.caseId);
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
@@ -82,10 +94,7 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
     .map((o) => {
     const key = `${o.topic}_${o.dueDate}`;
     const f = fulfillments[key] ?? {};
-    const state = fulfillmentStateOf({
-      paidReported: Boolean(f.paidBy),
-      receivedReported: Boolean(f.receivedBy),
-    });
+    const state = fulfillmentStateOf(f);
     const isOwn = o.obligorPartyId === input.partyId;
     return {
       key,
@@ -94,6 +103,7 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
       isOwnObligation: isOwn,
       state,
       label: labelOf(state),
+      // ★立場に合った種別だけ。義務者は支払い、権利者は入金
       canReport: isOwn ? (f.paidBy ? null : "PAID") : f.receivedBy ? null : "RECEIVED",
     };
   });
@@ -122,6 +132,13 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
   };
 }
 
+export class InvalidReportError extends Error {
+  constructor() {
+    super("この記録はご自身の立場では登録できません");
+    this.name = "InvalidReportError";
+  }
+}
+
 export async function recordFulfillment(input: {
   caseId: string;
   partyId: PartyId;
@@ -131,5 +148,13 @@ export async function recordFulfillment(input: {
   const caseId = asCaseId(input.caseId);
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
+
+  // ★立場を検証する。義務者が「入金を確認しました」と申告できると、
+  //   逸脱検知を永久に無効化できる（レビューで検出）。
+  const obligor = snap.parties.find((p) => p.role === "NON_CUSTODIAL")?.id ?? snap.parties[0]?.id ?? "";
+  if (!canReport({ isObligor: obligor === input.partyId, kind: input.kind })) {
+    throw new InvalidReportError();
+  }
+
   await reportFulfillment(caseId, input.key, input.partyId, input.kind);
 }

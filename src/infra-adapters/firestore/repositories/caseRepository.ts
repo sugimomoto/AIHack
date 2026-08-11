@@ -309,7 +309,9 @@ export async function loadIncomeBands(caseId: CaseId): Promise<Record<string, st
  */
 export async function listAgreementItems(
   caseId: CaseId,
-): Promise<{ topic: string; status: string; payload: Record<string, unknown> | null }[]> {
+): Promise<
+  { topic: string; status: string; payload: Record<string, unknown> | null; agreedAt: string }[]
+> {
   const snap = await caseRef(caseId).collection("agreementItems").get();
   return snap.docs
     .map((d) => ({
@@ -318,8 +320,9 @@ export async function listAgreementItems(
       payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
       agreedAt: (d.get("agreedAt") ?? "") as string,
     }))
-    .sort((a, b) => a.agreedAt.localeCompare(b.agreedAt))
-    .map(({ agreedAt: _ignored, ...rest }) => rest);
+    // ★agreedAt を捨てない。合意の始期が分からないと、
+    //   存在しなかった義務を「守られていない」と言ってしまう。
+    .sort((a, b) => a.agreedAt.localeCompare(b.agreedAt));
 }
 
 /** 履行の申告。★自己申告であり、アプリは入金を観測しない */

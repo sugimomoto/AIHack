@@ -47,6 +47,8 @@ export type AgreementItemInput = {
   topic: string;
   status: string;
   payload: Record<string, unknown> | null;
+  /** ★合意が成立した日時。これより前の期日は義務にしない */
+  agreedAt?: string;
 };
 
 /**
@@ -72,12 +74,19 @@ export function generateObligations(input: {
     const payDay = item.payload?.payDay;
     if (typeof amount !== "number" || typeof payDay !== "string") continue;
 
+    // ★合意の始期が分からなければ作らない。
+    //   いつからの義務か分からないものを「守られていない」と言えない。
+    if (!item.agreedAt) continue;
+    const since = item.agreedAt.slice(0, 10);
+
     for (let k = 0; k < input.months; k++) {
       const m = m0 + k;
       const year = y0 + Math.floor((m - 1) / 12);
       const month = ((m - 1) % 12) + 1;
       const dueDate = dueDateOf(payDay, year, month);
       if (!dueDate) continue;
+      // ★合意より前の期日は義務にしない
+      if (dueDate < since) continue;
       out.push({ topic: item.topic, dueDate, amountYen: amount, obligorPartyId: input.obligorPartyId });
     }
   }
@@ -96,16 +105,28 @@ export type FulfillmentState = (typeof FULFILLMENT_STATES)[number];
 
 /**
  * ★双方の申告が揃ったときのみ「確認できました」。
- *   一致していないことを、一致したことにしない。
+ *
+ * ★「双方」とは**別々の人**の申告である。
+ *   同じ人が両方を申告しても、確認できたことにはならない。
+ *   真偽値2つで判定していたため、これを見落としていた（レビューで検出）。
  */
-export function fulfillmentStateOf(r: {
-  paidReported: boolean;
-  receivedReported: boolean;
-}): FulfillmentState {
-  if (r.paidReported && r.receivedReported) return "CONFIRMED";
-  if (r.paidReported) return "PAID_REPORTED";
-  if (r.receivedReported) return "RECEIVED_REPORTED";
+export function fulfillmentStateOf(r: { paidBy?: string; receivedBy?: string }): FulfillmentState {
+  const both = Boolean(r.paidBy) && Boolean(r.receivedBy) && r.paidBy !== r.receivedBy;
+  if (both) return "CONFIRMED";
+  if (r.paidBy) return "PAID_REPORTED";
+  if (r.receivedBy) return "RECEIVED_REPORTED";
   return "NO_RECORD";
+}
+
+/**
+ * ★申告できる種別は、立場で決まる。
+ *
+ *   義務者が「入金を確認しました」と申告できると、
+ *   **逸脱検知を永久に無効化できる。**
+ *   相手の画面には、相手が申告していない記録が現れる。
+ */
+export function canReport(input: { isObligor: boolean; kind: "PAID" | "RECEIVED" }): boolean {
+  return input.isObligor ? input.kind === "PAID" : input.kind === "RECEIVED";
 }
 
 /**

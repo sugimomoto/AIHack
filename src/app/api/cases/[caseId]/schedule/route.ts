@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { todayJst } from "@/lib/today";
 import { loadSchedule, recordFulfillment } from "@/services/schedule";
 import { resolveParty } from "@/lib/resolveParty";
 import { errorResponse } from "../messages/route";
@@ -9,7 +10,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ caseId: string 
   const { caseId } = await ctx.params;
   try {
     const partyId = await resolveParty(req);
-    const today = new URL(req.url).searchParams.get("today") ?? new Date().toISOString().slice(0, 10);
+    const today = new URL(req.url).searchParams.get("today") ?? todayJst();
     return NextResponse.json(await loadSchedule({ caseId, partyId, today }));
   } catch (e) {
     return errorResponse(e);

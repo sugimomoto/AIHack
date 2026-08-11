@@ -13,6 +13,9 @@ export const FORBIDDEN_WORDS: readonly ForbiddenWord[] = [
   { word: "違反", replacement: "逸脱", reason: "責める語彙を避ける" },
   { word: "元夫", replacement: "お相手", reason: "関係性を想起させない" },
   { word: "元妻", replacement: "お相手", reason: "関係性を想起させない" },
+  // ★責める語彙。各テストが個別に補っていたため、一覧に含める（レビューで検出）
+  { word: "滞納", replacement: "入金が確認できていない状態", reason: "責める語彙を避ける" },
+  { word: "遅延", replacement: "行き違い", reason: "断定を避ける" },
 ];
 
 export class ForbiddenWordError extends Error {

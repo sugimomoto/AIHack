@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { DEVIATION_LABELS } from "@/domain/obligation/deviation";
 
 /**
  * 予定と履行
@@ -27,6 +28,8 @@ type View = {
 };
 
 const md = (d: string) => `${Number(d.slice(5, 7))}月${Number(d.slice(8, 10))}日`;
+/** ★年を落とさない。前年か当年か分からないと確認できない */
+const ymd = (d: string) => `${d.slice(0, 4)}年${md(d)}`;
 
 export function SchedulePanel({
   caseId,
@@ -111,20 +114,17 @@ export function SchedulePanel({
             marginBottom: 8,
           }}
         >
+          {/* ★文言は定数から取る。画面に直書きすると、語彙のテストが実画面を守らない */}
           <p style={{ fontSize: 12, lineHeight: 1.85, color: "var(--attention-text)" }}>
-            {md(v.deviations[0].dueDate)}分の お支払いの記録が確認できていません。
+            {ymd(v.deviations[v.deviations.length - 1].dueDate)}分の {DEVIATION_LABELS.NOTICE}。
+            {v.deviations.length > 1 && `（ほかに${v.deviations.length - 1}件）`}
             <br />
-            行き違いの可能性もあります。まずは記録をご確認ください。
+            {DEVIATION_LABELS.DETAIL}
           </p>
           {v.enforceability && (
             <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub-2)", marginTop: 7 }}>
-              {v.enforceability.explanation}
-              {v.enforceability.caveat && (
-                <>
-                  <br />
-                  <span style={{ color: "var(--muted)" }}>{v.enforceability.caveat}</span>
-                </>
-              )}
+              {/* ★注記は explanation に含まれている。分けて描かない */}
+              <span style={{ whiteSpace: "pre-wrap" }}>{v.enforceability.explanation}</span>
             </p>
           )}
         </div>

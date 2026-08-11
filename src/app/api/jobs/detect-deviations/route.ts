@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { todayJst } from "@/lib/today";
 
 /**
  * 逸脱の日次検知
@@ -24,14 +25,16 @@ export async function POST(req: Request) {
   const { loadForLlm } = await import("@/infra-adapters/firestore/repositories/caseRepository");
   const { asCaseId } = await import("@/domain/case/types");
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayJst();
   const caseIds = await listCaseIds();
   let detected = 0;
 
   for (const caseId of caseIds) {
     try {
       const snap = await loadForLlm(asCaseId(caseId));
-      const anyParty = snap.parties[0];
+      // ★退会者を選ぶと assertOwnParty で弾かれ、そのケースの逸脱が
+      //   恒久的に検知されなくなる（レビューで検出）
+      const anyParty = snap.parties.find((p) => p.state !== "WITHDRAWN");
       if (!anyParty) continue;
       const r = await loadSchedule({ caseId, partyId: asPartyId(anyParty.id), today });
       detected += r.deviations.length;

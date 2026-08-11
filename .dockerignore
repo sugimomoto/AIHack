@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.github
+.steering
+.meetings
+docs
+design
+tests
+scripts
+infra
+.env*
+!.env.example
+*.md
+.vercel
+.DS_Store

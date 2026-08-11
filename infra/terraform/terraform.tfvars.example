@@ -1,0 +1,4 @@
+project_id  = "aida-505206"
+region      = "asia-northeast1"
+image       = "asia-northeast1-docker.pkg.dev/aida-505206/aida/aida:latest"
+github_repo = "sugimomoto/AIHack"

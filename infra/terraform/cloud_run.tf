@@ -7,6 +7,15 @@ resource "google_service_account" "run" {
   display_name = "Aida Cloud Run runtime"
 }
 
+# ★Firestore へのアクセス。
+#   これが無いと、本番だけがデータを読めない状態になる（実際に起きた）。
+#   Secret Manager の権限だけでは足りない。
+resource "google_project_iam_member" "run_datastore" {
+  project = var.project_id
+  role    = "roles/datastore.user"
+  member  = "serviceAccount:${google_service_account.run.email}"
+}
+
 resource "google_cloud_run_v2_service" "app" {
   name                = var.service_name
   location            = var.region

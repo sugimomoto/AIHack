@@ -1,66 +1,43 @@
-"use client";
-
-import { useState } from "react";
-import { CaseChat } from "@/components/chat/CaseChat";
-import { AgreementPanel } from "@/components/agreement/AgreementPanel";
-import { DocumentPanel } from "@/components/document/DocumentPanel";
+import { DemoPanes } from "@/components/chat/DemoPanes";
+import { isDevPartySwitchEnabled } from "@/lib/party";
 
 /**
  * 両当事者を並べて確認する画面
  *
- * ★片側だけでは C1 を検証できない。
- *   「書いた言葉が相手に届かない」は、両方を同時に見て初めて確かめられる。
- *
- * ★この画面は開発用である。
- *   当事者の切替は `x-dev-party` ヘッダで行っており、
- *   本番では効かない（→ lib/party.ts）。
+ * ★本番では動かない。
+ *   当事者の切替は開発用であり、本番で通ると誰でも他人の当事者になれる。
+ *   黙って空の画面を出すのではなく、**動かない理由を書く。**
  */
-const CASE_ID = "case_dev_001";
+export const dynamic = "force-dynamic";
 
 export default function Page() {
-  const [key, setKey] = useState(0);
-  const bump = () => setKey((k) => k + 1);
+  if (!isDevPartySwitchEnabled()) return <Unavailable />;
+  return <DemoPanes />;
+}
 
+function Unavailable() {
   return (
-    <div className="flex min-h-dvh flex-col" style={{ background: "var(--surface-2)" }}>
+    <div className="grid min-h-dvh place-items-center px-8" style={{ background: "var(--surface-2)" }}>
       <div
-        className="px-4 py-2 text-center"
+        className="w-full max-w-[520px]"
         style={{
-          background: "var(--muted-bg)",
-          borderBottom: "1px solid var(--border)",
-          fontSize: 11.5,
-          lineHeight: 1.7,
-          color: "var(--text-sub-2)",
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r-lg)",
+          padding: 24,
         }}
       >
-        開発用の確認画面です。実データに接続しています。
-        <br className="sm:hidden" />
-        <span className="hidden sm:inline"> </span>
-        左に書いた言葉は、右には届きません。合意に必要な事実だけが取次ぎとして現れます。
-      </div>
-
-      <div className="flex flex-1 flex-col gap-3 p-3 sm:flex-row sm:justify-center">
-        {[
-          { partyId: "party_dev_a", label: "非監護親（Aさん）" },
-          { partyId: "party_dev_b", label: "監護親（Bさん）" },
-        ].map((p) => (
-          <div
-            key={p.partyId}
-            className="flex w-full flex-col overflow-hidden sm:w-[390px]"
-            style={{
-              background: "var(--bg)",
-              height: "min(760px, calc(100dvh - 90px))",
-              borderRadius: "var(--r-lg)",
-              border: "1px solid var(--border-strong)",
-            }}
-          >
-            <div className="flex min-h-0 flex-1 flex-col">
-              <CaseChat caseId={CASE_ID} partyId={p.partyId} label={p.label} onChanged={bump} reloadKey={key} />
-            </div>
-            <AgreementPanel caseId={CASE_ID} partyId={p.partyId} reloadKey={key} onChanged={bump} />
-            <DocumentPanel caseId={CASE_ID} partyId={p.partyId} reloadKey={key} />
-          </div>
-        ))}
+        <h1 style={{ fontSize: 16, fontWeight: 600 }}>この画面は本番では動きません</h1>
+        <p style={{ fontSize: 13.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 10 }}>
+          両当事者を並べて確認するには、当事者を切り替える必要があります。
+          <br />
+          この切替が本番で使えると、<strong>誰でも他人の当事者になれます。</strong>
+          その時点で、このプロダクトの中心にある「相手の言葉が届かない」という保証が意味を失います。
+        </p>
+        <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub-2)", marginTop: 12 }}>
+          そのため、切替は開発環境でのみ、かつ明示的に有効化したときだけ効くようにしています。
+          本番での確認には、招待からの登録を経た通常のログインが必要です。
+        </p>
       </div>
     </div>
   );

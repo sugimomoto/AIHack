@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   デザイントークン
+   出典: design/README.md（Design Tokens）— 納品値をそのまま使う
+   ⚠️ ここに定義された変数以外の色を、コンポーネントに直書きしない
+   ========================================================================= */
+:root {
+  /* 面 */
+  --bg: #fdf8ef;
+  --surface: #fffcf5;
+  --surface-2: #f7efe1;
+
+  /* 発言 */
+  --bubble-self: #f2e8d9; /* ① 自分の発言 */
+  --bubble-ai: #fbf0da; /* ② AI の発言・入力の入口 */
+  --envelope-head: #fbf3e6; /* ③ 取次ぎのヘッダ帯 */
+
+  /* 境界 */
+  --border: #efe3d0;
+  --border-strong: #e0d5c4;
+  --border-subtle: #f1e9dc;
+  --border-dashed: #e2d7c6;
+
+  /* 文字 */
+  --text: #3a342e;
+  --text-sub: #6f675e;
+  --text-sub-2: #655c53;
+
+  /* AI（図版用 / 文字用） */
+  --ai: #c08f3c;
+  --ai-text: #8a6212;
+
+  /* 合意（図版用 / 文字用 / 地） */
+  --agree: #5b8a63;
+  --agree-text: #3f6b49;
+  --agree-bg: #edf3e9;
+
+  /* 注意（図版用 / 文字用 / 地）— 赤は使わない */
+  --attention: #dcc0ab;
+  --attention-text: #834b32;
+  --attention-bg: #faede3;
+
+  /* 無効 */
+  --muted: #a99d8c;
+  --muted-bg: #f6efe5;
+
+  /* 角丸 */
+  --r-sm: 11px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 26px;
+  --r-device: 30px;
+  --r-full: 999px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-bubble-self: var(--bubble-self);
+  --color-bubble-ai: var(--bubble-ai);
+  --color-envelope-head: var(--envelope-head);
+  --color-border-base: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-dashed: var(--border-dashed);
+  --color-text: var(--text);
+  --color-text-sub: var(--text-sub);
+  --color-text-sub-2: var(--text-sub-2);
+  --color-ai: var(--ai);
+  --color-ai-text: var(--ai-text);
+  --color-agree: var(--agree);
+  --color-agree-text: var(--agree-text);
+  --color-agree-bg: var(--agree-bg);
+  --color-attention: var(--attention);
+  --color-attention-text: var(--attention-text);
+  --color-attention-bg: var(--attention-bg);
+  --color-muted: var(--muted);
+  --color-muted-bg: var(--muted-bg);
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-device: var(--r-device);
+
+  --font-sans: "Zen Kaku Gothic New", ui-sans-serif, system-ui, sans-serif;
+  --font-mincho: "Shippori Mincho", serif;
+}
+
+/* =========================================================================
+   ベース
+   ========================================================================= */
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 本文の行間は広めに保つ。情報密度を上げない */
+body {
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* 11px 未満のテキストを作らない */
+small {
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* =========================================================================
+   モーション — 最小限・ゆっくり・控えめ
+   ========================================================================= */
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 発言の出現: fade + 4px 上昇 / 320ms / ease-out */
+.anim-msg-in {
+  animation: msg-in 320ms ease-out both;
+}
+
+/* AI の応答待ち: 呼吸 3.2s ループ（点の明滅は使わない） */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+.anim-breathe {
+  animation: breathe 3.2s ease-in-out infinite;
+}
+
+/* 画面遷移: fade 240ms（横スライドは使わない） */
+.anim-fade {
+  animation: msg-in 240ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

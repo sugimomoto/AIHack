@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 /**
  * 招待トークン
@@ -27,4 +27,15 @@ export function expiresAt(now: Date): string {
   const d = new Date(now);
   d.setDate(d.getDate() + INVITATION_TTL_DAYS);
   return d.toISOString();
+}
+
+/**
+ * トークンのハッシュ
+ *
+ * ★平文を保存しない。
+ *   招待文書が漏れても、そこから有効なリンクを復元できない。
+ *   照会はハッシュ同士の比較で行う（→ invitationRepository.findByToken）。
+ */
+export function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
 }

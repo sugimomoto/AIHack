@@ -8,7 +8,10 @@ import {
   transition,
 } from "@/domain/invitation/stateMachine";
 import { buildInvitationMail, SUBJECT_FORBIDDEN_WORDS } from "@/domain/invitation/mail";
-import { generateInvitationToken, isWellFormedToken } from "@/domain/invitation/token";
+import { generateInvitationToken,
+  hashToken,
+  isWellFormedToken,
+} from "@/domain/invitation/token";
 
 /**
  * 招待
@@ -105,7 +108,51 @@ describe("★招待メールの制約", () => {
     expect(mail().body).toContain("https://example.test/invite/abc");
   });
 
-  it("★断ってよいことが書かれている", () => {
-    expect(mail().body).toMatch(/断|お断り|やめて|無視/);
+  /**
+   * ★「断ってよい」はメールに書かない。
+   *
+   * 納品物の確定文面は「お返事の期限はありません。」までにとどめている。
+   * 断ってよいことの明示は、受け取った側の画面（A-3）が担う。
+   *
+   *   メール      … 相手の職場や家庭で見られうる。情報量を最小にする
+   *   A-3 の画面  … 本人が一人で見ている。ここで初めて選択を提示する
+   *
+   * したがってメールに求めるのは「急かさないこと」である。
+   */
+  it("★急かす表現が含まれない", () => {
+    expect(mail().body).not.toMatch(/至急|お早め|までに|ご返信ください|お急ぎ|期限が/);
+  });
+
+  it("★期限がないことが明示されている", () => {
+    expect(mail().body).toContain("お返事の期限はありません");
+  });
+});
+
+/**
+ * ★トークンの保存方法
+ *
+ * 平文で保存すると、この文書が漏れた時点で有効なリンクが復元できてしまう。
+ * ハッシュで保存し、照会もハッシュで行う。
+ *
+ * ★このテストは実装より先に書かれた
+ */
+describe("トークンのハッシュ化", () => {
+  it("同じトークンからは同じハッシュが得られる（照会に使えること）", () => {
+    const t = generateInvitationToken();
+    expect(hashToken(t)).toBe(hashToken(t));
+  });
+
+  it("異なるトークンからは異なるハッシュになる", () => {
+    expect(hashToken(generateInvitationToken())).not.toBe(hashToken(generateInvitationToken()));
+  });
+
+  it("★ハッシュから元のトークンが読み取れない", () => {
+    const t = generateInvitationToken();
+    expect(hashToken(t)).not.toContain(t);
+    expect(hashToken(t)).not.toBe(t);
+  });
+
+  it("十分な長さがある（SHA-256 の16進表現）", () => {
+    expect(hashToken(generateInvitationToken())).toMatch(/^[0-9a-f]{64}$/);
   });
 });

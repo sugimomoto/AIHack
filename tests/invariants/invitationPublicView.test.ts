@@ -48,9 +48,14 @@ describe("A-6｜招待の公開ビュー", () => {
     expect(s).not.toContain("someone@example.test");
   });
 
-  it("返すキーが限定されている", () => {
+  it("★返すキーが限定されている（名前を出さない設定では state のみ）", () => {
     const v = toPublicView(BASE, new Date("2026-08-12"));
-    expect(Object.keys(v).sort()).toEqual(["senderName", "state"].sort());
+    expect(Object.keys(v)).toEqual(["state"]);
+  });
+
+  it("★返すキーが限定されている（名前を出す設定でも2つだけ）", () => {
+    const v = toPublicView({ ...BASE, revealSenderName: true }, new Date("2026-08-12"));
+    expect(Object.keys(v).sort()).toEqual(["senderName", "state"]);
   });
 
   describe("状態", () => {

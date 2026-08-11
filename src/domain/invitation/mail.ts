@@ -9,7 +9,7 @@
  *   相手の職場や家庭で見られる可能性がある（NFR-05 と同じ思想）。
  *
  * @see docs/product-requirements.md FR-14
- * @see design/README-v2.md A-2
+ * @see design/README-v2.md A-2（文面は納品物の確定文言に一致させている）
  */
 
 /** ★件名に出してはならない語 */
@@ -33,28 +33,23 @@ export type InvitationMail = { subject: string; body: string };
  *   追加した時点で「自由文を送れない」という安全性が失われる。
  */
 export function buildInvitationMail(input: InvitationMailInput): InvitationMail {
-  const from = input.revealSenderName ? `${input.senderName}さんから、` : "";
+  // ★露出しない場合、送信者名は本文のどこにも現れない
+  const from = input.revealSenderName ? `${input.senderName}さま` : "ご関係の方";
 
   return {
-    // ★内容が推測されない件名
-    subject: "お子さんに関する連絡のご案内",
+    // ★内容が推測されない件名（design/README-v2.md A-2 確定文言）
+    subject: "お手続きのご案内（Aida）",
 
     body: [
-      `${from}お子さんに関する連絡のやりとりを、アプリを通じて行うご提案が届いています。`,
+      "Aida は、お子さまに関する取り決めを、おふたりが直接やりとりせずに",
+      "進めるためのサービスです。",
       "",
-      "このアプリでは、おふたりが直接メッセージをやりとりすることはありません。",
-      "書いた言葉がそのまま相手に届くことはなく、決まったことだけが共有されます。",
+      `このご案内は、${from}からのご依頼でお送りしています。ご参加の場合も、`,
+      "直接メッセージをやりとりすることはありません。",
       "",
-      "住所や連絡先が相手に見えることもありません。",
-      "",
-      "▼ 内容を確認する",
+      "お返事の期限はありません。",
+      "▸ 内容を確認する",
       input.url,
-      "",
-      "――",
-      "ご参加は任意です。**お断りいただいても構いません。**",
-      "このご案内は繰り返し送られることはありません。",
-      "",
-      "リンクの有効期限は7日間です。",
     ].join("\n"),
   };
 }

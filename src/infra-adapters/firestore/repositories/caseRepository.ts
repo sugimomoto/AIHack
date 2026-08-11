@@ -140,3 +140,34 @@ export async function loadOwnContactInfo(partyId: PartyId): Promise<ContactInfo 
     annualIncome: d.get("annualIncome") ?? null,
   };
 }
+
+/**
+ * 本人の非開示情報を保存する。
+ *
+ * ★書き先は `/contactInfo/{partyId}`。ケース配下ではない。
+ *   パスの設計そのものが FR-09 の実装である。
+ *   ここをケース配下に移した瞬間、INV-2 の前提が崩れる。
+ */
+export async function saveOwnContactInfo(
+  partyId: PartyId,
+  patch: Partial<ContactInfo>,
+): Promise<void> {
+  const { partyId: _ignored, ...fields } = patch;
+  if (Object.keys(fields).length === 0) return;
+  await getDb().collection("contactInfo").doc(partyId).set(fields, { merge: true });
+}
+
+/**
+ * ケース配下の Party を更新する。
+ *
+ * ★ここに精密な年収を書いてはならない（INV-2a）。
+ *   書いてよいのは planProfileWrite が partyPatch に入れた値だけである。
+ */
+export async function patchParty(
+  caseId: CaseId,
+  partyId: PartyId,
+  patch: { incomeBand?: string; state?: PartyRecord["state"] },
+): Promise<void> {
+  if (Object.keys(patch).length === 0) return;
+  await caseRef(caseId).collection("parties").doc(partyId).set(patch, { merge: true });
+}

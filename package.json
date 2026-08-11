@@ -7,22 +7,33 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude tests/rules/**",
+    "test:watch": "vitest",
+    "test:rules": "firebase emulators:exec --only firestore \"vitest run tests/rules\"",
+    "emulator": "firebase emulators:start --only firestore",
+    "seed": "tsx scripts/seed-firestore.ts"
   },
   "dependencies": {
+    "firebase-admin": "^14.2.0",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "firebase": "^12.17.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.12",
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@10.33.2"
 }

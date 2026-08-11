@@ -1,0 +1,6 @@
+[
+  { "id": "tc_money",   "name": "お金のこと",         "sortOrder": 1 },
+  { "id": "tc_meeting", "name": "子どもと会うこと",   "sortOrder": 2 },
+  { "id": "tc_life",    "name": "子どもの進路・生活", "sortOrder": 3 },
+  { "id": "tc_daily",   "name": "日常の連絡",         "sortOrder": 4 }
+]

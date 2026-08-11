@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // 第三者成果物・生成物・インフラ定義は検査対象外
+    "design/**",
+    "infra/**",
+    "public/**",
   ]),
 ]);
 

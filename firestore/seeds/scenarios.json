@@ -1,0 +1,189 @@
+[
+  {
+    "id": "sc_001",
+    "categoryId": "tc_money",
+    "title": "養育費を決める",
+    "kind": "FORMAL",
+    "linkedTopic": "CHILD_SUPPORT",
+    "requiresConsent": true,
+    "promptHint": "養育費の額・支払日・終期を決める相談です。金額は算定表を参照して範囲を示してください。",
+    "isSystem": true,
+    "sortOrder": 1
+  },
+  {
+    "id": "sc_002",
+    "categoryId": "tc_money",
+    "title": "塾・習い事の費用を相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "CHILD_SUPPORT",
+    "requiresConsent": true,
+    "promptHint": "特別費用の分担に関する相談です。",
+    "isSystem": false,
+    "sortOrder": 2
+  },
+  {
+    "id": "sc_003",
+    "categoryId": "tc_money",
+    "title": "進学費用の分担を相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "CHILD_SUPPORT",
+    "requiresConsent": true,
+    "promptHint": "進学に伴う費用の分担に関する相談です。",
+    "isSystem": false,
+    "sortOrder": 3
+  },
+  {
+    "id": "sc_004",
+    "categoryId": "tc_money",
+    "title": "今月の支払いを待ってほしい",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "CHILD_SUPPORT",
+    "requiresConsent": true,
+    "promptHint": "支払時期の一時的な変更に関する相談です。事情を丁寧に受け止めてください。",
+    "isSystem": false,
+    "sortOrder": 4
+  },
+  {
+    "id": "sc_005",
+    "categoryId": "tc_money",
+    "title": "医療費の分担を相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "CHILD_SUPPORT",
+    "requiresConsent": true,
+    "promptHint": "医療費の分担に関する相談です。",
+    "isSystem": false,
+    "sortOrder": 5
+  },
+  {
+    "id": "sc_006",
+    "categoryId": "tc_meeting",
+    "title": "面会のルールを決める",
+    "kind": "FORMAL",
+    "linkedTopic": "VISITATION",
+    "requiresConsent": true,
+    "promptHint": "面会交流の頻度・時間・場所・受け渡し方法を決める相談です。",
+    "isSystem": true,
+    "sortOrder": 6
+  },
+  {
+    "id": "sc_007",
+    "categoryId": "tc_meeting",
+    "title": "今回の日程を変更したい",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "VISITATION",
+    "requiresConsent": true,
+    "promptHint": "面会日程の変更に関する相談です。★今回だけか今後もかを必ず確認してください。",
+    "isSystem": false,
+    "sortOrder": 7
+  },
+  {
+    "id": "sc_008",
+    "categoryId": "tc_meeting",
+    "title": "学校行事に参加したい",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "VISITATION",
+    "requiresConsent": true,
+    "promptHint": "学校行事への参加に関する相談です。",
+    "isSystem": false,
+    "sortOrder": 8
+  },
+  {
+    "id": "sc_009",
+    "categoryId": "tc_meeting",
+    "title": "長期休暇の過ごし方を相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "VISITATION",
+    "requiresConsent": true,
+    "promptHint": "長期休暇中の面会に関する相談です。",
+    "isSystem": false,
+    "sortOrder": 9
+  },
+  {
+    "id": "sc_010",
+    "categoryId": "tc_meeting",
+    "title": "宿泊・遠出について相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "VISITATION",
+    "requiresConsent": true,
+    "promptHint": "宿泊や遠方への外出に関する相談です。",
+    "isSystem": false,
+    "sortOrder": 10
+  },
+  {
+    "id": "sc_011",
+    "categoryId": "tc_life",
+    "title": "進学について相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": null,
+    "promptHint": "進学に関する相談です。共同親権の場合は双方の合意が必要です。",
+    "isSystem": false,
+    "sortOrder": 11
+  },
+  {
+    "id": "sc_012",
+    "categoryId": "tc_life",
+    "title": "医療について相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": null,
+    "promptHint": "医療に関する相談です。急迫の事情がある場合は単独で判断できます。",
+    "isSystem": false,
+    "sortOrder": 12
+  },
+  {
+    "id": "sc_013",
+    "categoryId": "tc_life",
+    "title": "転居・転校について相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": null,
+    "promptHint": "転居や転校に関する相談です。",
+    "isSystem": false,
+    "sortOrder": 13
+  },
+  {
+    "id": "sc_014",
+    "categoryId": "tc_daily",
+    "title": "送迎をお願いしたい",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "promptHint": "送迎の依頼です。合意が必要ですが軽微な調整です。",
+    "isSystem": false,
+    "sortOrder": 14
+  },
+  {
+    "id": "sc_015",
+    "categoryId": "tc_daily",
+    "title": "子どもの体調を伝える",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "promptHint": "体調に関する連絡です。合意は不要で、伝達のみを行います。",
+    "isSystem": false,
+    "sortOrder": 15
+  },
+  {
+    "id": "sc_016",
+    "categoryId": "tc_daily",
+    "title": "写真・成長を共有する",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "promptHint": "子どもの様子の共有です。合意は不要です。",
+    "isSystem": false,
+    "sortOrder": 16
+  },
+  {
+    "id": "sc_017",
+    "categoryId": "tc_daily",
+    "title": "学校からの連絡を共有する",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "promptHint": "学校からの連絡事項の共有です。合意は不要です。",
+    "isSystem": false,
+    "sortOrder": 17
+  }
+]

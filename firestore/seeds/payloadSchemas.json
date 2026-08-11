@@ -1,0 +1,83 @@
+[
+  {
+    "id": "ps_child_support_v1",
+    "targetType": "AGREEMENT_TOPIC",
+    "targetKey": "CHILD_SUPPORT",
+    "version": 1,
+    "status": "PUBLISHED",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["monthlyAmount", "payDay", "until"],
+      "properties": {
+        "monthlyAmount": {
+          "type": "integer",
+          "minimum": 0,
+          "title": "月額（円）"
+        },
+        "payDay": {
+          "type": "string",
+          "enum": ["LAST_DAY", "DAY_5", "DAY_10", "DAY_25"],
+          "title": "支払日"
+        },
+        "until": {
+          "type": "string",
+          "enum": ["AGE_18", "AGE_20", "AGE_22_MARCH", "GRADUATION"],
+          "title": "終期"
+        },
+        "payeeAccount": {
+          "type": "string",
+          "title": "振込先"
+        },
+        "specialExpenses": {
+          "type": "object",
+          "additionalProperties": false,
+          "title": "特別費用の分担",
+          "properties": {
+            "shareRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+            "requiresConsultation": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "ps_visitation_v1",
+    "targetType": "AGREEMENT_TOPIC",
+    "targetKey": "VISITATION",
+    "version": 1,
+    "status": "PUBLISHED",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frequency", "timeRange", "handoverPlace"],
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "enum": ["MONTHLY_1", "MONTHLY_2", "WEEKLY_1", "OTHER"],
+          "title": "頻度"
+        },
+        "dayOfWeek": {
+          "type": "string",
+          "enum": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+          "title": "曜日"
+        },
+        "weekOfMonth": { "type": "integer", "minimum": 1, "maximum": 5, "title": "第何週" },
+        "timeRange": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "to"],
+          "properties": {
+            "from": { "type": "string" },
+            "to": { "type": "string" }
+          },
+          "title": "時間帯"
+        },
+        "handoverPlace": { "type": "string", "title": "受け渡し場所" },
+        "overnightAllowed": { "type": "boolean", "title": "宿泊の可否" },
+        "onlineAllowed": { "type": "boolean", "title": "オンラインの可否" },
+        "eventsAllowed": { "type": "boolean", "title": "学校行事への参加" }
+      }
+    }
+  }
+]

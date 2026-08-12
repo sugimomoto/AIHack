@@ -195,5 +195,40 @@
         }
       }
     }
+  },
+  {
+    "id": "ps_adjustment_v1",
+    "targetType": "RELAY_EXTRACTION",
+    "targetKey": "ADJUSTMENT",
+    "version": 1,
+    "status": "PUBLISHED",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "title": "何について",
+          "description": "例: 入学金 / 塾の費用 / 医療費 / 今月の支払い"
+        },
+        "amountYen": {
+          "type": "integer",
+          "minimum": 0,
+          "title": "金額",
+          "description": "円。単位を含めない"
+        },
+        "shareText": {
+          "type": "string",
+          "title": "分担",
+          "description": "書かれたとおりに。例: 半分ずつ / 6対4"
+        },
+        "date": {
+          "type": "string",
+          "title": "日付",
+          "description": "書かれたとおりに。年は書かれていなければ入れない"
+        }
+      }
+    }
   }
 ]

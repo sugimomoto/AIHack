@@ -33,3 +33,13 @@ export async function scenarioOutcomes(scenarioId: string | null): Promise<Outco
     return [];
   }
 }
+
+/** シナリオの種別。★取り決めを動かしてよいかの判定に使う */
+export async function scenarioKind(scenarioId: string | null): Promise<string | null> {
+  if (!scenarioId) return null;
+  try {
+    return (await listScenarios()).find((s) => s.id === scenarioId)?.kind ?? "UNKNOWN";
+  } catch {
+    return "UNKNOWN";
+  }
+}

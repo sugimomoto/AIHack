@@ -2,6 +2,7 @@ import { asCaseId, asConsultationId, type PartyId } from "@/domain/case/types";
 import { respondTo } from "./dialogue";
 import { buildRelay } from "./relay";
 import {
+  appendAdjustment,
   appendArrangement,
   appendMediationEvent,
   appendSafetyEvent,
@@ -16,6 +17,8 @@ import { assertOwnParty, scopedInbound, scopedMessages, scopedOutbound } from "@
 import { parseEffect } from "@/domain/adjustment/flow";
 import { consultationIdOf, parseThreadId } from "@/domain/consultation/thread";
 import { arrangementFrom } from "@/domain/obligation/arrangement";
+import { assertNegotiable, canNegotiateAgreement } from "@/domain/consultation/negotiable";
+import { listScenarios } from "@/infra-adapters/firestore/repositories/masterRepository";
 import { todayJst } from "@/lib/today";
 import { requiresAgreement } from "@/domain/topic/level";
 import { detectSafetyFlags, needsHumanReview, toSafetyEvent } from "@/domain/safety/detect";
@@ -130,6 +133,10 @@ export async function postMessage(input: {
     content: r.reply,
   });
 
+  // ★種別はサーバ側で引く。画面から渡させると、
+  //   個別相談を FORMAL と偽って取り決めを動かせてしまう。
+  const scenarioKind = input.scenarioId ? await kindOf(input.scenarioId) : null;
+
   const relayed = await relayIfNeeded({
     caseId,
     consultationId,
@@ -141,6 +148,7 @@ export async function postMessage(input: {
     scenarioId: input.scenarioId ?? null,
     threadId,
     title: input.title ?? null,
+    scenarioKind,
   });
 
   // ★届いたかどうかを、その発言に残す。
@@ -163,6 +171,8 @@ async function relayIfNeeded(input: {
   scenarioId?: string | null;
   threadId?: string | null;
   title?: string | null;
+  /** ★取り決めを動かしてよい相談か（FORMAL だけ） */
+  scenarioKind?: string | null;
 }): Promise<string | null> {
   try {
     const relay = await buildRelay({
@@ -171,6 +181,8 @@ async function relayIfNeeded(input: {
       raw: input.raw,
       intents: input.intents,
       topic: input.topic,
+      // ★取り決めを動かさない相談は、柔軟なスキーマで取り出す（設計どおり）
+      flexible: !canNegotiateAgreement(input.scenarioKind),
     });
     if (!relay) return null;
 
@@ -184,17 +196,43 @@ async function relayIfNeeded(input: {
     // ★payload が無ければ、合意する内容が無い。
     //   分類を誤って L1 になっても、中身の無い提案を作らない。
     //   承諾を求める対象が空になり、片側の承諾で確定しうる。
-    const proposalId = requiresAgreement(input.topic ?? "OTHER") && relay.payload
-      ? await appendProposal(input.caseId, {
-          byPartyId: input.partyId,
-          topic: input.topic ?? "OTHER",
-          payload: relay.payload,
-          context: relay.context,
-          contextCategories: relay.categories,
-          status: "PENDING",
-          effect: input.effect,
-        })
-      : undefined;
+    // ★設計どおり、帰結を kind で分ける。
+    //     FORMAL       → AgreementItem（公正証書になる）
+    //     ADJUSTMENT   → Adjustment（公正証書にならない）
+    //     NOTIFICATION → 取次ぎのみ
+    //
+    //   実装は topic だけで分岐していたため、
+    //   「進学費用」の話が養育費への提案になり、
+    //   **合意済みの月額を書き換えうる状態だった。**
+    const negotiable = canNegotiateAgreement(input.scenarioKind);
+
+    let proposalId: string | undefined;
+    if (negotiable && requiresAgreement(input.topic ?? "OTHER") && relay.payload) {
+      // ★書き込みの直前で守る。分岐が増えても効くように
+      assertNegotiable(input.scenarioKind);
+      proposalId = await appendProposal(input.caseId, {
+        byPartyId: input.partyId,
+        topic: input.topic ?? "OTHER",
+        payload: relay.payload,
+        context: relay.context,
+        contextCategories: relay.categories,
+        status: "PENDING",
+        effect: input.effect,
+        // ★どの相談から出た提案か。混ざったときに追えるようにする
+        threadId: input.threadId ?? null,
+        scenarioId: input.scenarioId ?? null,
+      });
+    } else if (!negotiable && relay.payload && input.threadId) {
+      // ★ADJUSTMENT の行き先。取り決めには触れない
+      await appendAdjustment(input.caseId, {
+        threadId: input.threadId,
+        scenarioId: input.scenarioId ?? null,
+        topic: input.topic ?? "OTHER",
+        byPartyId: input.partyId,
+        change: relay.payload,
+        effect: input.effect,
+      }).catch((e) => console.error("[consultation] 調整の保存に失敗しました", e));
+    }
 
     // ★受け取る側にも同じスレッドの相談を用意する。
     //   これが無いと、届いたのに**相手の一覧に行が立たない。**
@@ -276,4 +314,13 @@ export async function loadView(input: {
     // ★自分が送ったものが、どう伝わったか
     outbound: scopedOutbound(snap, input.partyId, threadId),
   };
+}
+
+/** シナリオの種別。★取得できなければ、取り決めに触れない側に倒す */
+async function kindOf(scenarioId: string): Promise<string | null> {
+  try {
+    return (await listScenarios()).find((s) => s.id === scenarioId)?.kind ?? "UNKNOWN";
+  } catch {
+    return "UNKNOWN";
+  }
 }

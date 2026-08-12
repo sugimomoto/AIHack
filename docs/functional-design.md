@@ -221,6 +221,35 @@ graph LR
 - **FORMAL は 8論点（L1）に対応し、固定である。**`linkedTopic` で `AgreementTopic` enum を参照する
 - ADJUSTMENT / NOTIFICATION（L2・L3）は自由に追加できる
 
+#### ★ `linkedTopic` の意味は kind によって違う（実装事故の原因）
+
+この文書の ER には `linkedTopic "FORMALのみ・AgreementTopic"` と書いてある一方、
+下の初期セット表では ADJUSTMENT にも `CHILD_SUPPORT` を割り当てている。
+**この矛盾が、実装での取り違えを生んだ。**
+
+| kind | `linkedTopic` の意味 | 帰結 |
+| --- | --- | --- |
+| **FORMAL** | **その取り決めを決める** | AgreementItem の payload を埋める |
+| **ADJUSTMENT** | **関連する論点**（束ねるための参照にすぎない） | **Adjustment を作る。取り決めには触れない** |
+| NOTIFICATION | 同上 | 取次ぎのみ |
+
+> **★ ADJUSTMENT の `linkedTopic` は「その取り決めを決める」ことを意味しない。**
+>
+> 実装は `kind` を読まず `topic` だけで分岐していたため、
+> 「進学費用の分担」（ADJUSTMENT・`CHILD_SUPPORT`）の対話が
+> **養育費への提案を作っていた。**
+> 提案は論点ごとに「最後のものが最新」で引かれるため、
+> 入学金の話から出た金額が**合意済みの月額を書き換えうる状態だった。**
+>
+> 実データで確認：合意は月45,000円。その裏で
+> 「入学費100万円を半分」「そちらが60万、こちらが40万」が同じ論点に流れていた。
+
+**分岐は `kind` で行う。** `topic` だけで分岐しない。
+書き込みの直前でも守る（`assertNegotiable`）。分岐が増えても効くようにするため。
+
+**提案には出どころ（`threadId` / `scenarioId`）を持たせる。**
+これが無かったため、混ざっても気づく手段が無かった。
+
 #### マスタの初期セット
 
 | 分類 | シナリオ | kind | 紐づく論点 | 合意 |

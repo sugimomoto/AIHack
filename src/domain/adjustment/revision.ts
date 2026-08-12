@@ -71,6 +71,11 @@ const LABELS: Record<string, string> = {
   frequency: "回数",
   dayOfWeek: "曜日",
   weekOfMonth: "週",
+  // ★調整（ADJUSTMENT）の項目。公正証書には載らないが、画面には出る
+  subject: "何について",
+  amountYen: "金額",
+  shareText: "分担",
+  date: "日付",
 };
 
 function display(key: string, value: unknown): string | null {
@@ -80,7 +85,7 @@ function display(key: string, value: unknown): string | null {
   const codes = CODE_LABELS[key];
   if (codes) return codes[String(value)] ?? null; // ★未知のコードは通さない
 
-  if (key === "monthlyAmount" && typeof value === "number") {
+  if ((key === "monthlyAmount" || key === "amountYen") && typeof value === "number") {
     return `${value.toLocaleString("ja-JP")}円`;
   }
   if (typeof value === "number") return value.toLocaleString("ja-JP");

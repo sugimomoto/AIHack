@@ -350,6 +350,14 @@ export async function appendProposal(
     status: string;
     /** ★今回だけか、今後もか。判定できないうちは null */
     effect?: "ONE_TIME" | "PERMANENT" | null;
+    /**
+     * ★どの相談から出た提案か。
+     *   これが無かったため、**混ざっても気づく手段が無かった。**
+     *   「進学費用」から養育費への提案が出ていたことを、
+     *   実データから追えなかった。
+     */
+    threadId?: string | null;
+    scenarioId?: string | null;
   },
 ): Promise<string> {
   const ref = await caseRef(caseId)
@@ -497,6 +505,49 @@ export async function listExceptions(
       createdAt: (d.get("createdAt") ?? "") as string,
     }))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * 調整（Adjustment）
+ *
+ * ★設計は kind=ADJUSTMENT の帰結を「Adjustment を作る」と決めていた。
+ *   実装に行き先が無く、**養育費への提案になっていた。**
+ *
+ * ★双方の合意を要するが、公正証書には載らない。
+ */
+export async function appendAdjustment(
+  caseId: CaseId,
+  a: {
+    threadId: string;
+    scenarioId: string | null;
+    topic: string;
+    byPartyId: PartyId;
+    change: Record<string, unknown>;
+    effect: "ONE_TIME" | "PERMANENT" | null;
+  },
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("adjustments")
+    .add({ ...a, kind: "ADJUSTMENT", createdAt: new Date().toISOString() });
+}
+
+/** ★そのスレッドの調整だけ。作成順（最後が最新） */
+export async function listAdjustmentsByThread(
+  caseId: CaseId,
+  threadId: string,
+): Promise<{ byPartyId: string; change: Record<string, unknown>; createdAt: string }[]> {
+  const snap = await caseRef(caseId)
+    .collection("adjustments")
+    .where("kind", "==", "ADJUSTMENT")
+    .where("threadId", "==", threadId)
+    .get();
+  return snap.docs
+    .map((d) => ({
+      byPartyId: (d.get("byPartyId") ?? "") as string,
+      change: (d.get("change") ?? {}) as Record<string, unknown>,
+      createdAt: (d.get("createdAt") ?? "") as string,
+    }))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
 /**

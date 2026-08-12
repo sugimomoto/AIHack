@@ -51,6 +51,8 @@ export async function buildRelay(input: {
   raw: string;
   intents: readonly Intent[];
   topic: string | null;
+  /** ★取り決めを動かさない相談か（ADJUSTMENT / NOTIFICATION） */
+  flexible?: boolean;
 }): Promise<RelayResult | null> {
   // ★感情表現だけでは取次ぎを起こさない。受け止めて終わる
   if (!needsRelay(input.intents)) return null;
@@ -74,7 +76,7 @@ export async function buildRelay(input: {
 
   const v = verification!;
   // ★payload を先に作る。要約が逐語一致で落ちたときの受け皿になる
-  const payload = await structurePayload(input);
+  const payload = await structurePayload({ ...input, flexible: input.flexible });
   const summary = safeSummary(last!.summary, input.raw, topicLabel, payload);
 
   return {
@@ -134,10 +136,15 @@ async function structurePayload(input: {
   consultationId: string;
   raw: string;
   topic: string | null;
+  /** ★取り決めを動かさない相談では、柔軟なスキーマで取り出す（設計どおり） */
+  flexible?: boolean;
 }): Promise<Record<string, unknown> | null> {
-  if (!input.topic) return null;
+  // ★ADJUSTMENT は論点のスキーマを使わない。
+  //   養育費のスキーマで取り出すと、入学金が月額として入ってしまう。
+  const key = input.flexible ? "ADJUSTMENT" : input.topic;
+  if (!key) return null;
   try {
-    const master = await findPublishedPayloadSchema(input.topic);
+    const master = await findPublishedPayloadSchema(key);
     if (!master) return null;
 
     const res = await callLlmStructured<Record<string, unknown>>({

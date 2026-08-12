@@ -92,6 +92,7 @@ export async function postMessage(input: {
     scenarioId: input.scenarioId ?? null,
     threadId,
     title: input.title ?? null,
+    initiatedBy: "SELF",
   });
   const userMessageId = await appendMessage(caseId, consultationId, {
     partyId: input.partyId,
@@ -202,7 +203,13 @@ async function relayIfNeeded(input: {
         input.caseId,
         asConsultationId(consultationIdOf(to, input.threadId)),
         to,
-        { scenarioId: input.scenarioId ?? null, threadId: input.threadId, title: input.title ?? null },
+        {
+          scenarioId: input.scenarioId ?? null,
+          threadId: input.threadId,
+          title: input.title ?? null,
+          // ★相手が始めた相談。受け取る側から見れば「お相手から」
+          initiatedBy: "OTHER",
+        },
       ).catch(() => {});
     }
 

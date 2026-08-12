@@ -29,6 +29,9 @@ type Item = {
   threadId: string | null;
   state: ConsultState;
   status: string;
+  /** ★どちらから始まったか */
+  initiatedBy: "SELF" | "OTHER" | null;
+  createdAt: string | null;
   updatedAt: string;
 };
 type Data = {
@@ -49,6 +52,18 @@ function hrefOf(threadId: string | null, scenarioId: string | null): string {
   if (scenarioId) q.set("s", scenarioId);
   const qs = q.toString();
   return qs ? `/app/consult/talk?${qs}` : "/app/consult/talk";
+}
+
+/** ★始まりの出どころと日。分からないものは書かない（推測しない） */
+function originOf(i: { initiatedBy: "SELF" | "OTHER" | null; createdAt: string | null }): string {
+  const who =
+    i.initiatedBy === "OTHER"
+      ? "お相手から"
+      : i.initiatedBy === "SELF"
+        ? "ご自身から"
+        : null;
+  const when = i.createdAt ? `${md(i.createdAt)}にはじまりました` : null;
+  return [who, when].filter(Boolean).join(" ／ ");
 }
 
 function md(iso: string): string {
@@ -98,7 +113,7 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
         どれから話しても、順番はありません。
       </p>
 
-      {/* ★別のことを話す。相談が増えても、新しく始めにくくならないよう上に置く */}
+      {/* ★別のことを相談する。相談が増えても、新しく始めにくくならないよう上に置く */}
       <Link
         href="/app/consult/new"
         className="mt-4 flex items-center gap-3"
@@ -112,7 +127,7 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
           className="rounded-full object-cover"
           style={{ width: 30, height: 30, flexShrink: 0 }}
         />
-        <span style={{ fontSize: 14.5, flex: 1 }}>別のことを話す</span>
+        <span style={{ fontSize: 14.5, flex: 1 }}>別のことを相談する</span>
         <span style={{ color: "var(--text-sub)" }}>▸</span>
       </Link>
 
@@ -240,6 +255,13 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
                     {md(i.updatedAt)}
                   </span>
                 </div>
+
+                {/* ★どちらから始まった相談かが分からなかった。
+                       相手から来たものと、自分から始めたものが同じ見た目だった。
+                       始まった日も、最後に動いた日とは別に出す。 */}
+                <p style={{ fontSize: 11, color: "var(--text-sub-2)", marginTop: 3 }}>
+                  {originOf(i)}
+                </p>
               {/* ★一行の状態。数ではなく、いまどうなっているか */}
               <p
                 style={{
@@ -270,8 +292,15 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
                 <button
                   type="button"
                   onClick={() => void setStatus(i.threadId, "CLOSED")}
-                  className="mt-1.5"
-                  style={{ fontSize: 11, color: "var(--text-sub-2)" }}
+                  className="mt-2 rounded-full"
+                  style={{
+                    fontSize: 11.5,
+                    padding: "5px 12px",
+                    minHeight: 30,
+                    border: "1px solid var(--border)",
+                    background: "var(--surface-2)",
+                    color: "var(--text-sub)",
+                  }}
                 >
                   済んだことにする
                 </button>
@@ -307,16 +336,27 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
                   {/* ★戻せるのは、ご自身で閉じたものだけ。
                          合意で済んだものに「戻す」を出しても何も起きず、
                          **押しても戻らない**という体験になっていた。 */}
+                  {/* ★押せるものと、状態を表しているだけのものを、見た目で分ける。
+                         同じリンク色だと、どちらも押せるように見えていた。 */}
                   {i.status === "CLOSED" ? (
                     <button
                       type="button"
                       onClick={() => void setStatus(i.threadId, "OPEN")}
-                      style={{ fontSize: 11, color: "var(--agree-text)" }}
+                      className="rounded-full"
+                      style={{
+                        fontSize: 11.5,
+                        padding: "5px 12px",
+                        minHeight: 30,
+                        border: "1px solid var(--border-strong)",
+                        background: "var(--surface)",
+                        color: "var(--text)",
+                      }}
                     >
                       戻す
                     </button>
                   ) : (
-                    <span style={{ fontSize: 11, color: "var(--agree-text)" }}>
+                    // ★状態。押せない
+                    <span style={{ fontSize: 11, color: "var(--text-sub-2)" }}>
                       {CONSULT_STATE_LABEL.SETTLED}
                     </span>
                   )}

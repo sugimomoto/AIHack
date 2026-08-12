@@ -9,6 +9,7 @@
  *   BASE_URL=https://… pnpm demo-links
  *   DAYS=14 pnpm demo-links                … 期限を指定（既定7日）
  */
+import { writeFileSync } from "node:fs";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { signDemoLink } from "../src/domain/session/demoLink";
@@ -112,6 +113,44 @@ async function main() {
   console.log("─".repeat(64));
   console.log("・確認用と印を付けたケースにしか効きません。実在のケースには入れません。");
   console.log("・期限が切れたら、このコマンドを再実行してください。");
+
+  // ★ファイルにも残す。毎回コマンドを叩き直さなくて済むように。
+  //   **リポジトリには入れない**（.gitignore 済み）。
+  //   URLを持つ人がその当事者になれるため、公開リポジトリに置けない。
+  const lines = [
+    "# 検証用リンク",
+    "",
+    "> ★このファイルは Git に入りません（.gitignore 済み）。",
+    "> **URLを持つ人がその当事者になれます。**共有先にご注意ください。",
+    "",
+    `対象: ${BASE}`,
+    `ケース: ${caseId}（確認用）`,
+    `期限: ${DAYS}日（作成: ${new Date(now).toISOString().slice(0, 10)}）`,
+    "",
+    "★それぞれ別のブラウザ（またはシークレットウィンドウ）で開いてください。",
+    "同じブラウザで両方開くと、あとから開いたほうに切り替わります。",
+    "",
+    ...rows.flatMap((p) => [
+      `## ${p.role === "NON_CUSTODIAL" ? "非監護親（Aさん）／ 年収438万" : "監護親（Bさん）／ 年収210万"}`,
+      "",
+      "```",
+      link(p.id),
+      "```",
+      "",
+    ]),
+    "## 前提",
+    "",
+    "- お子さん2人（2009年8月・2015年4月生まれ）",
+    "- 双方の年収を登録済み（算定表が引ける状態）",
+    "",
+    "## 作り直す",
+    "",
+    "```bash",
+    "DAYS=14 pnpm demo-links",
+    "```",
+  ];
+  writeFileSync(".demo-links.md", lines.join("\n"), "utf8");
+  console.log("\n→ .demo-links.md に保存しました（Git には入りません）");
 }
 
 main().catch((e) => {

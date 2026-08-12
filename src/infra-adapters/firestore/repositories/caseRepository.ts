@@ -227,14 +227,31 @@ export async function ensureConsultation(
   caseId: CaseId,
   consultationId: ConsultationId,
   partyId: PartyId,
-  meta?: { scenarioId?: string | null; threadId?: string | null; title?: string | null },
+  meta?: {
+    scenarioId?: string | null;
+    threadId?: string | null;
+    title?: string | null;
+    /** ★どちらから始まったか。**立てたときだけ記録する** */
+    initiatedBy?: "SELF" | "OTHER";
+  },
 ): Promise<void> {
-  const patch: Record<string, unknown> = { partyId, updatedAt: new Date().toISOString() };
+  const ref = caseRef(caseId).collection("consultations").doc(consultationId);
+  const now = new Date().toISOString();
+  const patch: Record<string, unknown> = { partyId, updatedAt: now };
+
   // ★題は最初に立てたときだけ入れる。あとから上書きして消さない
   if (meta?.scenarioId) patch.scenarioId = meta.scenarioId;
   if (meta?.threadId) patch.threadId = meta.threadId;
   if (meta?.title) patch.title = meta.title;
-  await caseRef(caseId).collection("consultations").doc(consultationId).set(patch, { merge: true });
+
+  // ★始まりは一度だけ。あとから書き換えると、
+  //   相手から来た相談が自分発のものに化ける。
+  const exists = (await ref.get()).exists;
+  if (!exists) {
+    patch.createdAt = now;
+    patch.initiatedBy = meta?.initiatedBy ?? "SELF";
+  }
+  await ref.set(patch, { merge: true });
 }
 
 /**
@@ -278,6 +295,8 @@ export async function listConsultations(
     threadId: string | null;
     status: string;
     closedAt: string | null;
+    initiatedBy: "SELF" | "OTHER" | null;
+    createdAt: string | null;
     updatedAt: string;
   }[]
 > {
@@ -290,6 +309,8 @@ export async function listConsultations(
       threadId: (d.get("threadId") ?? null) as string | null,
       status: (d.get("status") ?? "OPEN") as string,
       closedAt: (d.get("closedAt") ?? null) as string | null,
+      initiatedBy: (d.get("initiatedBy") ?? null) as "SELF" | "OTHER" | null,
+      createdAt: (d.get("createdAt") ?? null) as string | null,
       updatedAt: (d.get("updatedAt") ?? "") as string,
     }))
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));

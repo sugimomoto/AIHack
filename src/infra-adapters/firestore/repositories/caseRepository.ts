@@ -452,3 +452,37 @@ export async function saveMediationDraft(
 ): Promise<void> {
   await caseRef(caseId).collection("mediationDrafts").doc(key).set(draft);
 }
+
+import type { SafetyEvent } from "@/domain/safety/detect";
+
+/**
+ * ★安全に関する記録
+ *
+ *   ケース配下に置かない。`/safetyEvents` を独立させる。
+ *   **原文を含むため、ケースの読み取り経路（loadForLlm）から
+ *   構造的に外す。**パスの設計そのものが防御である。
+ */
+export async function appendSafetyEvent(e: SafetyEvent): Promise<void> {
+  await getDb().collection("safetyEvents").add(e);
+}
+
+/** ★本人に検知があったか。★フラグの内容は返さない */
+export async function hasPendingSafetyEvent(partyId: PartyId): Promise<boolean> {
+  const snap = await getDb()
+    .collection("safetyEvents")
+    .where("partyId", "==", partyId)
+    .where("status", "==", "PENDING_REVIEW")
+    .limit(1)
+    .get();
+  return !snap.empty;
+}
+
+/** ★運営が読む。当事者には決して返さない */
+export async function listPendingSafetyEvents(limit = 50): Promise<SafetyEvent[]> {
+  const snap = await getDb()
+    .collection("safetyEvents")
+    .where("status", "==", "PENDING_REVIEW")
+    .limit(limit)
+    .get();
+  return snap.docs.map((d) => d.data() as SafetyEvent);
+}

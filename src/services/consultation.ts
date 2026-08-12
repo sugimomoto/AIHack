@@ -3,6 +3,7 @@ import { respondTo } from "./dialogue";
 import { buildRelay } from "./relay";
 import {
   appendMediationEvent,
+  appendSafetyEvent,
   appendMessage,
   appendProposal,
   ensureConsultation,
@@ -12,6 +13,7 @@ import {
 import { assertOwnParty, scopedInbound, scopedMessages } from "@/domain/case/scope";
 import { parseEffect } from "@/domain/adjustment/flow";
 import { requiresAgreement } from "@/domain/topic/level";
+import { detectSafetyFlags, needsHumanReview, toSafetyEvent } from "@/domain/safety/detect";
 
 /**
  * 相談の1往復
@@ -82,6 +84,22 @@ export async function postMessage(input: {
 
   // ★現在の取り決めを渡す。これがあるからこそ「今回だけ？」と問える（C3）
   // ★先に分類して、その話題の合意を渡す
+  // ★フラグを立てて記録するだけ。応答も画面も変えない。
+  //   変えると「見抜かれた」という監視感が生まれる（§5.9）。
+  //   通告するかどうかは、記録を読んだ人が決める。
+  const flags = detectSafetyFlags(input.text);
+  if (needsHumanReview(flags)) {
+    await appendSafetyEvent(
+      toSafetyEvent({
+        caseId,
+        partyId: input.partyId,
+        flags,
+        rawText: input.text, // ★原文を保全（FR-10）。G-F の意図的な例外
+        createdAt: new Date().toISOString(),
+      }),
+    );
+  }
+
   const r = await respondTo({
     caseId,
     consultationId,

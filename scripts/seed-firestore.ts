@@ -25,6 +25,8 @@ const COLLECTIONS = [
   ["masters/supportTables/items", "firestore/seeds/supportTables.json"],
   // ★記事は人が書く。LLMに書かせない（非弁対策の構造）
   ["masters/knowledgeArticles/items", "firestore/seeds/knowledgeArticles.json"],
+  // ★公的窓口のみ。番号・名称は要検証（R-20）
+  ["masters/supportResources/items", "firestore/seeds/supportResources.json"],
 ] as const;
 
 async function main() {

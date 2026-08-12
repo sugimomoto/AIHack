@@ -6,6 +6,7 @@ import { OwnMessage } from "./OwnMessage";
 import { AiMessage } from "./AiMessage";
 import { RelayMessage } from "./RelayMessage";
 import { TopicSheet } from "@/components/topic/TopicSheet";
+import { SupportLink } from "@/components/safety/SupportLink";
 
 /**
  * ケースに接続された対話
@@ -179,9 +180,11 @@ export function CaseChat({
       <TopicSheet onPick={(sc) => setText((t) => t || `${sc.title}について相談したいです。`)} />
 
       <div
-        className="flex shrink-0 items-end gap-2 px-3 pb-3 pt-2"
+        className="relative flex shrink-0 items-end gap-2 px-3 pb-3 pt-2"
         style={{ borderTop: "1px solid var(--border-subtle)" }}
       >
+        {/* ★常設。検知に一切反応しない（案2） */}
+        <SupportLink />
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}

@@ -1,0 +1,29 @@
+[
+ {
+  "id": "sr_189",
+  "name": "児童相談所虐待対応ダイヤル",
+  "contact": "189",
+  "scope": "CHILD",
+  "note": "お子さんのことで心配なとき",
+  "url": "https://www.cfa.go.jp/",
+  "verified": false
+ },
+ {
+  "id": "sr_8008",
+  "name": "DV相談ナビ",
+  "contact": "#8008",
+  "scope": "DV",
+  "note": "配偶者からの暴力について",
+  "url": "https://www.gender.go.jp/",
+  "verified": false
+ },
+ {
+  "id": "sr_houterasu",
+  "name": "法テラス",
+  "contact": "0570-078374",
+  "scope": "LEGAL",
+  "note": "法的な手続きの相談先を知りたいとき",
+  "url": "https://www.houterasu.or.jp/",
+  "verified": false
+ }
+]

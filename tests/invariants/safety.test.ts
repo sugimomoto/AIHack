@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   SAFETY_FLAGS,
@@ -127,5 +128,29 @@ describe("★原文の保全（FR-10）", () => {
   it("誰の・どのケースかが分かる", () => {
     expect(e.caseId).toBe("c1");
     expect(e.partyId).toBe("p1");
+  });
+});
+
+/**
+ * ★原文がケースの読み取り経路に出ないこと
+ *
+ * `safetyEvents` はケース配下に置かない。
+ * `loadForLlm` はケース配下しか読まないため、**構造的に到達しない。**
+ * パスの設計そのものが防御である。
+ */
+describe("★安全の記録はケース配下に無い", () => {
+  it("★リポジトリがケース配下に書いていない", () => {
+    const src = readFileSync("src/infra-adapters/firestore/repositories/caseRepository.ts", "utf8");
+    const i = src.indexOf("export async function appendSafetyEvent");
+    const body = src.slice(i, i + 400);
+    expect(body).toContain('collection("safetyEvents")');
+    expect(body).not.toContain("caseRef(");
+  });
+
+  it("★LLM用の読み取りが safetyEvents に触れていない", () => {
+    const src = readFileSync("src/infra-adapters/firestore/repositories/caseRepository.ts", "utf8");
+    const i = src.indexOf("export async function loadForLlm");
+    const body = src.slice(i, src.indexOf("export async function", i + 10));
+    expect(body).not.toContain("safetyEvents");
   });
 });

@@ -113,3 +113,20 @@ export async function listScenarios(): Promise<Scenario[]> {
     .map((d) => ({ id: d.id, ...d.data() }) as Scenario)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 }
+
+export type SupportResource = {
+  id: string;
+  name: string;
+  contact: string;
+  scope: "DV" | "CHILD" | "LEGAL";
+  note: string;
+  url: string;
+  /** ★番号・名称が検証済みか。未検証なら注記が付く */
+  verified: boolean;
+};
+
+/** ★公的窓口のみ。事業者の判断が入らないようにする */
+export async function listSupportResources(): Promise<SupportResource[]> {
+  const snap = await getDb().collection("masters/supportResources/items").get();
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as SupportResource);
+}

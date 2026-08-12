@@ -29,6 +29,7 @@ type View = {
     state: string;
     label: string;
     canReport: "PAID" | "RECEIVED" | null;
+    detail: string | null;
   }[];
   /** ★「今回だけ」の変更。保存はしていたが読む経路が無かった */
   exceptions: { id: string; topic: string; change: Record<string, unknown> }[];
@@ -170,15 +171,25 @@ export function SchedulePanel({
                 ? `${r.amountYen.toLocaleString()}円`
                 : TOPIC_LABEL[r.topic] ?? "お約束"}
             </span>
-            <span
-              style={{
-                display: "block",
-                fontSize: 11.5,
-                color: r.state === "CONFIRMED" ? "var(--agree-text)" : "var(--text-sub)",
-              }}
-            >
-              {r.label}
-            </span>
+            {/* ★実施の記録を作っていないものに「まだ記録がありません」と書かない。
+                   記録を待っているように見せると、書けないことを責める形になる。 */}
+            {typeof r.amountYen === "number" ? (
+              <span
+                style={{
+                  display: "block",
+                  fontSize: 11.5,
+                  color: r.state === "CONFIRMED" ? "var(--agree-text)" : "var(--text-sub)",
+                }}
+              >
+                {r.label}
+              </span>
+            ) : (
+              r.detail && (
+                <span style={{ display: "block", fontSize: 11.5, color: "var(--text-sub)" }}>
+                  {r.detail}
+                </span>
+              )
+            )}
           </div>
           {r.canReport && (
             <button

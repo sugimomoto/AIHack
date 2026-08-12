@@ -58,6 +58,8 @@ export type ScheduleRow = {
   label: string;
   /** 自分が申告できる種別。★義務者は支払い、権利者は入金 */
   canReport: "PAID" | "RECEIVED" | null;
+  /** ★時間や場所。合意にあるものだけを出す（推測しない） */
+  detail: string | null;
 };
 
 /** ★不正な日付を通すと、全件が偽の逸脱になる（レビューで検出） */
@@ -92,6 +94,16 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
     obligorPartyId: obligor,
   });
 
+  // ★合意から、その日の詳細（時間・場所）を引く。無ければ出さない
+  const detailOf = (topic: string): string | null => {
+    const p = items.find((i) => i.topic === topic)?.payload ?? null;
+    if (!p) return null;
+    const parts = [p.timeRange, p.handoverPlace]
+      .map((x) => (typeof x === "string" ? x.trim() : ""))
+      .filter((x) => x !== "");
+    return parts.length > 0 ? parts.join(" ／ ") : null;
+  };
+
   const rows: ScheduleRow[] = obligations
     // ★画面には、これから来る分と、直近で記録の無い分だけを出す
     .filter((o) => o.dueDate >= monthsBefore(input.today, 1))
@@ -109,6 +121,7 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
       state,
       label: labelOf(state),
       // ★立場に合った種別だけ。義務者は支払い、権利者は入金
+      detail: typeof o.amountYen === "number" ? null : detailOf(o.topic),
       // ★実施の記録は今回作っていない。面会交流では申告させない
       canReport:
         typeof o.amountYen !== "number"

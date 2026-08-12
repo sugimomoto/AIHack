@@ -110,7 +110,11 @@ export function CaseChat({
         style={{ minHeight: 48, borderBottom: "1px solid var(--border-subtle)" }}
       >
         <span style={{ fontSize: 14.5, fontWeight: 600 }}>{label}</span>
-        <span style={{ fontSize: 11, color: "var(--muted)" }}>{partyId}</span>
+        {/* ★内部の識別子を画面に出さない。
+             開発中の確認用に出していたものが、そのまま本番の画面に残っていた。 */}
+        {process.env.NODE_ENV !== "production" && (
+          <span style={{ fontSize: 11, color: "var(--muted)" }}>{partyId}</span>
+        )}
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-4 py-4">

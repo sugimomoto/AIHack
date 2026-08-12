@@ -26,6 +26,7 @@ export function QuietCard() {
       <p style={{ fontSize: 13.5, fontWeight: 600 }}>相談できる場所について</p>
       <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 6 }}>
         お子さんのことやご自身の安全について、公的な窓口があります。
+        確かでなくても連絡して構いませんし、匿名でも構いません。
         話すかどうかは、ご自身で決めていただけます。
       </p>
       <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub-2)", marginTop: 8 }}>

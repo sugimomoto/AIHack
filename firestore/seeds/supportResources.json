@@ -4,18 +4,30 @@
   "name": "児童相談所虐待対応ダイヤル",
   "contact": "189",
   "scope": "CHILD",
-  "note": "お子さんのことで心配なとき",
-  "url": "https://www.cfa.go.jp/",
-  "verified": false
+  "note": "通話料は無料です。匿名でもかけられます。",
+  "url": "https://www.cfa.go.jp/policies/jidougyakutai/gyakutai-taiou-dial",
+  "verified": true,
+  "operator": "こども家庭庁"
+ },
+ {
+  "id": "sr_dv_plus",
+  "name": "DV相談＋（プラス）",
+  "contact": "0120-279-889",
+  "scope": "DV",
+  "note": "24時間・通話料無料。チャット（12〜22時）とメールでも相談できます。",
+  "url": "https://soudanplus.jp/",
+  "verified": true,
+  "operator": "内閣府"
  },
  {
   "id": "sr_8008",
   "name": "DV相談ナビ",
   "contact": "#8008",
   "scope": "DV",
-  "note": "配偶者からの暴力について",
-  "url": "https://www.gender.go.jp/",
-  "verified": false
+  "note": "最寄りの相談センターにつながります。★通話料がかかります。",
+  "url": "https://www.gender.go.jp/policy/no_violence/dv_navi/index.html",
+  "verified": true,
+  "operator": "内閣府男女共同参画局"
  },
  {
   "id": "sr_houterasu",
@@ -24,6 +36,7 @@
   "scope": "LEGAL",
   "note": "法的な手続きの相談先を知りたいとき",
   "url": "https://www.houterasu.or.jp/",
-  "verified": false
+  "verified": false,
+  "operator": "日本司法支援センター"
  }
 ]

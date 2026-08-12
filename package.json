@@ -15,7 +15,8 @@
     "seed": "tsx scripts/seed-firestore.ts",
     "seed:dev": "tsx scripts/seed-dev-case.ts",
     "e2e": "tsx scripts/e2e.ts",
-    "test-links": "tsx scripts/make-test-links.ts"
+    "test-links": "tsx scripts/make-test-links.ts",
+    "demo-links": "tsx scripts/make-demo-links.ts"
   },
   "dependencies": {
     "firebase-admin": "^14.2.0",

@@ -509,3 +509,19 @@ export async function loadPartyAuthUid(caseId: CaseId, partyId: PartyId): Promis
   const d = await caseRef(caseId).collection("parties").doc(partyId).get();
   return (d.get("authUid") ?? null) as string | null;
 }
+
+/**
+ * ★確認用のケースかどうか
+ *
+ *   継続リンクは、この印が付いたケースにしか効かない。
+ *   印を付けられるのは運営トークンを持つ人だけである（→ /api/demo-session）。
+ *   **実在の当事者が入っているケースに、リンクで入れるようにしない。**
+ */
+export async function isDemoCase(caseId: CaseId): Promise<boolean> {
+  const d = await caseRef(caseId).get();
+  return d.get("demo") === true;
+}
+
+export async function markDemoCase(caseId: CaseId): Promise<void> {
+  await caseRef(caseId).set({ demo: true }, { merge: true });
+}

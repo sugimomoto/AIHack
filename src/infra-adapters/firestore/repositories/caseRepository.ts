@@ -238,6 +238,23 @@ export async function ensureConsultation(
 }
 
 /**
+ * 相談を閉じる／戻す。
+ *
+ * ★済んだものが残り続けると、**対応が要るものが埋もれる。**
+ * ★消さない。沈めるだけ。あとから戻せる。
+ */
+export async function setConsultationStatus(
+  caseId: CaseId,
+  consultationId: ConsultationId,
+  status: "OPEN" | "CLOSED",
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("consultations")
+    .doc(consultationId)
+    .set({ status }, { merge: true });
+}
+
+/**
  * 相談の一覧（K-1）
  *
  * ★自分の相談だけ。**未読の印も件数バッジも持たない。**

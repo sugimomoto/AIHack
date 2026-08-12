@@ -31,7 +31,25 @@ type Item = {
   status: string;
   updatedAt: string;
 };
-type Data = { items: Item[]; inbound: { id: string; content: string }[] };
+type Data = {
+  items: Item[];
+  /** ★お返事をお待ちしている相談の数。受け取った取次ぎの総数ではない */
+  awaitingCount: number;
+  latest: {
+    threadId: string | null;
+    scenarioId: string | null;
+    title: string;
+    content: string | null;
+  } | null;
+};
+
+function hrefOf(threadId: string | null, scenarioId: string | null): string {
+  const q = new URLSearchParams();
+  if (threadId) q.set("t", threadId);
+  if (scenarioId) q.set("s", scenarioId);
+  const qs = q.toString();
+  return qs ? `/app/consult/talk?${qs}` : "/app/consult/talk";
+}
 
 function md(iso: string): string {
   if (!iso) return "";
@@ -61,12 +79,15 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
   const open = d.items.filter((i) => !isSettled(i.state));
   const closed = d.items.filter((i) => isSettled(i.state));
   // ★一覧からは、そのスレッドをそのまま開く（新しく立てない）
-  const href = (i: Item) => {
-    const q = new URLSearchParams();
-    if (i.threadId) q.set("t", i.threadId);
-    if (i.scenarioId) q.set("s", i.scenarioId);
-    const qs = q.toString();
-    return qs ? `/app/consult/talk?${qs}` : "/app/consult/talk";
+  const href = (i: Item) => hrefOf(i.threadId, i.scenarioId);
+
+  const reopen = async (threadId: string | null) => {
+    await fetch(`/api/cases/${caseId}/consultations/close`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-dev-party": partyId },
+      body: JSON.stringify({ threadId, status: "OPEN" }),
+    });
+    window.location.reload();
   };
 
   return (
@@ -77,10 +98,30 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
         どれから話しても、順番はありません。
       </p>
 
-      {/* ★届いているご相談。相手の言葉ではないため封書として描く */}
-      {d.inbound.length > 0 && (
-        <div
-          className="mt-4 overflow-hidden"
+      {/* ★別のことを話す。相談が増えても、新しく始めにくくならないよう上に置く */}
+      <Link
+        href="/app/consult/new"
+        className="mt-4 flex items-center gap-3"
+        style={{ border: "1px dashed var(--border-strong)", borderRadius: 20, padding: 14 }}
+      >
+        <Image
+          src="/character/capybara-sit.png"
+          alt=""
+          width={30}
+          height={30}
+          className="rounded-full object-cover"
+          style={{ width: 30, height: 30, flexShrink: 0 }}
+        />
+        <span style={{ fontSize: 14.5, flex: 1 }}>別のことを話す</span>
+        <span style={{ color: "var(--text-sub)" }}>▸</span>
+      </Link>
+
+      {/* ★届いているご相談。相手の言葉ではないため封書として描く。
+             **開ける先を持たせる。**案内だけのカードにしない。 */}
+      {d.latest && (
+        <Link
+          href={hrefOf(d.latest.threadId, d.latest.scenarioId)}
+          className="mt-3.5 block overflow-hidden"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--border)",
@@ -98,22 +139,37 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
             <span style={{ fontSize: 11.5, color: "var(--agree-text)", letterSpacing: ".06em" }}>
               お相手からのご相談
             </span>
-            <span style={{ fontSize: 10.5, color: "var(--text-sub)" }}>{d.inbound.length}件</span>
+            {/* ★お返事をお待ちしている相談の数。取次ぎの総数ではない */}
+            <span style={{ fontSize: 10.5, color: "var(--text-sub)" }}>
+              {d.awaitingCount > 1 ? `ほかに${d.awaitingCount - 1}件` : ""}
+            </span>
           </div>
           <div style={{ padding: 14 }}>
-            <p style={{ fontSize: 14.5, lineHeight: 1.95 }}>
-              {d.inbound[d.inbound.length - 1].content.split("\n")[0]}
+            <p style={{ fontSize: 11.5, color: "var(--text-sub-2)" }}>{d.latest.title}</p>
+            <p style={{ fontSize: 14.5, lineHeight: 1.95, marginTop: 4 }}>
+              {(d.latest.content ?? "").split("\n")[0]}
             </p>
             <p style={{ fontSize: 12.5, color: "var(--text-sub)", marginTop: 8 }}>
               お返事は、急ぎません。
             </p>
           </div>
-        </div>
+          <span
+            className="block"
+            style={{
+              borderTop: "1px solid var(--border-subtle)",
+              padding: "12px 14px",
+              fontSize: 13.5,
+              color: "var(--agree-text)",
+            }}
+          >
+            相談を開く ▸
+          </span>
+        </Link>
       )}
 
       {/* ★1件目を書くときがいちばん怖い。
              「お相手には届きません」は、書いたあとではなく**書く前**に要る（L-1） */}
-      {d.items.length === 0 && d.inbound.length === 0 && (
+      {d.items.length === 0 && (
         <Link
           href="/app/consult/start"
           className="mt-4 block"
@@ -218,49 +274,34 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
             style={{ background: "var(--surface-2)", borderRadius: "var(--r-md)" }}
           >
             {closed.map((i, n) => (
-              <Link
+              <div
                 key={i.id}
-                href={href(i)}
                 className="flex items-center justify-between gap-3"
                 style={{
                   padding: "12px 14px",
                   borderTop: n === 0 ? undefined : "1px solid var(--border-subtle)",
                 }}
               >
-                <span style={{ fontSize: 13.5, color: "var(--text-sub)" }}>{i.title}</span>
+                <Link href={href(i)} style={{ fontSize: 13.5, color: "var(--text-sub)", flex: 1 }}>
+                  {i.title}
+                </Link>
                 <span className="flex items-center gap-2" style={{ flexShrink: 0 }}>
-                  <span style={{ fontSize: 11, color: "var(--agree-text)" }}>
-                    {CONSULT_STATE_LABEL.SETTLED}
-                  </span>
+                  {/* ★消していない。戻せる */}
+                  <button
+                    type="button"
+                    onClick={() => void reopen(i.threadId)}
+                    style={{ fontSize: 11, color: "var(--agree-text)" }}
+                  >
+                    戻す
+                  </button>
                   <span style={{ fontSize: 11, color: "var(--muted)" }}>{md(i.updatedAt)}</span>
                 </span>
-              </Link>
+              </div>
             ))}
           </div>
         </>
       )}
 
-      {/* ★別のことを話す → 相談の開始（設計 #4） */}
-      <Link
-        href="/app/consult/new"
-        className="mt-4 flex items-center gap-3"
-        style={{
-          border: "1px dashed var(--border-strong)",
-          borderRadius: 20,
-          padding: 16,
-        }}
-      >
-        <Image
-          src="/character/capybara-sit.png"
-          alt=""
-          width={34}
-          height={34}
-          className="rounded-full object-cover"
-          style={{ width: 34, height: 34, flexShrink: 0 }}
-        />
-        <span style={{ fontSize: 14.5, flex: 1 }}>別のことを話す</span>
-        <span style={{ color: "var(--text-sub)" }}>▸</span>
-      </Link>
     </div>
   );
 }

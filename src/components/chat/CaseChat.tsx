@@ -224,6 +224,35 @@ export function CaseChat({
         <div ref={endRef} />
       </div>
 
+      {/* ★済んだものが残り続けると、対応が要るものが埋もれる。
+             ただし消さない。沈めるだけで、あとから戻せる。 */}
+      {threadId && (
+        <div className="shrink-0 px-4 pb-1 text-right">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setBusy(true);
+              void fetch(`/api/cases/${caseId}/consultations/close`, {
+                method: "POST",
+                headers: headers(),
+                body: JSON.stringify({ threadId, status: "CLOSED" }),
+              })
+                .then(() => {
+                  window.location.href = "/app/consult";
+                })
+                .finally(() => setBusy(false));
+            }}
+            style={{ fontSize: 12, color: "var(--text-sub)", textDecoration: "underline" }}
+          >
+            このご相談を、済んだことにする
+          </button>
+          <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
+            一覧の下に移ります。あとから戻せます。
+          </p>
+        </div>
+      )}
+
       {/* ★入力欄より前に置かない。選ばずに書き始められることが必須要件 */}
       <TopicSheet onPick={(sc) => setText((t) => t || `${sc.title}について相談したいです。`)} />
 

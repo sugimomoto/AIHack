@@ -73,18 +73,38 @@ export async function GET(req: Request, ctx: { params: Promise<{ caseId: string 
         ...r,
         threadId,
         title: r.title ?? DEFAULT_TITLE,
-        state: consultStateOf({
-          lastOwnAt: lastOwn.get(r.id) ?? null,
-          lastInboundAt: lastIn.get(threadId) ?? null,
-          settled: Boolean(topic && agreed.has(topic)),
-        }),
+        // ★本人が閉じたものは、状態にかかわらず沈める
+        state:
+          r.status === "CLOSED"
+            ? ("SETTLED" as const)
+            : consultStateOf({
+                lastOwnAt: lastOwn.get(r.id) ?? null,
+                lastInboundAt: lastIn.get(threadId) ?? null,
+                settled: Boolean(topic && agreed.has(topic)),
+              }),
+        lastInbound: lastIn.get(threadId)
+          ? (scopedInbound(snap, partyId, threadId).at(-1)?.content ?? null)
+          : null,
       };
     });
 
+    // ★件数は「これまでに受け取った取次ぎの総数」ではない。
+    //   それでは未対応でも未読でもなく、**何の数か分からない。**
+    //   お返事をお待ちしている相談の数だけを数える。
+    const awaiting = items.filter((i) => i.state === "ARRIVED");
+
     return NextResponse.json({
       items,
-      // ★届いているご相談。相手の言葉ではない
-      inbound: scopedInbound(snap, partyId),
+      awaitingCount: awaiting.length,
+      // ★開ける先を持たせる。案内だけのカードにしない
+      latest: awaiting[0]
+        ? {
+            threadId: awaiting[0].threadId,
+            scenarioId: awaiting[0].scenarioId,
+            title: awaiting[0].title,
+            content: awaiting[0].lastInbound,
+          }
+        : null,
     });
   } catch (e) {
     return errorResponse(e);

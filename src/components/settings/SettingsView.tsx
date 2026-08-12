@@ -178,6 +178,7 @@ export function SettingsView({ caseId, partyId }: { caseId: string; partyId: str
         }}
       >
         {[
+          { href: "/app/settings/registered", label: "登録した内容" },
           { href: "/knowledge", label: "制度のこと" },
           { href: "/context", label: "AIに渡しているもの" },
           { href: "/account", label: "次に使うときのために" },

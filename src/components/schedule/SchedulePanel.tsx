@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { DEVIATION_LABELS } from "@/domain/obligation/deviation";
+import { EmptyUpcoming } from "@/components/ui/EmptyState";
 
 /**
  * 予定と履行
@@ -76,7 +77,9 @@ export function SchedulePanel({
     }
   };
 
-  if (!v || v.rows.length === 0) return null;
+  // ★空白を返さない。タブを開いて何も無いのは、壊れて見える（L-3）
+  if (!v) return null;
+  if (v.rows.length === 0) return <EmptyUpcoming />;
 
   return (
     <div

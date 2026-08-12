@@ -6,6 +6,7 @@ import { OwnMessage } from "./OwnMessage";
 import { AiMessage } from "./AiMessage";
 import { RelayMessage } from "./RelayMessage";
 import { TopicSheet } from "@/components/topic/TopicSheet";
+import { EmptyConsult } from "@/components/ui/EmptyState";
 import { SupportLink } from "@/components/safety/SupportLink";
 
 /**
@@ -118,6 +119,10 @@ export function CaseChat({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-4 py-4">
+        {/* ★1件目を書くときがいちばん怖い。
+               「お相手には届きません」は、書いたあとではなく**書く前**に要る（L-1） */}
+        {view.inbound.length === 0 && view.messages.length === 0 && <EmptyConsult />}
+
         {/* ★自分宛の取次ぎ。相手の言葉ではないため封書として描く */}
         {view.inbound.map((e) => {
           // ★1行目が要約、2行目以降が背景（→ domain/relay/prompts.ts buildRelayText）

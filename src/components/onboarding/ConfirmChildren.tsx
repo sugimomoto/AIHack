@@ -30,10 +30,17 @@ export function ConfirmChildren({
   caseId,
   births,
   next,
+  heading = "お子さんのことが、すでに登録されています",
+  lead = "違っているところがあれば、直してください。合っていれば、そのまま進めます。",
+  /** ★設定から開いたときは「うかがうのはここまで」を出さない（入口ではない） */
+  hideClosing = false,
 }: {
   caseId: string;
   births: string[];
   next: string;
+  heading?: string;
+  lead?: string;
+  hideClosing?: boolean;
 }) {
   const [rows, setRows] = useState<Row[]>(births.map(toRow));
   const [editing, setEditing] = useState<number | null>(null);
@@ -74,12 +81,10 @@ export function ConfirmChildren({
   };
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto px-5 pb-8 pt-8">
-      <h1 style={{ fontSize: 18, lineHeight: 1.7, fontWeight: 600 }}>
-        お子さんのことが、すでに登録されています
-      </h1>
+    <div className={hideClosing ? "flex flex-col" : "flex h-full flex-col overflow-y-auto px-5 pb-8 pt-8"}>
+      <h1 style={{ fontSize: 18, lineHeight: 1.7, fontWeight: 600 }}>{heading}</h1>
       <p style={{ fontSize: 13, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}>
-        違っているところがあれば、直してください。合っていれば、そのまま進めます。
+        {lead}
       </p>
 
       {rows.map((r, i) => (
@@ -169,6 +174,7 @@ export function ConfirmChildren({
       </button>
 
       {/* ★質問がまだ続くのではという警戒を、その場で終わらせる */}
+      {!hideClosing && (
       <div
         className="mt-6 flex gap-3"
         style={{
@@ -194,6 +200,7 @@ export function ConfirmChildren({
           </p>
         </div>
       </div>
+      )}
     </div>
   );
 }

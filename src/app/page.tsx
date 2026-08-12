@@ -28,6 +28,7 @@ const ROUTES = [
   { href: "/metrics", label: "原価", note: "CT-1〜CT-4。ルーティングなしとの比較を実測値で出します。" },
   { href: "/knowledge", label: "取り決めについて知る", note: "制度の一般的な説明。個別の助言はしません。" },
   { href: "/mock", label: "体験モック", note: "デザイン確認用。両当事者の視点を切り替えられます。" },
+  { href: "/signin", label: "お戻りになる", note: "ご登録済みのメールアドレスにリンクをお送りします。" },
 ];
 
 export default function Page() {

@@ -486,3 +486,26 @@ export async function listPendingSafetyEvents(limit = 50): Promise<SafetyEvent[]
     .get();
   return snap.docs.map((d) => d.data() as SafetyEvent);
 }
+
+import type { PartyRef } from "@/domain/session/authLink";
+
+/** ★全ケースから識別子で引く。ケースIDを知らなくても復帰できるようにする */
+export async function findPartiesByAuthUid(uid: string): Promise<PartyRef[]> {
+  const snap = await getDb().collectionGroup("parties").where("authUid", "==", uid).get();
+  return snap.docs.map((d) => ({
+    id: d.id,
+    caseId: d.ref.parent.parent?.id ?? "",
+    authUid: (d.get("authUid") ?? null) as string | null,
+    state: (d.get("state") ?? "ACTIVE") as string,
+  }));
+}
+
+/** 当事者に識別子を結びつける */
+export async function linkAuthUid(caseId: CaseId, partyId: PartyId, uid: string): Promise<void> {
+  await caseRef(caseId).collection("parties").doc(partyId).set({ authUid: uid }, { merge: true });
+}
+
+export async function loadPartyAuthUid(caseId: CaseId, partyId: PartyId): Promise<string | null> {
+  const d = await caseRef(caseId).collection("parties").doc(partyId).get();
+  return (d.get("authUid") ?? null) as string | null;
+}

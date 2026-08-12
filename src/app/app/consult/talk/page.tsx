@@ -2,7 +2,12 @@ import { redirect } from "next/navigation";
 import { readSession } from "@/lib/session";
 import { CaseChat } from "@/components/chat/CaseChat";
 import { RevisionSheet } from "@/components/agreement/RevisionSheet";
-import { scenarioTitle, scenarioOutcomes, scenarioKind } from "@/services/scenarioTitle";
+import {
+  scenarioTitle,
+  scenarioOutcomes,
+  scenarioKind,
+  scenarioOpening,
+} from "@/services/scenarioTitle";
 import { OutcomeCard } from "@/components/consult/OutcomeCard";
 import { AdjustmentPanel } from "@/components/consult/AdjustmentPanel";
 import { canNegotiateAgreement } from "@/domain/consultation/negotiable";
@@ -19,7 +24,11 @@ export default async function Page({
   const session = await readSession();
   if (!session) redirect("/");
   const { s, t } = await searchParams;
-  const [title, kind] = await Promise.all([scenarioTitle(s ?? null), scenarioKind(s ?? null)]);
+  const [title, kind, guide] = await Promise.all([
+    scenarioTitle(s ?? null),
+    scenarioKind(s ?? null),
+    scenarioOpening(s ?? null),
+  ]);
   // ★取り決めを動かさない相談で「この相談で決まること」に
   //   養育費のスキーマ（月額・支払日・終期）を出していた。
   //   決まらないものを、決まるように見せない。
@@ -37,6 +46,8 @@ export default async function Page({
           label={title}
           scenarioId={s ?? null}
           threadId={t ?? null}
+          opening={guide.opening}
+          examples={guide.examples}
           backHref="/app/consult"
         />
       </div>

@@ -16,6 +16,13 @@ export type Scenario = {
   categoryId?: string | null;
   linkedTopic: string | null;
   promptHint?: string;
+  /**
+   * ★当事者に見せる書き出しの案内。
+   *   promptHint（LLMへの指示）とは別物。**混ぜない。**
+   *   AIに毎回作らせない：毎回同じ文になり、勝手な数字も作られない。
+   */
+  opening?: string;
+  examples?: string[];
   sortOrder?: number;
 };
 

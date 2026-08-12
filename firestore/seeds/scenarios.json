@@ -8,7 +8,12 @@
     "requiresConsent": true,
     "promptHint": "養育費の額・支払日・終期を決める相談です。金額は算定表を参照して範囲を示してください。",
     "isSystem": true,
-    "sortOrder": 1
+    "sortOrder": 1,
+    "opening": "養育費のことですね。金額・お支払いの日・いつまで続けるか、この3つが決まると書面にできます。",
+    "examples": [
+      "月に◯万円くらいでお願いしたいです",
+      "毎月末日に受け取れると助かります"
+    ]
   },
   {
     "id": "sc_002",
@@ -19,7 +24,12 @@
     "requiresConsent": true,
     "promptHint": "特別費用の分担に関する相談です。",
     "isSystem": false,
-    "sortOrder": 2
+    "sortOrder": 2,
+    "opening": "習いごとの費用のことですね。何にいくらかかるか、どう分けたいかを書いていただけます。",
+    "examples": [
+      "月◯円の塾代を、半分ずつにできませんか",
+      "夏期講習の費用について相談したいです"
+    ]
   },
   {
     "id": "sc_003",
@@ -30,7 +40,12 @@
     "requiresConsent": true,
     "promptHint": "進学に伴う費用の分担に関する相談です。",
     "isSystem": false,
-    "sortOrder": 3
+    "sortOrder": 3,
+    "opening": "進学の費用のことですね。何にいくらかかるか、どう分けたいかを書いていただけます。",
+    "examples": [
+      "入学金◯万円を、半分ずつにしたいです",
+      "受験にかかる費用について相談したいです"
+    ]
   },
   {
     "id": "sc_004",
@@ -41,7 +56,12 @@
     "requiresConsent": true,
     "promptHint": "支払時期の一時的な変更に関する相談です。事情を丁寧に受け止めてください。",
     "isSystem": false,
-    "sortOrder": 4
+    "sortOrder": 4,
+    "opening": "今月のお支払いのことですね。いつまでなら都合がつきそうかを書いていただけます。事情は、書かなくてかまいません。",
+    "examples": [
+      "今月は、来月末までお待ちいただけませんか",
+      "分けてお支払いできないでしょうか"
+    ]
   },
   {
     "id": "sc_005",
@@ -52,7 +72,12 @@
     "requiresConsent": true,
     "promptHint": "医療費の分担に関する相談です。",
     "isSystem": false,
-    "sortOrder": 5
+    "sortOrder": 5,
+    "opening": "医療費のことですね。何にいくらかかったか、どう分けたいかを書いていただけます。",
+    "examples": [
+      "治療費◯円がかかりました。半分ずつにできませんか",
+      "通院が続きそうで、費用を相談したいです"
+    ]
   },
   {
     "id": "sc_006",
@@ -63,7 +88,12 @@
     "requiresConsent": true,
     "promptHint": "面会交流の頻度・時間・場所・受け渡し方法を決める相談です。",
     "isSystem": true,
-    "sortOrder": 6
+    "sortOrder": 6,
+    "opening": "お会いになる約束のことですね。回数・曜日・時間・受け渡しの場所が決まると、書面にできます。",
+    "examples": [
+      "月1回、第2土曜の10時から17時にしたいです",
+      "受け渡しは◯◯駅でお願いしたいです"
+    ]
   },
   {
     "id": "sc_007",
@@ -74,7 +104,12 @@
     "requiresConsent": true,
     "promptHint": "面会日程の変更に関する相談です。★今回だけか今後もかを必ず確認してください。",
     "isSystem": false,
-    "sortOrder": 7
+    "sortOrder": 7,
+    "opening": "今回の日程のことですね。いつなら都合がつくかを書いていただけます。",
+    "examples": [
+      "今回だけ、第3日曜にできませんか",
+      "◯月◯日に変えていただけると助かります"
+    ]
   },
   {
     "id": "sc_008",
@@ -85,7 +120,12 @@
     "requiresConsent": true,
     "promptHint": "学校行事への参加に関する相談です。",
     "isSystem": false,
-    "sortOrder": 8
+    "sortOrder": 8,
+    "opening": "学校行事のことですね。いつ何があるか、どうしたいかを書いていただけます。",
+    "examples": [
+      "◯月◯日の運動会に行きたいです",
+      "参観日に参加できないでしょうか"
+    ]
   },
   {
     "id": "sc_009",
@@ -96,7 +136,12 @@
     "requiresConsent": true,
     "promptHint": "長期休暇中の面会に関する相談です。",
     "isSystem": false,
-    "sortOrder": 9
+    "sortOrder": 9,
+    "opening": "長いお休みのことですね。いつ、どのくらい過ごしたいかを書いていただけます。",
+    "examples": [
+      "夏休みに3日ほど、一緒に過ごせませんか",
+      "お盆の予定について相談したいです"
+    ]
   },
   {
     "id": "sc_010",
@@ -107,7 +152,12 @@
     "requiresConsent": true,
     "promptHint": "宿泊や遠方への外出に関する相談です。",
     "isSystem": false,
-    "sortOrder": 10
+    "sortOrder": 10,
+    "opening": "お泊まりやお出かけのことですね。いつ、どこへ、どのくらいかを書いていただけます。",
+    "examples": [
+      "◯月に1泊で、祖父母の家に行きたいです",
+      "日帰りで遠出してもよいでしょうか"
+    ]
   },
   {
     "id": "sc_011",
@@ -118,7 +168,12 @@
     "requiresConsent": null,
     "promptHint": "進学に関する相談です。共同親権の場合は双方の合意が必要です。",
     "isSystem": false,
-    "sortOrder": 11
+    "sortOrder": 11,
+    "opening": "進学のことですね。いま考えていること、迷っていることから書いていただけます。",
+    "examples": [
+      "公立と私立で迷っています",
+      "受験のことを、一緒に考えたいです"
+    ]
   },
   {
     "id": "sc_012",
@@ -129,7 +184,12 @@
     "requiresConsent": null,
     "promptHint": "医療に関する相談です。急迫の事情がある場合は単独で判断できます。",
     "isSystem": false,
-    "sortOrder": 12
+    "sortOrder": 12,
+    "opening": "お子さんの医療のことですね。いまの状況と、相談したいことを書いていただけます。",
+    "examples": [
+      "通院が必要と言われました",
+      "治療の方針を、一緒に考えたいです"
+    ]
   },
   {
     "id": "sc_013",
@@ -140,7 +200,12 @@
     "requiresConsent": null,
     "promptHint": "転居や転校に関する相談です。",
     "isSystem": false,
-    "sortOrder": 13
+    "sortOrder": 13,
+    "opening": "お住まいや学校のことですね。いつ、どうなりそうかを書いていただけます。",
+    "examples": [
+      "◯月に引っ越すことになりそうです",
+      "転校について相談したいです"
+    ]
   },
   {
     "id": "sc_014",
@@ -151,7 +216,12 @@
     "requiresConsent": true,
     "promptHint": "送迎の依頼です。合意が必要ですが軽微な調整です。",
     "isSystem": false,
-    "sortOrder": 14
+    "sortOrder": 14,
+    "opening": "送り迎えのことですね。いつ、どこへかを書いていただけます。",
+    "examples": [
+      "◯月◯日の塾の送迎を、お願いできませんか",
+      "来週の火曜、迎えに行っていただけますか"
+    ]
   },
   {
     "id": "sc_015",
@@ -162,7 +232,12 @@
     "requiresConsent": false,
     "promptHint": "体調に関する連絡です。合意は不要で、伝達のみを行います。",
     "isSystem": false,
-    "sortOrder": 15
+    "sortOrder": 15,
+    "opening": "お子さんのご様子ですね。いつから、どんな状態かを書いていただけます。",
+    "examples": [
+      "今朝から熱があります",
+      "◯日に受診しました"
+    ]
   },
   {
     "id": "sc_016",
@@ -173,7 +248,12 @@
     "requiresConsent": false,
     "promptHint": "子どもの様子の共有です。合意は不要です。",
     "isSystem": false,
-    "sortOrder": 16
+    "sortOrder": 16,
+    "opening": "お子さんのご様子ですね。伝えたいことを、そのまま書いていただけます。",
+    "examples": [
+      "運動会でリレーに出ました",
+      "背が伸びました"
+    ]
   },
   {
     "id": "sc_017",
@@ -184,6 +264,11 @@
     "requiresConsent": false,
     "promptHint": "学校からの連絡事項の共有です。合意は不要です。",
     "isSystem": false,
-    "sortOrder": 17
+    "sortOrder": 17,
+    "opening": "学校からのお知らせですね。いつ、何があるかを書いていただけます。",
+    "examples": [
+      "◯月◯日に授業参観があります",
+      "提出物の期限の連絡がありました"
+    ]
   }
 ]

@@ -38,6 +38,8 @@ export function CaseChat({
   reloadKey,
   scenarioId = null,
   threadId = null,
+  opening = null,
+  examples = [],
   backHref,
 }: {
   caseId: string;
@@ -49,6 +51,12 @@ export function CaseChat({
   scenarioId?: string | null;
   /** ★どのスレッドか。同じトピックでも件ごとに分かれる */
   threadId?: string | null;
+  /**
+   * ★書き出しの案内。何をどう書けばよいか分からないまま、
+   *   空の入力欄に向かわせない。
+   */
+  opening?: string | null;
+  examples?: string[];
   /** ★一覧に戻る導線。タブへ戻らせない（K-2） */
   backHref?: string;
 }) {
@@ -143,7 +151,67 @@ export function CaseChat({
       <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-4 py-4">
         {/* ★1件目を書くときがいちばん怖い。
                「お相手には届きません」は、書いたあとではなく**書く前**に要る（L-1） */}
-        {view.inbound.length === 0 && view.messages.length === 0 && <EmptyConsult />}
+        {view.inbound.length === 0 && view.messages.length === 0 && (
+          opening ? (
+            <div className="anim-msg-in">
+              <div className="flex gap-2.5">
+                <Image
+                  src="/character/capybara-sit.png"
+                  alt=""
+                  width={26}
+                  height={26}
+                  style={{ flexShrink: 0 }}
+                />
+                <div className="min-w-0">
+                  <p style={{ fontSize: 13.5, lineHeight: 1.95 }}>{opening}</p>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      lineHeight: 1.95,
+                      color: "var(--text-sub)",
+                      marginTop: 6,
+                    }}
+                  >
+                    ここに書いたことは、お相手には届きません。整えなくても、まとまっていなくてもかまいません。
+                  </p>
+                </div>
+              </div>
+
+              {/* ★選ぶと入力欄に入るだけ。**そのまま送らない。**
+                     直してから送れることが分かる形にする。 */}
+              {examples.length > 0 && (
+                <div className="mt-3" style={{ paddingLeft: 37 }}>
+                  <p style={{ fontSize: 11.5, color: "var(--text-sub-2)" }}>書き出しの例</p>
+                  <div className="mt-1.5 flex flex-col items-start gap-1.5">
+                    {examples.map((e) => (
+                      <button
+                        key={e}
+                        type="button"
+                        onClick={() => setText(e)}
+                        className="text-left"
+                        style={{
+                          fontSize: 12.5,
+                          lineHeight: 1.7,
+                          padding: "8px 12px",
+                          borderRadius: "var(--r-md)",
+                          border: "1px solid var(--border)",
+                          background: "var(--surface)",
+                        }}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>
+                    選ぶと入力欄に入ります。直してからお送りいただけます。
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <EmptyConsult />
+          )
+        )}
 
         {/* ★3種を時系列で混ぜる。
                「書いた → こう伝わった」が並んで初めて、

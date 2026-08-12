@@ -43,3 +43,23 @@ export async function scenarioKind(scenarioId: string | null): Promise<string | 
     return "UNKNOWN";
   }
 }
+
+/**
+ * 書き出しの案内。
+ *
+ * ★AIに毎回作らせない。
+ *   毎回同じ文になり、勝手な数字も作られず、費用もかからない。
+ *
+ * ★promptHint（LLMへの指示）とは別物。**当事者に見せてよいのはこちらだけ。**
+ */
+export async function scenarioOpening(
+  scenarioId: string | null,
+): Promise<{ opening: string | null; examples: string[] }> {
+  if (!scenarioId) return { opening: null, examples: [] };
+  try {
+    const sc = (await listScenarios()).find((s) => s.id === scenarioId);
+    return { opening: sc?.opening ?? null, examples: sc?.examples ?? [] };
+  } catch {
+    return { opening: null, examples: [] };
+  }
+}

@@ -12,9 +12,10 @@ import { readSession } from "@/lib/session";
  */
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
   if (!(await readSession())) {
     return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
   }
-  return NextResponse.json(await computeMetrics());
+  const since = new URL(req.url).searchParams.get("since") ?? undefined;
+  return NextResponse.json(await computeMetrics({ since }));
 }

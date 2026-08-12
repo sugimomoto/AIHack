@@ -11,8 +11,11 @@ export const dynamic = "force-dynamic";
 
 const jpy = (n: number) => `${n.toFixed(4)}円`;
 
+/** ★設計を変える前のログが混ざると、CT-4 が実態を表さない */
+const SINCE = process.env.METRICS_SINCE || undefined;
+
 export default async function Page() {
-  const m = await computeMetrics().catch(() => null);
+  const m = await computeMetrics({ since: SINCE }).catch(() => null);
 
   return (
     <PhoneFrame>
@@ -21,6 +24,7 @@ export default async function Page() {
         {!m && <p style={{ fontSize: 13, color: "var(--text-sub)", marginTop: 12 }}>読み込めませんでした。</p>}
         {m && (
           <>
+            {m.since && <Row label="集計期間" value={`${m.since} 以降`} />}
             <Row label="呼び出し" value={`${m.calls}回`} />
             <Row label="入力／出力トークン" value={`${m.inputTokens.toLocaleString()} / ${m.outputTokens.toLocaleString()}`} />
             <Row label="合計" value={jpy(m.totalJpy)} />

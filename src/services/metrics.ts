@@ -12,6 +12,8 @@ import { listCallLogs } from "@/infra-adapters/firestore/repositories/llmCallLog
  * ★ログには原文が入っていない（G-F）。集計に必要なのはトークン数だけである。
  */
 export type Metrics = {
+  /** ★どの期間の集計か。示さないと数字の意味が変わる */
+  since: string | null;
   calls: number;
   messages: number;
   inputTokens: number;
@@ -26,8 +28,16 @@ export type Metrics = {
   byPurpose: Record<string, { calls: number; jpy: number }>;
 };
 
-export async function computeMetrics(caseId?: string): Promise<Metrics> {
-  const logs = await listCallLogs(caseId);
+/**
+ * ★期間で絞れるようにする。
+ *
+ *   設計を変える前のログが混ざると、CT-4 が実態を表さない。
+ *   実際、調停案のキャッシュを入れる前のログが混ざって
+ *   削減率が過小に出ていた。
+ */
+export async function computeMetrics(opts?: { caseId?: string; since?: string }): Promise<Metrics> {
+  const all = await listCallLogs(opts?.caseId);
+  const logs = opts?.since ? all.filter((l) => l.createdAt >= opts.since!) : all;
   const large = await ratesOf(TIER_CONFIG.LARGE.model);
 
   const byTier: Metrics["byTier"] = {};
@@ -54,6 +64,7 @@ export async function computeMetrics(caseId?: string): Promise<Metrics> {
   const messages = byPurpose.EMOTION_RECEPTION?.calls ?? 0;
 
   return {
+    since: opts?.since ?? null,
     calls: logs.length,
     messages,
     inputTokens,

@@ -123,7 +123,11 @@ LLM の出力は毎回変わります。**テストで確かめるだけでは�
 | | |
 | --- | --- |
 | 階層 | SMALL `gpt-4.1-nano` ／ MEDIUM `gpt-4.1-mini` ／ LARGE `gpt-5.1`（`reasoning_effort=medium`） |
-| **CT-4** | ルーティングなしとの比較を[**実測値**](https://aida-4n47tjpp2a-an.a.run.app/metrics)で算出 |
+| **CT-1** | メッセージ単価 **約0.42円**（事前試算 0.36円） |
+| **CT-4** | ルーティングなしとの比較 **約50%削減**（[実測](https://aida-4n47tjpp2a-an.a.run.app/metrics)） |
+
+> **数字は測る範囲で変わります。**`/metrics` は集計期間を画面に出します。
+> 期間を示さない削減率は意味を持ちません。
 
 ### ★ 推論モデルの罠（実測）
 

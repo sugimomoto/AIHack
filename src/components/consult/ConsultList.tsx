@@ -81,11 +81,11 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
   // ★一覧からは、そのスレッドをそのまま開く（新しく立てない）
   const href = (i: Item) => hrefOf(i.threadId, i.scenarioId);
 
-  const reopen = async (threadId: string | null) => {
+  const setStatus = async (threadId: string | null, status: "OPEN" | "CLOSED") => {
     await fetch(`/api/cases/${caseId}/consultations/close`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-dev-party": partyId },
-      body: JSON.stringify({ threadId, status: "OPEN" }),
+      body: JSON.stringify({ threadId, status }),
     });
     window.location.reload();
   };
@@ -225,22 +225,21 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
           }}
         >
           {open.map((i, n) => (
-            <Link
+            <div
               key={i.id}
-              href={href(i)}
-              className="block"
               style={{
                 padding: "14px 16px",
                 borderTop: n === 0 ? undefined : "1px solid var(--border-subtle)",
               }}
             >
-              <div className="flex items-baseline justify-between gap-3">
-                <span style={{ fontSize: 15 }}>{i.title}</span>
-                {/* ★日付は右端に小さく置くだけ。件数バッジも未読の印も持たない */}
-                <span style={{ fontSize: 11, color: "var(--text-sub-2)", flexShrink: 0 }}>
-                  {md(i.updatedAt)}
-                </span>
-              </div>
+              <Link href={href(i)} className="block">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span style={{ fontSize: 15 }}>{i.title}</span>
+                  {/* ★日付は右端に小さく置くだけ。件数バッジも未読の印も持たない */}
+                  <span style={{ fontSize: 11, color: "var(--text-sub-2)", flexShrink: 0 }}>
+                    {md(i.updatedAt)}
+                  </span>
+                </div>
               {/* ★一行の状態。数ではなく、いまどうなっているか */}
               <p
                 style={{
@@ -252,13 +251,32 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
               >
                 {CONSULT_STATE_LABEL[i.state]}
               </p>
-              {/* ★急かす代わりに、急がなくてよいと書く */}
-              {i.state === "ARRIVED" && (
-                <p style={{ fontSize: 11.5, color: "var(--text-sub-2)", marginTop: 2 }}>
-                  {CONSULT_NO_HURRY}
-                </p>
+                {/* ★急かす代わりに、急がなくてよいと書く */}
+                {i.state === "ARRIVED" && (
+                  <p style={{ fontSize: 11.5, color: "var(--text-sub-2)", marginTop: 2 }}>
+                    {CONSULT_NO_HURRY}
+                  </p>
+                )}
+              </Link>
+
+              {/* ★閉じる導線も一覧に置く。
+                     戻すは一覧で1タップ、閉じ直すには対話を開く必要があり、
+                     **往復できない形になっていた。**
+
+                     ただし届いているものは、ここから閉じさせない。
+                     開かずに1タップで沈められると、
+                     **相手のご相談を読まずに埋められる。** */}
+              {i.state !== "ARRIVED" && (
+                <button
+                  type="button"
+                  onClick={() => void setStatus(i.threadId, "CLOSED")}
+                  className="mt-1.5"
+                  style={{ fontSize: 11, color: "var(--text-sub-2)" }}
+                >
+                  済んだことにする
+                </button>
               )}
-            </Link>
+            </div>
           ))}
         </div>
       )}
@@ -292,7 +310,7 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
                   {i.status === "CLOSED" ? (
                     <button
                       type="button"
-                      onClick={() => void reopen(i.threadId)}
+                      onClick={() => void setStatus(i.threadId, "OPEN")}
                       style={{ fontSize: 11, color: "var(--agree-text)" }}
                     >
                       戻す

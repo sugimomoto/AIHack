@@ -254,7 +254,67 @@ async function main() {
   if (ag.body.draft?.rangeText) console.log(`     算定表: ${String(ag.body.draft.rangeText).split("\n")[0]}`);
 
   // ─────────────────────────────────────────────
-  section("⑦ 安全・運用");
+  section("⑦ ★N-1／K-6：成立と、そのあとの変更");
+  for (const cookie of [cA2, cB]) {
+    await call(`/api/cases/${caseId}/agreement`, {
+      method: "POST",
+      cookie,
+      body: { topic: "CHILD_SUPPORT", status: "ACCEPTED" },
+    });
+  }
+  const agreed = await call(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, { cookie: cA2 });
+  ok("★合意が成立する", agreed.body.state === "AGREED" && agreed.body.agreement !== null);
+
+  // ★自由記述を送りつけても、越えない
+  const reqRev = await call(`/api/cases/${caseId}/revision`, {
+    method: "POST",
+    cookie: cA2,
+    body: {
+      topic: "CHILD_SUPPORT",
+      change: { payDay: "DAY_10" },
+      reasonCode: "土曜に出勤しろと急に言われて、もう本当にどうにもならない",
+    },
+  });
+  ok("変更を申し出られる", reqRev.status === 200);
+
+  const raw = await call(`/api/cases/${caseId}/revision?topic=CHILD_SUPPORT`, { cookie: cB });
+  ok("★一覧に無い背景は渡らない", raw.body.reason === null);
+
+  // ★選ばれたカテゴリは、定型の伝聞文になって渡る
+  await call(`/api/cases/${caseId}/revision`, {
+    method: "POST",
+    cookie: cA2,
+    body: {
+      topic: "CHILD_SUPPORT",
+      change: { payDay: "DAY_10" },
+      reasonCode: "SCHEDULE_CONSTRAINT",
+    },
+  });
+
+  const seen = await call(`/api/cases/${caseId}/revision?topic=CHILD_SUPPORT`, { cookie: cB });
+  ok("★相手に申し出が届く", seen.body.isOwn === false);
+  ok("★申し出た本人には、自分の申し出と分かる", (
+    await call(`/api/cases/${caseId}/revision?topic=CHILD_SUPPORT`, { cookie: cA2 })
+  ).body.isOwn === true);
+  ok("★背景は伝聞形で渡る", String(seen.body.reason ?? "").endsWith("とのことです。"));
+  ok("★何が変わらないかが言葉になっている", String(seen.body.description?.sentence).length > 0);
+
+  // ★お返事があるまで、いまの取り決めが続く
+  const during = await call(`/api/cases/${caseId}/document`, { cookie: cB });
+  ok("★変更申請中でも、いまの取り決めが書面に残る", during.status === 200);
+
+  const keep = await call(`/api/cases/${caseId}/revision`, {
+    method: "POST",
+    cookie: cB,
+    body: { topic: "CHILD_SUPPORT", action: "KEEP" },
+  });
+  ok("★「いまのままにしたい」で合意済に戻る", keep.body.status === "AGREED");
+
+  const after = await call(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, { cookie: cB });
+  ok("★断っても、いまの取り決めを失わない", after.body.agreement !== null);
+
+  // ─────────────────────────────────────────────
+  section("⑧ 安全・運用");
   const metricsNoAuth = await call("/api/metrics");
   ok("★原価は未認証で見られない", metricsNoAuth.status === 401);
   const safety = await call("/api/safety");

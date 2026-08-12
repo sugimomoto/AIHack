@@ -261,9 +261,15 @@ export async function loadAgreementView(input: {
 
   const payloads = parties.map((id) => byParty.get(id) ?? null);
 
+  // ★N-1：成立した取り決めそのもの。祝うためではなく、何が決まったかを示すため
+  const agreed = await loadAgreementItem(caseId, input.topic);
+
   return {
     topic: input.topic,
     ready,
+    agreement: agreed
+      ? { payload: agreed.payload, agreedAt: (agreed.agreedAt ?? "").slice(0, 10) }
+      : null,
     proposals: parties.map((id) => ({
       isOwn: id === input.partyId,
       payload: byParty.get(id) ?? null,

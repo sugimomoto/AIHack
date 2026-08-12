@@ -295,6 +295,57 @@ export async function appendRevision(
     .add({ ...rev, createdAt: new Date().toISOString() });
 }
 
+/**
+ * 変更の申し出（K-6）
+ *
+ * ★ここに入れてよいのは、取次ぎの検査を通った文だけである。
+ *   原文をそのまま置くと、相手の画面に出た瞬間に C1 が破れる。
+ *
+ * ★合意の payload には触れない。**承諾されるまで、いまの取り決めが続く。**
+ */
+export async function saveRevisionRequest(
+  caseId: CaseId,
+  topic: string,
+  req: { byPartyId: PartyId; change: Record<string, unknown>; relayedReason: string | null },
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("agreementItems")
+    .doc(topic)
+    .set(
+      {
+        status: "REVISION_REQUESTED",
+        revisionRequest: { ...req, createdAt: new Date().toISOString() },
+      },
+      { merge: true },
+    );
+}
+
+export async function loadRevisionRequest(
+  caseId: CaseId,
+  topic: string,
+): Promise<{
+  byPartyId: string;
+  change: Record<string, unknown>;
+  relayedReason: string | null;
+  createdAt: string;
+} | null> {
+  const d = await caseRef(caseId).collection("agreementItems").doc(topic).get();
+  if (d.get("status") !== "REVISION_REQUESTED") return null;
+  return (d.get("revisionRequest") ?? null) as never;
+}
+
+/** 申し出を取り下げる。★status は呼び出し側が状態機械を通して決める */
+export async function clearRevisionRequest(
+  caseId: CaseId,
+  topic: string,
+  status: string,
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("agreementItems")
+    .doc(topic)
+    .set({ status, revisionRequest: null }, { merge: true });
+}
+
 /** ★ONE_TIME の例外。合意は変えず、その回の義務にだけ効く */
 export async function appendException(
   caseId: CaseId,
@@ -344,14 +395,30 @@ export async function finalizeAgreement(
     );
 }
 
-/** 現在の合意（版つき） */
+/**
+ * 現在の合意（版つき）
+ *
+ * ★変更申請中でも読める。**変更を申し出ただけでは、いまの取り決めは失効しない。**
+ *   ここで null を返すと、K-6 の「いまの取り決め」を並べられない。
+ */
 export async function loadAgreementItem(
   caseId: CaseId,
   topic: string,
-): Promise<{ version: number; payload: Record<string, unknown> } | null> {
+): Promise<{
+  version: number;
+  payload: Record<string, unknown>;
+  status: string;
+  agreedAt: string | null;
+} | null> {
   const d = await caseRef(caseId).collection("agreementItems").doc(topic).get();
-  if (!d.exists || d.get("status") !== "AGREED") return null;
-  return { version: (d.get("version") ?? 1) as number, payload: (d.get("payload") ?? {}) as Record<string, unknown> };
+  const status = d.get("status");
+  if (!d.exists || (status !== "AGREED" && status !== "REVISION_REQUESTED")) return null;
+  return {
+    version: (d.get("version") ?? 1) as number,
+    payload: (d.get("payload") ?? {}) as Record<string, unknown>,
+    status: status as string,
+    agreedAt: (d.get("agreedAt") ?? null) as string | null,
+  };
 }
 
 /** 当事者の年収帯。★これだけが越える（INV-2a） */

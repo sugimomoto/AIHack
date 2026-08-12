@@ -139,6 +139,18 @@ button {
   animation: msg-in 320ms ease-out both;
 }
 
+/* 合意の成立（N-1）: 上下の線が左から引かれる 480ms
+   ★祝いの演出はここだけ。紙吹雪もバッジも使わない。
+   これは離婚の条件が決まった瞬間であり、祝われると失ったものを思い出させる。 */
+@keyframes rule-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
 /* AI の応答待ち: 呼吸 3.2s ループ（点の明滅は使わない） */
 @keyframes breathe {
   0%,

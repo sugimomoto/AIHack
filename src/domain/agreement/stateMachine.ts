@@ -36,6 +36,8 @@ export const AGREEMENT_EVENTS = [
   "ESCALATE",
   "REQUEST_REVISION",
   "AGREE_REVISION",
+  // ★「いまの取り決めのままにしたい」。これが無いと、断った人が現在の合意を失う
+  "DECLINE_REVISION",
   "REVISION_FAILED",
   "DETECT_DEVIATION",
   "RECOVER",
@@ -63,6 +65,8 @@ const TRANSITIONS: Record<AgreementStatus, Partial<Record<AgreementEvent, Agreem
   },
   REVISION_REQUESTED: {
     AGREE_REVISION: "AGREED",
+    // ★断ることは、話し合いのやり直しではない。いまの取り決めがそのまま続く
+    DECLINE_REVISION: "AGREED",
     REVISION_FAILED: "IN_NEGOTIATION",
   },
   DEVIATED: {
@@ -104,7 +108,18 @@ export function isTerminal(s: AgreementStatus): boolean {
   return allowedEvents(s).length === 0;
 }
 
-/** 公正証書の原案に載る状態か */
+/**
+ * 公正証書の原案に載る状態か。
+ *
+ * ★変更申請中も載る。**変更を申し出ただけでは、いまの取り決めは失効しない。**
+ *   ここを落とすと、相手が変更を申し出た瞬間に、
+ *   合意済みの内容が書面から消える。
+ *   「お返事があるまで、いまの取り決めが続きます」は、画面の文言であると同時に
+ *   **書面の内容についての約束でもある。**
+ *
+ * ★載るのは、あくまで**合意済みの payload** である。
+ *   申し出られた変更案は、承諾されるまで payload に入らない。
+ */
 export function isDocumentable(s: AgreementStatus): boolean {
-  return s === "AGREED" || s === "DEVIATED";
+  return s === "AGREED" || s === "DEVIATED" || s === "REVISION_REQUESTED";
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { AgreementMoment } from "./AgreementMoment";
+import { RevisionRequestForm } from "./RevisionRequestForm";
 
 /**
  * 合意の状況
@@ -16,6 +18,8 @@ type View = {
   converged: boolean;
   state: "WAITING_BOTH" | "WAITING_OTHER" | "NEEDS_CONVERGENCE" | "AGREED" | "REJECTED";
   ownConsent: "PENDING" | "ACCEPTED" | "REJECTED";
+  /** ★N-1：成立した取り決め */
+  agreement: { payload: Record<string, unknown>; agreedAt: string } | null;
 };
 
 const STATE_LABEL: Record<View["state"], string> = {
@@ -39,6 +43,7 @@ export function AgreementPanel({
 }) {
   const [v, setV] = useState<View | null>(null);
   const [busy, setBusy] = useState(false);
+  const [asking, setAsking] = useState(false);
 
   const fetchView = useCallback(async (): Promise<View | null> => {
     const res = await fetch(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, {
@@ -76,11 +81,12 @@ export function AgreementPanel({
 
   if (!v) return null;
 
-  // ★調停案は長くなりうる。パネル側で高さを制限し、対話を押し出さない
+  // ★高さの制限は、3つのパネルをまとめる側で持つ（app/page.tsx）。
+  //   パネルごとに上限を持たせていたため、合計が枠を超えて対話の高さが 0 になっていた。
   return (
     <div
-      className="shrink-0 overflow-y-auto px-4 py-3"
-      style={{ borderTop: "1px solid var(--border-subtle)", maxHeight: "42%" }}
+      className="shrink-0 px-4 py-3"
+      style={{ borderTop: "1px solid var(--border-subtle)" }}
     >
       <div className="flex items-center justify-between">
         <span style={{ fontSize: 13.5, fontWeight: 600 }}>養育費</span>
@@ -94,13 +100,22 @@ export function AgreementPanel({
         </span>
       </div>
 
-      {!v.ready && (
+      {/* ★N-1：決まったものは、いちばん上に静かに置く。
+             祝わない。上下に線が1本ずつ引かれて、その中に内容が置かれるだけ。 */}
+      {v.agreement && (
+        <div className="mt-3">
+          <AgreementMoment payload={v.agreement.payload} agreedOn={v.agreement.agreedAt} />
+        </div>
+      )}
+
+      {!v.ready && !v.agreement && (
         <p style={{ fontSize: 12, lineHeight: 1.85, color: "var(--text-sub)", marginTop: 6 }}>
           おふたりのご提案が揃うと、算定表の目安をお示しします。
         </p>
       )}
 
-      {v.draft && (
+      {/* ★決まったあとに目安を出し続けない。決まったものが基準である */}
+      {v.draft && !v.agreement && (
         <div
           className="mt-2.5"
           style={{
@@ -166,6 +181,38 @@ export function AgreementPanel({
             まだ決めない
           </button>
         </div>
+      )}
+
+      {/* ★「変更を申し出る」を目立たせない。
+             一度決まったものを動かす操作を、勧める形にしない。 */}
+      {v.agreement && (
+        <div className="mt-3">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => setAsking(true)}
+            style={{ fontSize: 12.5, color: "var(--text-sub)", textDecoration: "underline" }}
+          >
+            変更を申し出る
+          </button>
+          <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 6 }}>
+            変更には、お相手の同意が必要です。
+          </p>
+        </div>
+      )}
+
+      {asking && v.agreement && (
+        <RevisionRequestForm
+          caseId={caseId}
+          partyId={partyId}
+          current={v.agreement.payload}
+          onDone={() => {
+            setAsking(false);
+            void fetchView().then((r) => r && setV(r));
+            onChanged?.();
+          }}
+          onCancel={() => setAsking(false)}
+        />
       )}
     </div>
   );

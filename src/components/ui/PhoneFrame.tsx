@@ -8,7 +8,8 @@ export function PhoneFrame({ children }: { children: ReactNode }) {
       style={{ background: "var(--surface-2)" }}
     >
       <div
-        className="flex w-full flex-col overflow-hidden sm:w-[390px]"
+        // ★ボトムシート（K-6）はこの枠の中に収める。端末の外にはみ出させない
+        className="relative flex w-full flex-col overflow-hidden sm:w-[390px]"
         style={{
           background: "var(--bg)",
           height: "min(844px, 100dvh)",

@@ -80,8 +80,8 @@ export function SchedulePanel({
 
   return (
     <div
-      className="shrink-0 overflow-y-auto px-4 py-3"
-      style={{ borderTop: "1px solid var(--border-subtle)", maxHeight: "36%" }}
+      className="shrink-0 px-4 py-3"
+      style={{ borderTop: "1px solid var(--border-subtle)" }}
     >
       <p style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 8 }}>予定</p>
 

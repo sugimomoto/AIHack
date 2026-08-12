@@ -26,6 +26,8 @@ const EXPECTED: [AgreementStatus, AgreementEvent, AgreementStatus][] = [
   ["AGREED", "REQUEST_REVISION", "REVISION_REQUESTED"],
   ["AGREED", "DETECT_DEVIATION", "DEVIATED"],
   ["REVISION_REQUESTED", "AGREE_REVISION", "AGREED"],
+  // ★「いまの取り決めのままにしたい」。断ることは、話し合いのやり直しではない
+  ["REVISION_REQUESTED", "DECLINE_REVISION", "AGREED"],
   ["REVISION_REQUESTED", "REVISION_FAILED", "IN_NEGOTIATION"],
   ["DEVIATED", "RECOVER", "AGREED"],
 ];
@@ -51,7 +53,7 @@ describe("合意の状態機械", () => {
     });
 
     it("検証した組み合わせが 状態数 × イベント数 と一致する", () => {
-      expect(AGREEMENT_STATUSES.length * AGREEMENT_EVENTS.length).toBe(54);
+      expect(AGREEMENT_STATUSES.length * AGREEMENT_EVENTS.length).toBe(60);
     });
   });
 
@@ -87,11 +89,21 @@ describe("合意の状態機械", () => {
   });
 
   describe("公正証書に載る状態", () => {
-    it("AGREED と DEVIATED のみ（逸脱中でも合意は有効である）", () => {
+    // ★逸脱中でも合意は有効である。
+    // ★変更申請中も載る。**変更を申し出ただけでは、いまの取り決めは失効しない。**
+    //   ここを落とすと、相手が変更を申し出た瞬間に書面から内容が消える。
+    it("AGREED・DEVIATED・REVISION_REQUESTED", () => {
       expect(AGREEMENT_STATUSES.filter(isDocumentable).sort()).toEqual([
         "AGREED",
         "DEVIATED",
+        "REVISION_REQUESTED",
       ]);
+    });
+
+    it("★話し合いの途中・調停へ移ったものは載せない", () => {
+      for (const s of ["NOT_STARTED", "IN_NEGOTIATION", "ESCALATED"] as const) {
+        expect(isDocumentable(s)).toBe(false);
+      }
     });
   });
 });

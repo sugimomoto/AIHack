@@ -3,6 +3,7 @@ import { readSession } from "@/lib/session";
 import { PhoneFrame } from "@/components/ui/PhoneFrame";
 import { CaseChat } from "@/components/chat/CaseChat";
 import { AgreementPanel } from "@/components/agreement/AgreementPanel";
+import { RevisionSheet } from "@/components/agreement/RevisionSheet";
 import { SchedulePanel } from "@/components/schedule/SchedulePanel";
 import { DocumentPanel } from "@/components/document/DocumentPanel";
 import { QuietCard } from "@/components/safety/QuietCard";
@@ -49,9 +50,17 @@ export default async function Page() {
       <div className="flex min-h-0 flex-1 flex-col">
         <CaseChat caseId={s.caseId} partyId={s.partyId} label="相談" />
       </div>
-      <AgreementPanel caseId={s.caseId} partyId={s.partyId} />
-      <SchedulePanel caseId={s.caseId} partyId={s.partyId} />
-      <DocumentPanel caseId={s.caseId} partyId={s.partyId} />
+      {/* ★K-6：相手が変更を申し出ていれば、まずこれに答える */}
+      <RevisionSheet caseId={s.caseId} partyId={s.partyId} />
+
+      {/* ★3つまとめて、ここで高さを持つ。
+             パネルごとに上限（42%＋36%＋38%）を持たせていたため合計が枠を超え、
+             **対話の高さが 0 になっていた。**対話を押し出さないことが要件である。 */}
+      <div className="shrink-0 overflow-y-auto" style={{ maxHeight: "52%" }}>
+        <AgreementPanel caseId={s.caseId} partyId={s.partyId} />
+        <SchedulePanel caseId={s.caseId} partyId={s.partyId} />
+        <DocumentPanel caseId={s.caseId} partyId={s.partyId} />
+      </div>
     </PhoneFrame>
   );
 }

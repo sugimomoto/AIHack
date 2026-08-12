@@ -23,7 +23,8 @@ const templates = JSON.parse(readFileSync("firestore/seeds/clauseTemplates.json"
 describe("★G-3b｜条項に現れる enum に表記があること", () => {
   for (const t of templates) {
     const schema = schemas.find((s) => s.id === t.payloadSchemaId)!;
-    const keys = [...t.body.matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]);
+    // ★childrenRef はケースの情報から作る。payload のキーではない
+    const keys = [...t.body.matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]).filter((k) => k !== "childrenRef");
 
     for (const key of keys) {
       const prop = schema.schema.properties[key];
@@ -42,6 +43,7 @@ describe("★G-3b｜条項に現れる enum に表記があること", () => {
     for (const t of templates) {
       const schema = schemas.find((s) => s.id === t.payloadSchemaId)!;
       for (const m of t.body.matchAll(/\{\{(\w+)\}\}/g)) {
+        if (m[1] === "childrenRef") continue;
         const prop = schema.schema.properties[m[1]] as { type?: string } | undefined;
         if (prop?.type === "object") bad.push(`${t.topic}.${m[1]}`);
       }

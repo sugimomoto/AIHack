@@ -184,3 +184,59 @@ describe("値の書式", () => {
     expect(formatValue("timeRange", "10:00-17:00")).toBe("10時00分から17時00分まで");
   });
 });
+
+/**
+ * ★複数のお子さんに対応する
+ *
+ *   ひな形が「丙」1人固定だった。子が2人以上いると、
+ *   **誰についての取り決めなのかが文から読み取れない。**
+ *
+ * ★氏名を条項に出さない。
+ *   公正証書には氏名が入るが、原案は当事者が公証役場に持ち込むもので
+ *   あり、**アプリ側で氏名を保持しない設計と整合させる。**
+ *   「長男」「長女」といった続柄も、こちらでは判定できない。
+ */
+describe("★複数のお子さん", () => {
+  const T = [
+    {
+      id: "ct_cs",
+      topic: "CHILD_SUPPORT",
+      order: 1,
+      title: "養育費",
+      body: "甲は乙に対し、{{childrenRef}}の養育費として、{{monthlyAmount}}円を{{payDay}}限り支払う。",
+    },
+  ];
+  const item = (n: number) => ({
+    topic: "CHILD_SUPPORT",
+    status: "AGREED" as const,
+    payload: { monthlyAmount: 30000, payDay: "DAY_25" },
+    childCount: n,
+  });
+
+  it("1人なら従来どおり", () => {
+    const d = buildDocument({ templates: T, items: [item(1)] });
+    expect(d.clauses[0].body).toContain("丙の養育費");
+  });
+
+  it("★2人なら、2人ぶんの表記になる", () => {
+    const d = buildDocument({ templates: T, items: [item(2)] });
+    expect(d.clauses[0].body).toContain("丙及び丁");
+  });
+
+  it("★3人にも対応する", () => {
+    const d = buildDocument({ templates: T, items: [item(3)] });
+    expect(d.clauses[0].body).toContain("丙、丁及び戊");
+  });
+
+  it("★人数が分からなければ、文書を返さない（誰の取り決めか書けない）", () => {
+    expect(() =>
+      buildDocument({ templates: T, items: [{ ...item(1), childCount: 0 }] }),
+    ).toThrow(UnresolvedPlaceholderError);
+  });
+
+  it("★金額は総額である（子ごとに割らない）", () => {
+    // 算定表は「子○人」で総額を出す。割ると根拠を失う
+    const d = buildDocument({ templates: T, items: [item(3)] });
+    expect(d.clauses[0].body).toContain("30,000円");
+  });
+});

@@ -3,6 +3,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import { PhoneFrame } from "@/components/ui/PhoneFrame";
+import {
+  SITUATIONS,
+  SITUATION_LABEL,
+  SITUATION_NOTE,
+  type Situation,
+} from "@/domain/case/situation";
 
 /**
  * はじめる
@@ -15,6 +21,7 @@ import { PhoneFrame } from "@/components/ui/PhoneFrame";
  */
 export default function Page() {
   const [busy, setBusy] = useState(false);
+  const [situation, setSituation] = useState<Situation | null>(null);
 
   const start = async (role: "CUSTODIAL" | "NON_CUSTODIAL") => {
     if (busy) return;
@@ -23,9 +30,10 @@ export default function Page() {
       const res = await fetch("/api/cases", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ role }),
+        body: JSON.stringify({ role, situation }),
       });
-      if (res.ok) window.location.href = "/onboarding/invite";
+      // ★お子さんと年収を伺ってから、状況に応じた次の一手へ進む
+      if (res.ok) window.location.href = "/onboarding/children";
     } finally {
       setBusy(false);
     }
@@ -53,6 +61,32 @@ export default function Page() {
           </p>
         </div>
 
+        {/* ★状況の違いを、最初に吸収する。
+             「もう離婚して取り決めもある人」と「まだ相手と話していない人」を
+             同じ入口に通さない。 */}
+        <p style={{ fontSize: 13.5, fontWeight: 600, marginTop: 28 }}>いまの状況に近いものを選んでください。</p>
+        <div className="mt-3 flex flex-col gap-2.5">
+          {SITUATIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setSituation(s)}
+              className="text-left"
+              style={{
+                background: situation === s ? "var(--agree-bg)" : "var(--surface)",
+                border: `1px solid ${situation === s ? "var(--agree)" : "var(--border)"}`,
+                borderRadius: "var(--r-md)",
+                padding: 14,
+              }}
+            >
+              <p style={{ fontSize: 14, fontWeight: 600 }}>{SITUATION_LABEL[s]}</p>
+              <p style={{ fontSize: 12, lineHeight: 1.85, color: "var(--text-sub)", marginTop: 3 }}>
+                {SITUATION_NOTE[s]}
+              </p>
+            </button>
+          ))}
+        </div>
+
         <p style={{ fontSize: 13.5, fontWeight: 600, marginTop: 28 }}>お子さんと同居されていますか。</p>
         <p style={{ fontSize: 12, lineHeight: 1.9, color: "var(--text-sub-2)", marginTop: 6 }}>
           養育費の目安をお出しするために伺います。あとから変えられます。
@@ -66,7 +100,7 @@ export default function Page() {
             <button
               key={o.role}
               type="button"
-              disabled={busy}
+              disabled={busy || !situation}
               onClick={() => void start(o.role)}
               className="disabled:opacity-50"
               style={{
@@ -83,7 +117,7 @@ export default function Page() {
         </div>
 
         <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 20, textAlign: "center" }}>
-          お名前やご連絡先の入力は要りません。
+          {situation ? "お名前やご連絡先の入力は要りません。" : "まず、いまの状況をお選びください。"}
         </p>
       </div>
     </PhoneFrame>

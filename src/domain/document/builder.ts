@@ -29,7 +29,27 @@ export type AgreementItemInput = {
   topic: string;
   status: string;
   payload: Record<string, unknown> | null;
+  /** ★お子さんの人数。条項の表記に要る */
+  childCount?: number;
 };
+
+/**
+ * ★条項で子を指す語
+ *
+ *   公正証書では甲・乙・丙…と当事者を置く。
+ *   子が複数いれば、丙・丁・戊と続く。
+ *
+ * ★氏名を出さない。原案は当事者が公証役場に持ち込むものであり、
+ *   アプリ側で氏名を保持しない設計と整合させる。
+ */
+const CHILD_MARKS = ["丙", "丁", "戊"];
+
+export function childrenRefOf(count: number): string | null {
+  if (count < 1 || count > CHILD_MARKS.length) return null;
+  const m = CHILD_MARKS.slice(0, count);
+  if (m.length === 1) return m[0];
+  return `${m.slice(0, -1).join("、")}及び${m[m.length - 1]}`;
+}
 
 export type Clause = { number: number; title: string; body: string; templateId: string };
 
@@ -130,9 +150,9 @@ export function buildDocument(input: {
   items: readonly AgreementItemInput[];
 }): Document {
   // ★AGREED だけを対象にする。決まっていないことを条項にしない
-  const agreed = new Map(
-    input.items.filter((i) => i.status === "AGREED").map((i) => [i.topic, i.payload ?? {}]),
-  );
+  const agreedItems = input.items.filter((i) => i.status === "AGREED");
+  const agreed = new Map(agreedItems.map((i) => [i.topic, i.payload ?? {}]));
+  const childCounts = new Map(agreedItems.map((i) => [i.topic, i.childCount ?? 0]));
 
   const clauses: Clause[] = [];
   for (const t of [...input.templates].sort((a, b) => a.order - b.order)) {
@@ -140,8 +160,11 @@ export function buildDocument(input: {
     if (!payload) continue;
 
     const missing: string[] = [];
+    // ★子を指す語は payload ではなく、ケースの情報から作る
+    const childrenRef = childrenRefOf(childCounts.get(t.topic) ?? 0);
+
     const body = t.body.replace(PLACEHOLDER, (_m, key: string) => {
-      const v = formatValue(key, payload[key]);
+      const v = key === "childrenRef" ? childrenRef : formatValue(key, payload[key]);
       if (v === null) {
         missing.push(key);
         return _m;

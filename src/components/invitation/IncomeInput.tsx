@@ -18,8 +18,9 @@ import { toIncomeBand, INCOME_BAND_NOTE } from "@/domain/income/band";
  * @see docs/product-requirements.md FR-16a
  * @see docs/ui-design.md §5.1
  */
-export function IncomeInput() {
+export function IncomeInput({ caseId, next }: { caseId?: string; next?: string }) {
   const [raw, setRaw] = useState("");
+  const [busy, setBusy] = useState(false);
   const yen = Number(raw.replace(/[^0-9]/g, ""));
   const band = raw !== "" && Number.isFinite(yen) && yen >= 0 ? toIncomeBand(yen) : null;
 
@@ -78,6 +79,37 @@ export function IncomeInput() {
       <p style={{ fontSize: 11, lineHeight: 1.9, color: "var(--muted)", marginTop: 10 }}>
         {INCOME_BAND_NOTE}
       </p>
+
+      {next && (
+        <button
+          type="button"
+          disabled={band === null || busy}
+          onClick={() => {
+            setBusy(true);
+            void fetch("/api/profile", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ annualIncomeYen: yen }),
+            })
+              .then(() => {
+                window.location.href = next;
+              })
+              .finally(() => setBusy(false));
+          }}
+          className="mt-5 w-full disabled:opacity-45"
+          style={{
+            background: "var(--agree-bg)",
+            border: "1px solid var(--agree)",
+            borderRadius: "var(--r-full)",
+            minHeight: 50,
+            fontSize: 15,
+            fontWeight: 600,
+            color: "var(--agree-text)",
+          }}
+        >
+          次へ
+        </button>
+      )}
     </div>
   );
 }

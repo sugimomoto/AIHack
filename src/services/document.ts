@@ -29,8 +29,14 @@ export async function buildCaseDocument(input: {
 
   const [templates, items] = await Promise.all([listClauseTemplates(), listAgreementItems(caseId)]);
 
+  // ★お子さんの人数は、ケースから取る。条項の表記に要る
+  const childCount = snap.children.length;
+
   try {
-    return { ok: true, document: buildDocument({ templates, items }) };
+    return {
+      ok: true,
+      document: buildDocument({ templates, items: items.map((i) => ({ ...i, childCount })) }),
+    };
   } catch (e) {
     if (e instanceof UnresolvedPlaceholderError) {
       // ★空欄のある文書を返さない。何が足りないかだけを返す

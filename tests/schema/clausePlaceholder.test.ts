@@ -26,6 +26,12 @@ type Template = {
   body: string;
 };
 
+/**
+ * ★ケースの情報から作る差し込み。payload のキーではない。
+ *   人数が分からなければ文書を返さない（documentBuilder のテストで固定）。
+ */
+const FROM_CASE = new Set(["childrenRef"]);
+
 const read = <T,>(p: string): T[] => JSON.parse(readFileSync(p, "utf8"));
 const schemas = read<Schema>("firestore/seeds/payloadSchemas.json");
 const templates = read<Template>("firestore/seeds/clauseTemplates.json");
@@ -37,7 +43,7 @@ describe("G-3｜条項ひな形とスキーマの整合", () => {
     expect(s, `スキーマが見つかりません: ${t.payloadSchemaId}`).toBeDefined();
 
     const keys = new Set(Object.keys(s!.schema.properties));
-    const placeholders = [...t.body.matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]);
+    const placeholders = [...t.body.matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]).filter((k) => !FROM_CASE.has(k));
 
     expect(placeholders.length, "プレースホルダが1つもありません").toBeGreaterThan(0);
     for (const p of placeholders) {

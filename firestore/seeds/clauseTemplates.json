@@ -6,7 +6,7 @@
   "order": 1,
   "title": "養育費",
   "condition": null,
-  "body": "甲は乙に対し、丙の養育費として、{{monthlyAmount}}円を{{payDay}}限り、乙の指定する方法により支払う。\n前項の支払は、丙が{{until}}に達する月まで継続する。"
+  "body": "甲は乙に対し、{{childrenRef}}の養育費として、{{monthlyAmount}}円を{{payDay}}限り、乙の指定する方法により支払う。\n前項の支払は、{{childrenRef}}がそれぞれ{{until}}に達する月まで継続する。"
  },
  {
   "id": "ct_visitation_v1",
@@ -15,6 +15,6 @@
   "order": 2,
   "title": "面会交流",
   "condition": null,
-  "body": "乙は甲に対し、甲が丙と面会交流することを認める。\n面会交流は{{frequency}}とし、時間は{{timeRange}}、受け渡し場所は{{handoverPlace}}とする。\n面会交流の具体的な日程は、甲乙間で事前に協議して定める。"
+  "body": "乙は甲に対し、甲が{{childrenRef}}と面会交流することを認める。\n面会交流は{{frequency}}とし、時間は{{timeRange}}、受け渡し場所は{{handoverPlace}}とする。\n面会交流の具体的な日程は、甲乙間で事前に協議して定める。"
  }
 ]

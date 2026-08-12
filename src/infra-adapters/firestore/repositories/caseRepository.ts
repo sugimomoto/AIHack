@@ -525,3 +525,30 @@ export async function isDemoCase(caseId: CaseId): Promise<boolean> {
 export async function markDemoCase(caseId: CaseId): Promise<void> {
   await caseRef(caseId).set({ demo: true }, { merge: true });
 }
+
+/** 子の登録。★算定表は人数と年齢で表を選ぶ。これが無いと目安が出せない */
+export async function saveChildren(
+  caseId: CaseId,
+  children: { birthDate: string; name?: string }[],
+): Promise<void> {
+  const db = getDb();
+  const col = caseRef(caseId).collection("children");
+  const existing = await col.get();
+  const batch = db.batch();
+  existing.docs.forEach((d) => batch.delete(d.ref));
+  children.forEach((c, i) =>
+    // ★名前は任意。入れなくても算定表は引ける
+    batch.set(col.doc(`child_${i + 1}`), { birthDate: c.birthDate, name: c.name ?? null }),
+  );
+  await batch.commit();
+}
+
+/** ケースの状況。★入口の分岐を記録する */
+export async function saveSituation(caseId: CaseId, situation: string): Promise<void> {
+  await caseRef(caseId).set({ situation }, { merge: true });
+}
+
+export async function loadSituation(caseId: CaseId): Promise<string | null> {
+  const d = await caseRef(caseId).get();
+  return (d.get("situation") ?? null) as string | null;
+}

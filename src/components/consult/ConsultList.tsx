@@ -3,6 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+  CONSULT_NO_HURRY,
+  CONSULT_STATE_LABEL,
+  isSettled,
+  type ConsultState,
+} from "@/domain/consultation/state";
 
 /**
  * K-1 相談の一覧
@@ -21,6 +27,7 @@ type Item = {
   title: string;
   scenarioId: string | null;
   threadId: string | null;
+  state: ConsultState;
   status: string;
   updatedAt: string;
 };
@@ -50,8 +57,9 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
 
   if (!d) return null;
 
-  const open = d.items.filter((i) => i.status !== "CLOSED");
-  const closed = d.items.filter((i) => i.status === "CLOSED");
+  // ★済んだものは沈めるが、消さない
+  const open = d.items.filter((i) => !isSettled(i.state));
+  const closed = d.items.filter((i) => isSettled(i.state));
   // ★一覧からは、そのスレッドをそのまま開く（新しく立てない）
   const href = (i: Item) => {
     const q = new URLSearchParams();
@@ -164,17 +172,36 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
             <Link
               key={i.id}
               href={href(i)}
-              className="flex items-center justify-between gap-3"
+              className="block"
               style={{
                 padding: "14px 16px",
                 borderTop: n === 0 ? undefined : "1px solid var(--border-subtle)",
               }}
             >
-              <span style={{ fontSize: 15 }}>{i.title}</span>
-              {/* ★日付は右端に小さく置くだけ */}
-              <span style={{ fontSize: 11, color: "var(--text-sub-2)", flexShrink: 0 }}>
-                {md(i.updatedAt)}
-              </span>
+              <div className="flex items-baseline justify-between gap-3">
+                <span style={{ fontSize: 15 }}>{i.title}</span>
+                {/* ★日付は右端に小さく置くだけ。件数バッジも未読の印も持たない */}
+                <span style={{ fontSize: 11, color: "var(--text-sub-2)", flexShrink: 0 }}>
+                  {md(i.updatedAt)}
+                </span>
+              </div>
+              {/* ★一行の状態。数ではなく、いまどうなっているか */}
+              <p
+                style={{
+                  fontSize: 12,
+                  lineHeight: 1.8,
+                  marginTop: 4,
+                  color: i.state === "ARRIVED" ? "var(--agree-text)" : "var(--text-sub)",
+                }}
+              >
+                {CONSULT_STATE_LABEL[i.state]}
+              </p>
+              {/* ★急かす代わりに、急がなくてよいと書く */}
+              {i.state === "ARRIVED" && (
+                <p style={{ fontSize: 11.5, color: "var(--text-sub-2)", marginTop: 2 }}>
+                  {CONSULT_NO_HURRY}
+                </p>
+              )}
             </Link>
           ))}
         </div>
@@ -201,7 +228,12 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
                 }}
               >
                 <span style={{ fontSize: 13.5, color: "var(--text-sub)" }}>{i.title}</span>
-                <span style={{ fontSize: 11, color: "var(--muted)" }}>{md(i.updatedAt)}</span>
+                <span className="flex items-center gap-2" style={{ flexShrink: 0 }}>
+                  <span style={{ fontSize: 11, color: "var(--agree-text)" }}>
+                    {CONSULT_STATE_LABEL.SETTLED}
+                  </span>
+                  <span style={{ fontSize: 11, color: "var(--muted)" }}>{md(i.updatedAt)}</span>
+                </span>
               </Link>
             ))}
           </div>

@@ -85,12 +85,60 @@ async function main() {
   console.log(`E2E: ${BASE}`);
 
   // ─────────────────────────────────────────────
-  section("① ケースを開始する");
-  const start = await call("/api/cases", { method: "POST", body: { role: "NON_CUSTODIAL" } });
+  section("① オンボーディング（I-1 → I-2 → I-3 → I-4）");
+  const start = await call("/api/cases", {
+    method: "POST",
+    body: { situation: "DIVORCED_NO_TERMS" },
+  });
   ok("ケースが作られる", start.status === 200);
   ok("セッションが発行される", Boolean(start.cookie));
   const cA = start.cookie!;
   const caseId = start.body.caseId as string;
+
+  // ★I-2 同居。役割はここでだけ決まる
+  const livingBad = await call(`/api/cases/${caseId}/living`, {
+    method: "POST",
+    cookie: cA,
+    body: { living: "SOMETIMES" },
+  });
+  ok("★知らない答えは受け付けない", livingBad.status === 400);
+
+  const varies = await call(`/api/cases/${caseId}/living`, {
+    method: "POST",
+    cookie: cA,
+    body: { living: "VARIES" },
+  });
+  ok("★お子さんによって違う場合、役割を決めない", varies.body.roleConfirmed === false);
+
+  const living = await call(`/api/cases/${caseId}/living`, {
+    method: "POST",
+    cookie: cA,
+    body: { living: "APART" },
+  });
+  ok("同居の答えから役割が決まる", living.body.roleConfirmed === true);
+
+  // ★I-3 お子さん。算定表は人数と年齢で表を選ぶ
+  const tooMany = await call(`/api/cases/${caseId}/children`, {
+    method: "POST",
+    cookie: cA,
+    body: { children: [1, 2, 3, 4].map((i) => ({ birthDate: `201${i}-04-01` })) },
+  });
+  ok("★4人以上は受け付けない（算定表が公表されていない）", tooMany.status === 400);
+
+  const kids = await call(`/api/cases/${caseId}/children`, {
+    method: "POST",
+    cookie: cA,
+    body: { children: [{ birthDate: "2009-08-01" }, { birthDate: "2015-04-01" }] },
+  });
+  ok("お子さんを登録できる", kids.status === 200 && kids.body.count === 2);
+
+  // ★I-4 年収。飛ばせる画面だが、目安を出すには要る
+  const income = await call("/api/profile", {
+    method: "POST",
+    cookie: cA,
+    body: { annualIncomeYen: 4_380_000 },
+  });
+  ok("年収を登録できる", income.status === 200);
 
   // ─────────────────────────────────────────────
   section("② 招待する");
@@ -123,6 +171,19 @@ async function main() {
   const sB = await call("/api/session", { cookie: cB });
   ok("同じケースの当事者になる", sA.body.caseId === sB.body.caseId);
   ok("★別の当事者である", sA.body.partyId !== sB.body.partyId);
+
+  // ★H-1：受諾した側にうかがうのは、お子さんの確認1枚だけ。
+  //   名前は返さない（共有しない情報である）
+  const kidsB = await call(`/api/cases/${caseId}/view`, { cookie: cB });
+  ok("★受諾した側にお子さんの呼び名が渡らない", !JSON.stringify(kidsB.body).includes("name"));
+
+  // ★年収は受諾直後に聞かない。必要になった時点で対話の中でうかがう（H-2）
+  const incomeB = await call("/api/profile", {
+    method: "POST",
+    cookie: cB,
+    body: { annualIncomeYen: 2_100_000 },
+  });
+  ok("受諾した側も年収を登録できる", incomeB.status === 200);
 
   // ─────────────────────────────────────────────
   section("④ ★C1：書いた言葉が相手に届かない");

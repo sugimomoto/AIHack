@@ -6,6 +6,8 @@ import { AgreementPanel } from "@/components/agreement/AgreementPanel";
 import { SchedulePanel } from "@/components/schedule/SchedulePanel";
 import { DocumentPanel } from "@/components/document/DocumentPanel";
 import { QuietCard } from "@/components/safety/QuietCard";
+import { InviteCard } from "@/components/onboarding/InviteCard";
+import { IncomeCard } from "@/components/onboarding/IncomeCard";
 
 /**
  * アプリ本体
@@ -27,9 +29,23 @@ export default async function Page() {
   const { asPartyId } = await import("@/domain/case/types");
   const quiet = await hasPendingSafetyEvent(asPartyId(s.partyId)).catch(() => false);
 
+  // ★招待はオンボーディングから外した。お相手がまだ加わっていないときだけ、ここに置く。
+  //   まだ加わっていないことを、遅れとして書かない。
+  const { loadForLlm } = await import("@/infra-adapters/firestore/repositories/caseRepository");
+  const { asCaseId } = await import("@/domain/case/types");
+  const snap = await loadForLlm(asCaseId(s.caseId)).catch(() => null);
+  const alone = snap?.parties.some((p) => p.id !== s.partyId && p.state === "PREPARING") ?? false;
+
+  // ★年収をオンボーディングから外した結果、受諾した側は入れる経路を持たない。
+  //   算定表は双方の年収で引くので、**入れる場所自体は要る。**
+  //   ただし通り道には置かない（H-2）。
+  const needsIncome = snap?.parties.some((p) => p.id === s.partyId && !p.incomeBand) ?? false;
+
   return (
     <PhoneFrame>
       {quiet && <QuietCard />}
+      {alone && <InviteCard />}
+      {needsIncome && <IncomeCard />}
       <div className="flex min-h-0 flex-1 flex-col">
         <CaseChat caseId={s.caseId} partyId={s.partyId} label="相談" />
       </div>

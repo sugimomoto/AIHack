@@ -18,7 +18,16 @@ import { toIncomeBand, INCOME_BAND_NOTE } from "@/domain/income/band";
  * @see docs/product-requirements.md FR-16a
  * @see docs/ui-design.md §5.1
  */
-export function IncomeInput({ caseId, next }: { caseId?: string; next?: string }) {
+export function IncomeInput({
+  caseId,
+  next,
+  skip,
+}: {
+  caseId?: string;
+  next?: string;
+  /** ★飛ばした先。入れないと実質的な強制になる */
+  skip?: string;
+}) {
   const [raw, setRaw] = useState("");
   const [busy, setBusy] = useState(false);
   const yen = Number(raw.replace(/[^0-9]/g, ""));
@@ -26,7 +35,11 @@ export function IncomeInput({ caseId, next }: { caseId?: string; next?: string }
 
   return (
     <div className="flex h-full flex-col overflow-y-auto px-5 pb-8 pt-6">
-      <h1 style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.7 }}>年収を教えてください</h1>
+      {/* ★用途を見出しに置く。何のために聞かれているか分からないまま金額を書かせない */}
+      <p style={{ fontSize: 12, color: "var(--text-sub-2)" }}>目安を出すために</p>
+      <h1 style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.7, marginTop: 4 }}>
+        年収を教えてください
+      </h1>
       <p style={{ fontSize: 13, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 8 }}>
         養育費の目安を出すために使います。源泉徴収票の「支払金額」をご覧ください。
       </p>
@@ -109,6 +122,29 @@ export function IncomeInput({ caseId, next }: { caseId?: string; next?: string }
         >
           次へ
         </button>
+      )}
+
+      {/* ★「あとで入力する」と「入れなくても、話し合いは続けられます」が
+           両方揃っていないと、実質的な強制になる。
+           目安が出ないことを、不利益として書かない。 */}
+      {skip && (
+        <div className="mt-5 text-center">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setBusy(true);
+              window.location.href = skip;
+            }}
+            className="disabled:opacity-50"
+            style={{ fontSize: 13, color: "var(--text-sub)", textDecoration: "underline" }}
+          >
+            あとで入力する
+          </button>
+          <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 8 }}>
+            入れなくても、話し合いは続けられます。
+          </p>
+        </div>
       )}
     </div>
   );

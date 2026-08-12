@@ -126,10 +126,18 @@ export function ChildrenForm({ caseId, next }: { caseId: string; next: string })
       <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--text-sub-2)", marginTop: 14 }}>
         生まれ月までしか伺いません。養育費の目安は、15歳以上かどうかで変わります。
       </p>
+      {/* ★エラーにも警告にもしない。
+           算定表の対象外であることを、本人の責任のように見せないため。
+           「話し合いは、そのまま進められます」まで書いて、はじめて中立になる。 */}
       {rows.length === 3 && (
-        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 4 }}>
-          裁判所が公表している算定表は3人までです。4人以上の場合、目安をお出しできません。
-        </p>
+        <div
+          className="anim-msg-in mt-3"
+          style={{ background: "var(--surface-2)", borderRadius: "var(--r-md)", padding: 12 }}
+        >
+          <p style={{ fontSize: 11.5, lineHeight: 1.95, color: "var(--text-sub)" }}>
+            4人目以降は、目安の表が公表されていないため、金額の目安をお出しできません。話し合いは、そのまま進められます。
+          </p>
+        </div>
       )}
 
       <button

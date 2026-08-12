@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#F0E7D6; font-family:"Zen Kaku Gothic New", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#3F6B49; text-decoration:none; }
+  a:hover { color:#2E5236; text-decoration:underline; }
+</style>
+</helmet>
+
+<div style="padding:60px 64px 110px; display:flex; flex-direction:column; gap:44px; background:#F0E7D6; color:#3A342E; min-width:3900px;">
+
+  <!-- 見出し -->
+  <div style="display:flex; align-items:flex-end; gap:44px; flex-wrap:wrap;">
+    <div style="display:flex; flex-direction:column; gap:12px; max-width:780px;">
+      <div style="font-size:12px; letter-spacing:.14em; color:#6F675E;">AIDA ／ 画面フロー図（全体）</div>
+      <h1 style="margin:0; font-size:34px; font-weight:500; letter-spacing:.02em; line-height:1.45;">全40画面と、そのつながり</h1>
+      <p style="margin:0; font-size:14px; line-height:1.95; color:#655C53; text-wrap:pretty;">第1弾から第5弾までに設計した全画面を1枚にまとめました。<b style="font-weight:500;">必ず通る画面は、招待する側で6枚、受諾する側で5枚だけ</b>です。それ以外はすべて、本人が選んだときだけ開きます。</p>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:16px; padding:14px 18px;"><div style="font-size:22px; font-weight:500;">40</div><div style="margin-top:3px; font-size:11.5px; color:#6F675E;">画面</div></div>
+      <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:16px; padding:14px 18px;"><div style="font-size:22px; font-weight:500;">5</div><div style="margin-top:3px; font-size:11.5px; color:#6F675E;">タブ</div></div>
+      <div style="background:#EDF3E9; border:1px solid #5B8A63; border-radius:16px; padding:14px 18px;"><div style="font-size:22px; font-weight:500; color:#3F6B49;">6 ／ 5</div><div style="margin-top:3px; font-size:11.5px; color:#6F675E;">必ず通る（招待側／受諾側）</div></div>
+      <div style="background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:16px; padding:14px 18px;"><div style="font-size:22px; font-weight:500; color:#8A6212;">3</div><div style="margin-top:3px; font-size:11.5px; color:#6F675E;">飛ばせる画面</div></div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; font-size:11.5px; color:#655C53;">
+      <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:13px; border-radius:4px; background:#EDF3E9; border:1px solid #5B8A63;"></span>必ず通る</div>
+      <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:13px; border-radius:4px; background:#FFFCF5; border:1px solid #EFE3D0;"></span>選んだときだけ</div>
+      <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:13px; border-radius:4px; background:#FBF0DA; border:1px dashed #DCC7A6;"></span>飛ばせる</div>
+      <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:13px; border-radius:4px; background:#F6EFE5; border:1px solid #C4B8A7;"></span>例外・空・エラー</div>
+    </div>
+  </div>
+
+  <!-- 帯1 入口 -->
+  <div style="background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 28px; display:flex; flex-direction:column; gap:16px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-size:11px; letter-spacing:.16em; color:#6F675E;">帯 1</span>
+      <span style="font-size:15px; font-weight:500;">入口</span>
+      <span style="font-size:12px; color:#6F675E;">ここで、はじめて使う人と、ご案内から来た人に分かれます</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div style="width:186px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px;"><div style="font-size:13px; color:#3F6B49;">起動画面</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">1弾 ／ アプリ名とアイコンだけ</div></div>
+      <span style="font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:186px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px;"><div style="font-size:13px; color:#3F6B49;">E ログイン</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">2弾 ／ 用途の説明を出さない</div></div>
+      <span style="font-size:14px; color:#8A6212;">⤷</span>
+      <div style="width:186px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">I-7 別の端末から戻る</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">3弾 ／ 確認コード</div></div>
+      <div style="width:34px;"></div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:12px; color:#8A6212; width:96px;">はじめて使う</span><span style="font-size:14px; color:#8A6212;">⤷</span><span style="font-size:12.5px; color:#3F6B49;">帯 2 へ</span></div>
+        <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:12px; color:#8A6212; width:96px;">ご案内から来た</span><span style="font-size:14px; color:#8A6212;">⤷</span><span style="font-size:12.5px; color:#3F6B49;">帯 3 へ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 帯2 招待側オンボ -->
+  <div style="background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 28px; display:flex; flex-direction:column; gap:16px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-size:11px; letter-spacing:.16em; color:#6F675E;">帯 2</span>
+      <span style="font-size:15px; font-weight:500;">オンボーディング ／ 招待する側</span>
+      <span style="font-size:12px; color:#6F675E;">必ず通るのは3枚。残りは飛ばせます。招待はここに含めません</span>
+    </div>
+    <div style="display:flex; align-items:stretch; gap:11px; flex-wrap:wrap;">
+      <div style="width:176px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px;"><div style="font-size:13px; color:#3F6B49;">I-1 状況の確認</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">5つから1つ</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px;"><div style="font-size:13px; color:#3F6B49;">I-2 同居</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">3つから1つ</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px;"><div style="font-size:13px; color:#3F6B49;">I-3 お子さん</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">人数・生まれ年月</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">I-4 年収</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">帯だけが相手に見える</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">I-5 すでにある取り決め</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">I-1で該当した方のみ</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">I-6 次に使うとき</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">メールの登録</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#EDF3E9; border:1.5px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; flex-direction:column; justify-content:center;"><div style="font-size:13px; color:#3F6B49;">ホーム</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">帯 4 へ</div></div>
+    </div>
+  </div>
+
+  <!-- 帯3 受諾側 -->
+  <div style="background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 28px; display:flex; flex-direction:column; gap:16px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-size:11px; letter-spacing:.16em; color:#6F675E;">帯 3</span>
+      <span style="font-size:15px; font-weight:500;">オンボーディング ／ 受諾する側</span>
+      <span style="font-size:12px; color:#834B32;">うかがうのは1枚だけ。年収はここで聞きません</span>
+    </div>
+    <div style="display:flex; align-items:stretch; gap:11px; flex-wrap:wrap;">
+      <div style="width:176px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px;"><div style="font-size:13px; color:#3F6B49;">A-3 最初の画面</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">2弾 ／ 参加しない選択もできる</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px;"><div style="font-size:13px; color:#3F6B49;">H-1 お子さんの確認</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">3弾 ／ 見て、違えば直すだけ</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#EDF3E9; border:1.5px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; flex-direction:column; justify-content:center;"><div style="font-size:13px; color:#3F6B49;">ホーム</div><div style="margin-top:4px; font-size:10.5px; color:#6F675E;">届いているご相談が1件</div></div>
+      <span style="align-self:center; font-size:14px; color:#8A6212;">⤷</span>
+      <div style="width:230px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">H-2 年収を対話の中でうかがう</div><div style="margin-top:4px; font-size:10.5px; line-height:1.7; color:#6F675E;">お金の話題で目安が要る場面になってから。断れる</div></div>
+      <div style="width:26px;"></div>
+      <div style="display:flex; flex-direction:column; gap:8px; justify-content:center;">
+        <div style="width:250px; background:#F6EFE5; border:1px solid #C4B8A7; border-radius:14px; padding:11px 13px;"><div style="font-size:12.5px;">O-2 このご案内は使えません</div><div style="margin-top:3px; font-size:10.5px; color:#6F675E;">取り消された</div></div>
+        <div style="width:250px; background:#F6EFE5; border:1px solid #C4B8A7; border-radius:14px; padding:11px 13px;"><div style="font-size:12.5px;">O-3 すでにお使いです</div><div style="margin-top:3px; font-size:10.5px; color:#6F675E;">ログインへつなぐ</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 帯4 タブ -->
+  <div style="background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 28px; display:flex; flex-direction:column; gap:18px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-size:11px; letter-spacing:.16em; color:#6F675E;">帯 4</span>
+      <span style="font-size:15px; font-weight:500;">5つのタブと、その配下</span>
+      <span style="font-size:12px; color:#6F675E;">ここが常駐の構造。どのタブからでも、いつでも行き来できます</span>
+    </div>
+
+    <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+
+      <!-- ホーム -->
+      <div style="width:290px; flex:none; display:flex; flex-direction:column; gap:9px;">
+        <div style="background:#EDF3E9; border:1.5px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:9px;">
+          <svg width="17" height="17" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#3F6B49" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span style="font-size:13.5px; color:#3F6B49;">ホーム</span>
+        </div>
+        <div style="padding-left:16px; display:flex; flex-direction:column; gap:7px;">
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">通常（届いているご相談・進捗・入力の入口）</div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">A-4 ひとりで進めている</div>
+          <div style="background:#F6EFE5; border:1px solid #C4B8A7; border-radius:12px; padding:9px 12px; font-size:12px;">G-3 窓口カード（検知の翌日）</div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">お相手にお伝えする → <span style="color:#3F6B49;">帯 5</span></div>
+        </div>
+      </div>
+
+      <!-- 相談 -->
+      <div style="width:290px; flex:none; display:flex; flex-direction:column; gap:9px;">
+        <div style="background:#EDF3E9; border:1.5px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:9px;">
+          <svg width="17" height="17" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#3F6B49" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span style="font-size:13.5px; color:#3F6B49;">相談</span>
+        </div>
+        <div style="padding-left:16px; display:flex; flex-direction:column; gap:7px;">
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-1 相談の一覧</div>
+          <div style="background:#F6EFE5; border:1px solid #C4B8A7; border-radius:12px; padding:9px 12px; font-size:12px;">L-1 空のとき</div>
+          <div style="padding-left:14px; display:flex; flex-direction:column; gap:7px;">
+            <div style="background:#FFFCF5; border:1.5px solid #DCC7A6; border-radius:12px; padding:9px 12px; font-size:12px;">K-2 対話　<span style="color:#8A6212;">①②③</span></div>
+            <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">1-c 今回だけ／今後も</div>
+            <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">N-1 合意が成立した瞬間</div>
+            <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">H-2 年収をうかがう</div>
+            <div style="background:#F6EFE5; border:1px solid #C4B8A7; border-radius:12px; padding:9px 12px; font-size:12px;">O-4 通信できないとき</div>
+          </div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">1-a 相談の開始（別のことを話す）</div>
+          <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">B-1 準備モードの対話</div>
+        </div>
+      </div>
+
+      <!-- 取り決め -->
+      <div style="width:290px; flex:none; display:flex; flex-direction:column; gap:9px;">
+        <div style="background:#EDF3E9; border:1.5px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:9px;">
+          <svg width="17" height="17" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#3F6B49" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#3F6B49" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span style="font-size:13.5px; color:#3F6B49;">取り決め</span>
+        </div>
+        <div style="padding-left:16px; display:flex; flex-direction:column; gap:7px;">
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">一覧（8項目・進捗バー）</div>
+          <div style="background:#F6EFE5; border:1px solid #C4B8A7; border-radius:12px; padding:9px 12px; font-size:12px;">L-2 空のとき（バーを出さない）</div>
+          <div style="padding-left:14px; display:flex; flex-direction:column; gap:7px;">
+            <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-5 項目の詳細・変更履歴</div>
+            <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-6 変更申請を受ける</div>
+            <div style="background:#F6EFE5; border:1px solid #C4B8A7; border-radius:12px; padding:9px 12px; font-size:12px;">N-2 調停へ移ったとき</div>
+          </div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">公正証書の原案</div>
+          <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">B-2 下書きの一覧（準備中）</div>
+        </div>
+      </div>
+
+      <!-- これから -->
+      <div style="width:290px; flex:none; display:flex; flex-direction:column; gap:9px;">
+        <div style="background:#EDF3E9; border:1.5px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:9px;">
+          <svg width="17" height="17" viewBox="0 0 22 22" fill="none"><rect x="3.5" y="5" width="15" height="13" rx="2" stroke="#3F6B49" stroke-width="1.5"/><path d="M3.5 9h15M7.5 3v4M14.5 3v4" stroke="#3F6B49" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span style="font-size:13.5px; color:#3F6B49;">これから</span>
+        </div>
+        <div style="padding-left:16px; display:flex; flex-direction:column; gap:7px;">
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">予定と記録</div>
+          <div style="background:#F6EFE5; border:1px solid #C4B8A7; border-radius:12px; padding:9px 12px; font-size:12px;">L-3 空のとき</div>
+          <div style="padding-left:14px;">
+            <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">4-a 逸脱の詳細と法的状態</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 設定 -->
+      <div style="width:290px; flex:none; display:flex; flex-direction:column; gap:9px;">
+        <div style="background:#EDF3E9; border:1.5px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:9px;">
+          <svg width="17" height="17" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#3F6B49" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#3F6B49" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span style="font-size:13.5px; color:#3F6B49;">設定</span>
+        </div>
+        <div style="padding-left:16px; display:flex; flex-direction:column; gap:7px;">
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-3 登録した内容</div>
+          <div style="padding-left:14px; display:flex; flex-direction:column; gap:7px;">
+            <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-4 お子さんを直す</div>
+            <div style="background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:12px; padding:9px 12px; font-size:12px;">I-4 年収を直す（同じ画面）</div>
+          </div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">お相手の呼び方 ／ 通知</div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">D-1 制度のこと → D-2 記事 → O-1 用語</div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">G-2 相談できる公的な窓口</div>
+          <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">M-1 ご利用をやめるとき</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 帯5 相手に伝える -->
+  <div style="background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 28px; display:flex; flex-direction:column; gap:16px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-size:11px; letter-spacing:.16em; color:#6F675E;">帯 5</span>
+      <span style="font-size:15px; font-weight:500;">お相手に伝える経路</span>
+      <span style="font-size:12px; color:#6F675E;">ホームのカードから、本人が選んだときだけ。オンボーディングには含めません</span>
+    </div>
+    <div style="display:flex; align-items:stretch; gap:11px; flex-wrap:wrap;">
+      <div style="width:176px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">A-1 招待の作成</div><div style="margin-top:4px; font-size:10.5px; line-height:1.7; color:#6F675E;">リンク／メールを同じ重さで並べる</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">A-2 送信前のプレビュー</div><div style="margin-top:4px; font-size:10.5px; line-height:1.7; color:#6F675E;">全文を見せる。自由文の欄はない</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">A-4 ひとりで進めている</div><div style="margin-top:4px; font-size:10.5px; line-height:1.7; color:#6F675E;">催促・再送・経過日数を出さない</div></div>
+      <span style="align-self:center; font-size:14px; color:#8A6212;">⤷</span>
+      <div style="width:176px; background:#F7EFE1; border:1px solid #E0D5C4; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">B-1 準備モードの対話</div><div style="margin-top:4px; font-size:10.5px; line-height:1.7; color:#6F675E;">地が沈む／鍵の帯／③が出ない</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#F7EFE1; border:1px solid #E0D5C4; border-radius:14px; padding:12px 14px;"><div style="font-size:13px;">B-2 下書きの一覧</div><div style="margin-top:4px; font-size:10.5px; line-height:1.7; color:#6F675E;">参加後もカードが1枚増えるだけ</div></div>
+      <span style="align-self:center; font-size:14px; color:#8C8173;">▸</span>
+      <div style="width:176px; background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:12px 14px; display:flex; flex-direction:column; justify-content:center;"><div style="font-size:13px; color:#3F6B49;">通常のホームへ合流</div></div>
+    </div>
+  </div>
+
+  <!-- 帯6 横断 -->
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+
+    <div style="flex:1; min-width:640px; background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 28px; display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; align-items:baseline; gap:12px;">
+        <span style="font-size:11px; letter-spacing:.16em; color:#6F675E;">帯 6</span>
+        <span style="font-size:15px; font-weight:500;">画面を持たない横断のふるまい</span>
+      </div>
+      <div style="display:flex; gap:11px; flex-wrap:wrap;">
+        <div style="width:290px; background:#F6EFE5; border:1px solid #C4B8A7; border-radius:14px; padding:13px 15px;">
+          <div style="font-size:13px;">N-3 通知（ロック画面）</div>
+          <div style="margin-top:6px; font-size:11px; line-height:1.8; color:#655C53;">既定は本文なし「お知らせがあります」。ONでも主語はAI。9:00–21:00の外では出さず翌朝にまとめる</div>
+        </div>
+        <div style="width:290px; background:#F6EFE5; border:1px solid #C4B8A7; border-radius:14px; padding:13px 15px;">
+          <div style="font-size:13px;">G-2 窓口の常設表示</div>
+          <div style="margin-top:6px; font-size:11px; line-height:1.8; color:#655C53;">対話の入力欄の上に、最初から最後まで同じ1行。検知に反応しない</div>
+        </div>
+        <div style="width:290px; background:#F6EFE5; border:1px solid #C4B8A7; border-radius:14px; padding:13px 15px;">
+          <div style="font-size:13px;">O-4 通信できないとき</div>
+          <div style="margin-top:6px; font-size:11px; line-height:1.8; color:#655C53;">上部に帯。書いたものは端末に残り、つながったら送る</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1; min-width:560px; background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 28px; display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; align-items:baseline; gap:12px;">
+        <span style="font-size:11px; letter-spacing:.16em; color:#6F675E;">帯 7</span>
+        <span style="font-size:15px; font-weight:500;">取り決めの状態遷移</span>
+        <span style="font-size:12px; color:#6F675E;">7状態 ／ 画面の出方を決めるもと</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap;">
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px dashed #C4B8A7; border-radius:11px; padding:5px 10px; font-size:12px; color:#6F675E;">未着手</span>
+          <span style="font-size:13px; color:#8C8173;">▸</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #DCC0AB; background:#FAEDE3; border-radius:11px; padding:5px 10px; font-size:12px; color:#834B32;">係争中</span>
+          <span style="font-size:13px; color:#8C8173;">▸</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:11px; padding:5px 10px; font-size:12px; color:#3F6B49;">合意済</span>
+          <span style="margin-left:6px; font-size:11.5px; color:#6F675E;">→ N-1 が対話に出る</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap; padding-left:96px;">
+          <span style="font-size:13px; color:#8A6212;">⤷</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #A99D8C; background:#F6EFE5; border-radius:11px; padding:5px 10px; font-size:12px; color:#655C53;">調停へ</span>
+          <span style="margin-left:6px; font-size:11.5px; color:#6F675E;">→ N-2。ほかの項目は続く</span>
+        </div>
+        <div style="height:1px; background:#EFE3D0;"></div>
+        <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap;">
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:11px; padding:5px 10px; font-size:12px; color:#3F6B49;">合意済</span>
+          <span style="font-size:13px; color:#8C8173;">▸</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #C6D3C1; background:#F1F5EE; border-radius:11px; padding:5px 10px; font-size:12px; color:#3F6B49;">変更申請中</span>
+          <span style="margin-left:6px; font-size:11.5px; color:#6F675E;">→ 相手側に K-6。返事まで現状が続く</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap;">
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:11px; padding:5px 10px; font-size:12px; color:#3F6B49;">合意済</span>
+          <span style="font-size:13px; color:#8C8173;">▸</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #DCC0AB; background:#FFFCF5; border-radius:11px; padding:5px 10px; font-size:12px; color:#834B32;">逸脱</span>
+          <span style="margin-left:6px; font-size:11.5px; color:#6F675E;">→ 4-a。責める通知は送らない</span>
+        </div>
+        <div style="height:1px; background:#EFE3D0;"></div>
+        <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap;">
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px dashed #C4B8A7; border-radius:11px; padding:5px 10px; font-size:12px; color:#6F675E;">ご自身の記録</span>
+          <span style="font-size:13px; color:#8C8173;">▸</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:11px; padding:5px 10px; font-size:12px; color:#3F6B49;">合意済</span>
+          <span style="margin-left:6px; font-size:11.5px; color:#6F675E;">I-5 で記録 → 相手も同じ内容を記録した時点で</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 必ず通る画面 -->
+  <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:24px; padding:24px 28px; max-width:1240px;">
+    <div style="font-size:14px; font-weight:500; margin-bottom:12px;">この図の読み方</div>
+    <p style="margin:0; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">緑の枠が、避けて通れない画面です。どちらの側も帯1の2枚（起動・ログイン）を通り、そのあと招待する側は4枚（I-1・I-2・I-3・ホーム）、受諾する側は3枚（A-3・H-1・ホーム）。合計で6枚と5枚です。ホームと帯1は両方の側で共通なので、緑の枠を数えた総数とは一致しません。<br>それ以外はすべて、本人が選んだときにだけ開きます。招待も、年収も、ナレッジも、準備モードも同じ扱いです。何かを促すために画面を挟むことはしていません。<br>帯6の3つは独立した画面を持たず、どの画面にも同じ形で現れます。帯7の状態が、どの画面がいつ出るかを決めています。</p>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

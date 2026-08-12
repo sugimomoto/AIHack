@@ -40,8 +40,11 @@ export function InviteLanding({ view, token }: { view: InvitationPublicView; tok
         body: JSON.stringify({ action }),
       });
       if (!res.ok) return;
-      // ★受諾でセッションが発行される。以降は通常の画面へ
-      if (action === "ACCEPT") window.location.href = "/app";
+      // ★受諾でセッションが発行される。
+      //   うかがうのは、お子さんの確認 1枚だけ。年収はここで聞かない。
+      //   「参加しない選択もできます」と伝えた直後に最も抵抗の大きい質問を置くと、
+      //   **あの一文が入口の作法だったことになる。**
+      if (action === "ACCEPT") window.location.href = "/onboarding/confirm-children";
       else setDeclined(true);
     } finally {
       setBusy(false);

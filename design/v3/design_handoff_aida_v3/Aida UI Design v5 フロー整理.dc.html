@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#F0E7D6; font-family:"Zen Kaku Gothic New", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#3F6B49; text-decoration:none; }
+  a:hover { color:#2E5236; text-decoration:underline; }
+</style>
+</helmet>
+
+<div style="padding:64px 72px 120px; display:flex; flex-direction:column; gap:88px; background:#F0E7D6; color:#3A342E; min-width:4600px;">
+
+  <section style="display:flex; flex-direction:column; gap:88px;">
+
+    <div id="4a" style="display:flex; flex-direction:column; gap:14px; max-width:980px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:24px; padding:0 9px; border-radius:6px; background:#3A342E; color:#FDF8EF; font-size:12px; font-weight:500; letter-spacing:.06em;">4a</span>
+        <span style="font-size:12px; letter-spacing:.14em; color:#6F675E;">AIDA ／ フロー整理と不足画面（第4弾）</span>
+      </div>
+      <h1 style="margin:0; font-size:38px; font-weight:500; letter-spacing:.02em; line-height:1.4;">タブの下に、着地する画面がなかった</h1>
+      <p style="margin:0; font-size:15px; line-height:2; color:#655C53; text-wrap:pretty;">ご指摘の2点はどちらも欠落でした。棚卸しの結果、根っこは同じところにありました。<b style="font-weight:500;">タブは5つ設計したのに、着地する画面を描いていたのは3つだけ</b>だったのです。相談タブは対話1本に直結する前提になっており、複数の相談が並行することを画面に反映していませんでした。<br>入れたものと入れなかったものを<a href="#audit">棚卸し表</a>に全部並べています。今回描いたのは6枚（<a href="#K">K</a>）。優先度をつけたので、次に何を描くかはご判断ください。</p>
+    </div>
+
+    <!-- ============ 棚卸し ============ -->
+    <div id="audit" style="display:flex; flex-direction:column; gap:26px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#6F675E;">①</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">棚卸し</h2>
+        <span style="font-size:13px; color:#6F675E;">タブごとに、着地する画面があるか</span>
+      </div>
+
+      <!-- タブ×画面 -->
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:270px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:20px 22px;">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:12px;">
+            <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#8A6212" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span style="font-size:15px; font-weight:500;">ホーム</span>
+            <span style="margin-left:auto; font-size:11px; color:#3F6B49; border:1px solid #5B8A63; background:#EDF3E9; border-radius:9px; padding:3px 8px;">あり</span>
+          </div>
+          <div style="font-size:12.5px; line-height:1.95; color:#655C53;">1弾で確定。3種の状態（通常／ひとりで進めている／届いている）も描けています。</div>
+        </div>
+
+        <div style="flex:1; min-width:270px; background:#FFFCF5; border:1.5px solid #DCC0AB; border-radius:20px; padding:20px 22px;">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:12px;">
+            <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#834B32" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span style="font-size:15px; font-weight:500;">相談</span>
+            <span style="margin-left:auto; font-size:11px; color:#834B32; border:1px solid #DCC0AB; background:#FAEDE3; border-radius:9px; padding:3px 8px;">欠落</span>
+          </div>
+          <div style="font-size:12.5px; line-height:1.95; color:#655C53;"><b style="font-weight:500;">一覧がありません。</b>タブを押すと、いま話している相談へ直行する前提になっていました。実際は「養育費」「面会の日程」「塾の費用」が同時に進みます。<br>→ <a href="#K1">K-1 相談の一覧</a>を新設</div>
+        </div>
+
+        <div style="flex:1; min-width:270px; background:#FFFCF5; border:1.5px solid #DCC0AB; border-radius:20px; padding:20px 22px;">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:12px;">
+            <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#834B32" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#834B32" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span style="font-size:15px; font-weight:500;">取り決め</span>
+            <span style="margin-left:auto; font-size:11px; color:#834B32; border:1px solid #DCC0AB; background:#FAEDE3; border-radius:9px; padding:3px 8px;">一部欠落</span>
+          </div>
+          <div style="font-size:12.5px; line-height:1.95; color:#655C53;">一覧はあります。1弾に「項目をタップすると詳細（合意内容・合意日時・変更履歴）へ」と書きましたが、その画面を描いていません。<br>→ <a href="#K5">K-5 項目の詳細</a>を新設</div>
+        </div>
+
+        <div style="flex:1; min-width:270px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:20px 22px;">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:12px;">
+            <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><rect x="3.5" y="5" width="15" height="13" rx="2" stroke="#8A6212" stroke-width="1.5"/><path d="M3.5 9h15M7.5 3v4M14.5 3v4" stroke="#8A6212" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span style="font-size:15px; font-weight:500;">これから</span>
+            <span style="margin-left:auto; font-size:11px; color:#3F6B49; border:1px solid #5B8A63; background:#EDF3E9; border-radius:9px; padding:3px 8px;">あり</span>
+          </div>
+          <div style="font-size:12.5px; line-height:1.95; color:#655C53;">1弾のラフで確定。逸脱の詳細も描けています。空の状態だけ未着手。</div>
+        </div>
+
+        <div style="flex:1; min-width:270px; background:#FFFCF5; border:1.5px solid #DCC0AB; border-radius:20px; padding:20px 22px;">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:12px;">
+            <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#834B32" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#834B32" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span style="font-size:15px; font-weight:500;">設定</span>
+            <span style="margin-left:auto; font-size:11px; color:#834B32; border:1px solid #DCC0AB; background:#FAEDE3; border-radius:9px; padding:3px 8px;">欠落</span>
+          </div>
+          <div style="font-size:12.5px; line-height:1.95; color:#655C53;"><b style="font-weight:500;">登録した内容を直す場所がありません。</b>オンボーディングで4種類（状況・同居・お子さん・年収）お預かりしているのに、あとから見る画面がありませんでした。<br>→ <a href="#K3">K-3 登録した内容</a>／<a href="#K4">K-4 お子さんを直す</a>を新設</div>
+        </div>
+      </div>
+
+      <!-- 不足一覧 -->
+      <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start;">
+
+        <div style="flex:1; min-width:560px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:24px; padding:24px 26px;">
+          <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px;">
+            <span style="font-size:15px; font-weight:500;">今回描いたもの</span>
+            <span style="font-size:12px; color:#6F675E;">これが無いと、通しで使えません</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0;">
+            <div style="display:flex; gap:14px; padding:13px 0; border-bottom:1px solid #F1E9DC;">
+              <span style="flex:none; width:52px; font-size:12px; color:#3F6B49;">K-1</span>
+              <div style="flex:1;"><div style="font-size:14px;">相談の一覧</div><div style="margin-top:4px; font-size:12px; line-height:1.8; color:#655C53;">相談タブの着地。進行中の相談と、新しく始める入口</div></div>
+            </div>
+            <div style="display:flex; gap:14px; padding:13px 0; border-bottom:1px solid #F1E9DC;">
+              <span style="flex:none; width:52px; font-size:12px; color:#3F6B49;">K-2</span>
+              <div style="flex:1;"><div style="font-size:14px;">対話（タブバーを補った版）</div><div style="margin-top:4px; font-size:12px; line-height:1.8; color:#655C53;">ヘッダの ⌄ で相談を切り替える。下部にタブ</div></div>
+            </div>
+            <div style="display:flex; gap:14px; padding:13px 0; border-bottom:1px solid #F1E9DC;">
+              <span style="flex:none; width:52px; font-size:12px; color:#3F6B49;">K-3</span>
+              <div style="flex:1;"><div style="font-size:14px;">設定 ＞ 登録した内容</div><div style="margin-top:4px; font-size:12px; line-height:1.8; color:#655C53;">状況・同居・お子さん・年収を、あとから直す</div></div>
+            </div>
+            <div style="display:flex; gap:14px; padding:13px 0; border-bottom:1px solid #F1E9DC;">
+              <span style="flex:none; width:52px; font-size:12px; color:#3F6B49;">K-4</span>
+              <div style="flex:1;"><div style="font-size:14px;">お子さんを直す</div><div style="margin-top:4px; font-size:12px; line-height:1.8; color:#655C53;">直すと相手にどう伝わるかを、その場に書く</div></div>
+            </div>
+            <div style="display:flex; gap:14px; padding:13px 0; border-bottom:1px solid #F1E9DC;">
+              <span style="flex:none; width:52px; font-size:12px; color:#3F6B49;">K-5</span>
+              <div style="flex:1;"><div style="font-size:14px;">取り決めの項目詳細</div><div style="margin-top:4px; font-size:12px; line-height:1.8; color:#655C53;">合意内容・合意日・変更履歴</div></div>
+            </div>
+            <div style="display:flex; gap:14px; padding:13px 0;">
+              <span style="flex:none; width:52px; font-size:12px; color:#834B32;">K-6</span>
+              <div style="flex:1;"><div style="font-size:14px;">変更申請を受ける側</div><div style="margin-top:4px; font-size:12px; line-height:1.8; color:#655C53;"><b style="font-weight:500;">これも欠落でした。</b>「変更申請中」から「合意済」に戻すには、相手の同意操作が要るのに、その画面がありませんでした</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1; min-width:420px; background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:24px 26px;">
+          <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px;">
+            <span style="font-size:15px; font-weight:500;">今回は描いていないもの</span>
+            <span style="font-size:12px; color:#6F675E;">優先度つき ／ ご判断ください</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0;">
+            <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #EFE3D0;"><span style="flex:none; width:30px; font-size:11.5px; color:#834B32;">高</span><div style="flex:1; font-size:12.5px; line-height:1.85;">空の状態3つ（相談0件・取り決め0件・予定0件）<br><span style="color:#655C53; font-size:11.5px;">最初に開いたときに必ず通る。ここが空白だと不安になります</span></div></div>
+            <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #EFE3D0;"><span style="flex:none; width:30px; font-size:11.5px; color:#834B32;">高</span><div style="flex:1; font-size:12.5px; line-height:1.85;">「やめたいと伝える」のあとの説明画面<br><span style="color:#655C53; font-size:11.5px;">2弾で導線だけ作り、行き先を描いていません</span></div></div>
+            <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #EFE3D0;"><span style="flex:none; width:30px; font-size:11.5px; color:#8A6212;">中</span><div style="flex:1; font-size:12.5px; line-height:1.85;">合意が成立した瞬間<br><span style="color:#655C53; font-size:11.5px;">1弾に「境界線が1本引かれる480ms」と書きましたが、画面がありません</span></div></div>
+            <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #EFE3D0;"><span style="flex:none; width:30px; font-size:11.5px; color:#8A6212;">中</span><div style="flex:1; font-size:12.5px; line-height:1.85;">「調停へ」に移ったとき<br><span style="color:#655C53; font-size:11.5px;">6状態の1つ。アプリの外に出たあと、この画面はどうなるのか</span></div></div>
+            <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #EFE3D0;"><span style="flex:none; width:30px; font-size:11.5px; color:#8A6212;">中</span><div style="flex:1; font-size:12.5px; line-height:1.85;">通知の見え方（ロック画面）<br><span style="color:#655C53; font-size:11.5px;">既定OFFの文面「お知らせがあります」を、実物で確認したい</span></div></div>
+            <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #EFE3D0;"><span style="flex:none; width:30px; font-size:11.5px; color:#6F675E;">低</span><div style="flex:1; font-size:12.5px; line-height:1.85;">ナレッジの用語集（D-1の4番目）</div></div>
+            <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #EFE3D0;"><span style="flex:none; width:30px; font-size:11.5px; color:#6F675E;">低</span><div style="flex:1; font-size:12.5px; line-height:1.85;">招待リンクが期限切れ／すでに参加済み</div></div>
+            <div style="display:flex; gap:12px; padding:12px 0;"><span style="flex:none; width:30px; font-size:11.5px; color:#6F675E;">低</span><div style="flex:1; font-size:12.5px; line-height:1.85;">通信できないとき<br><span style="color:#655C53; font-size:11.5px;">文言は1弾で確定済み（「うまくいきませんでした。もう一度お試しください」）</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 整理したナビ構造 -->
+      <div style="background:#FBF7EE; border:1px solid #E5DBCA; border-radius:24px; padding:26px 28px; display:flex flex-direction:column; gap:18px;">
+        <div style="font-size:15px; font-weight:500; margin-bottom:16px;">整理したナビゲーション構造</div>
+        <div style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+
+          <div style="width:250px; flex:none; display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:11px 13px; font-size:13px; color:#3F6B49;">ホーム</div>
+            <div style="padding-left:14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">A-1 招待の作成</div>
+              <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">B 準備モード</div>
+            </div>
+          </div>
+
+          <div style="width:250px; flex:none; display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:11px 13px; font-size:13px; color:#3F6B49;">相談</div>
+            <div style="padding-left:14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-1 相談の一覧 <span style="color:#3F6B49;">新</span></div>
+              <div style="padding-left:12px; display:flex; flex-direction:column; gap:6px;">
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-2 対話 <span style="color:#3F6B49;">改</span></div>
+                <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">1-c 今回だけ／今後も</div>
+                <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">H-2 年収をうかがう</div>
+              </div>
+              <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">1-a 相談の開始</div>
+            </div>
+          </div>
+
+          <div style="width:250px; flex:none; display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:11px 13px; font-size:13px; color:#3F6B49;">取り決め</div>
+            <div style="padding-left:14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-5 項目の詳細 <span style="color:#3F6B49;">新</span></div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-6 変更申請を受ける <span style="color:#3F6B49;">新</span></div>
+              <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">公正証書の原案</div>
+            </div>
+          </div>
+
+          <div style="width:250px; flex:none; display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:11px 13px; font-size:13px; color:#3F6B49;">これから</div>
+            <div style="padding-left:14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">4-a 逸脱の詳細</div>
+            </div>
+          </div>
+
+          <div style="width:250px; flex:none; display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#EDF3E9; border:1px solid #5B8A63; border-radius:14px; padding:11px 13px; font-size:13px; color:#3F6B49;">設定</div>
+            <div style="padding-left:14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-3 登録した内容 <span style="color:#3F6B49;">新</span></div>
+              <div style="padding-left:12px;"><div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:12px; padding:9px 12px; font-size:12px;">K-4 お子さんを直す <span style="color:#3F6B49;">新</span></div></div>
+              <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">お相手の呼び方 ／ 通知</div>
+              <div style="background:#F7EFE1; border:1px solid #E0D5C4; border-radius:12px; padding:9px 12px; font-size:12px;">制度のこと（D）／ 窓口（G）</div>
+              <div style="border:1px dashed #DCC0AB; border-radius:12px; padding:9px 12px; font-size:12px; color:#834B32;">やめたいとき → 行き先が未着手</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ K 今回の画面 ============ -->
+    <div id="K" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#6F675E;">②</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">補った6画面</h2>
+        <span style="font-size:13px; color:#6F675E;">390×844</span>
+      </div>
+
+      <div style="display:flex; gap:36px; flex-wrap:wrap; align-items:flex-start;">
+
+        <!-- K-1 相談の一覧 -->
+        <div id="K1" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">K-1 ／ 相談の一覧（相談タブの着地）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 18px;">
+              <div style="font-size:22px; font-weight:500;">相談</div>
+              <div style="margin-top:8px; font-size:13px; line-height:1.9; color:#655C53;">どれから話しても、順番はありません。</div>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:10px; overflow:hidden;">
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; overflow:hidden;">
+                <div style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:#FBF3E6; border-bottom:1px dashed #E2D7C6;">
+                  <svg width="14" height="11" viewBox="0 0 15 12" fill="none"><rect x="0.6" y="0.6" width="13.8" height="10.8" rx="1.6" stroke="#3F6B49" stroke-width="1.1"/><path d="M1.4 1.6 7.5 6.4l6.1-4.8" stroke="#3F6B49" stroke-width="1.1"/></svg>
+                  <span style="font-size:11.5px; letter-spacing:.06em; color:#3F6B49;">お相手からのご相談</span>
+                </div>
+                <div style="padding:15px 14px 14px;">
+                  <div style="font-size:15.5px;">今回の日程を変更したい</div>
+                  <div style="margin-top:7px; font-size:12.5px; line-height:1.85; color:#655C53;">土曜の日程について、別案が来ています</div>
+                  <div style="margin-top:9px; font-size:12px; color:#655C53;">お返事は、急ぎません。</div>
+                </div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:15.5px;">塾の費用をどうするか</span>
+                  <span style="margin-left:auto; font-size:11.5px; color:#6F675E;">8月10日</span>
+                </div>
+                <div style="margin-top:7px; font-size:12.5px; line-height:1.85; color:#655C53;">こちらでお預かりしています</div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:15.5px;">受け渡しの場所</span>
+                  <span style="margin-left:auto; font-size:11.5px; color:#6F675E;">7月28日</span>
+                </div>
+                <div style="margin-top:7px; font-size:12.5px; line-height:1.85; color:#655C53;">書きかけです</div>
+              </div>
+
+              <div style="margin-top:8px; font-size:11.5px; letter-spacing:.08em; color:#6F675E;">お話しが済んだもの</div>
+              <div style="background:#F7EFE1; border:1px solid #EFE3D0; border-radius:20px; padding:4px 16px;">
+                <div style="padding:12px 0; border-bottom:1px solid #EDE2D2; display:flex; align-items:center;"><span style="font-size:14px; color:#655C53;">養育費を決める</span><span style="margin-left:auto; display:inline-flex; align-items:center; gap:5px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:9px; padding:3px 8px;"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6.3 4.8 9.2 10 3.2" stroke="#3F6B49" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:11px; color:#3F6B49;">合意済</span></span></div>
+                <div style="padding:12px 0; display:flex; align-items:center;"><span style="font-size:14px; color:#655C53;">写真の共有について</span><span style="margin-left:auto; font-size:11.5px; color:#6F675E;">6月</span></div>
+              </div>
+
+              <div style="margin-top:6px; border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; display:flex; align-items:center; gap:12px;">
+                <img src="assets/capybara.png" alt="" width="34" height="34" style="flex:none; width:34px; height:34px; border-radius:50%; object-fit:cover;">
+                <div style="flex:1; font-size:14.5px; line-height:1.75;">別のことを話す</div>
+                <span style="font-size:13px; color:#3F6B49;">▸</span>
+              </div>
+            </div>
+            <div style="flex:none; height:78px; border-top:1px solid #F1E9DC; background:#FFFCF5; display:flex; padding-top:8px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">ホーム</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#8A6212" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#8A6212;">相談</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">取り決め</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="3.5" y="5" width="15" height="13" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M3.5 9h15M7.5 3v4M14.5 3v4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">これから</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#6F675E" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">設定</span></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">日付は右端に小さく置くだけで、未読の印も件数バッジも持ちません。並び順は更新の新しい順ですが、「どれから話しても、順番はありません」を見出しの下に置いて、上から片づけるものに見えないようにしています。<br>済んだものは面2に沈めます。消しません（あとで見返す人がいます）。</div>
+        </div>
+
+        <!-- K-2 対話 -->
+        <div id="K2" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">K-2 ／ 対話（タブバーを補った版）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 12px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #F1E9DC;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:14.5px; color:#655C53;">今回の日程を変更したい</span>
+              <span style="font-size:11px; color:#6F675E;">⌄</span>
+              <span style="margin-left:auto; width:44px; height:44px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">⋯</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:20px 20px 8px; display:flex; flex-direction:column; gap:16px; overflow:hidden;">
+              <div style="align-self:center; font-size:11px; color:#6F675E; letter-spacing:.06em;">8月12日</div>
+              <div style="border:1px solid #EFE3D0; border-radius:20px; overflow:hidden; background:#FFFCF5;">
+                <div style="display:flex; align-items:center; gap:8px; padding:11px 14px; background:#FBF3E6; border-bottom:1px dashed #E2D7C6;">
+                  <svg width="14" height="11" viewBox="0 0 15 12" fill="none"><rect x="0.6" y="0.6" width="13.8" height="10.8" rx="1.6" stroke="#3F6B49" stroke-width="1.1"/><path d="M1.4 1.6 7.5 6.4l6.1-4.8" stroke="#3F6B49" stroke-width="1.1"/></svg>
+                  <span style="font-size:11.5px; letter-spacing:.06em; color:#3F6B49;">お相手からのご相談</span>
+                  <span style="margin-left:auto; font-size:10.5px; color:#6F675E;">AIが要約しました</span>
+                </div>
+                <div style="padding:16px 14px 14px;">
+                  <div style="font-size:15.5px; line-height:1.95;">土曜の日程について、別案のご相談が来ています。</div>
+                  <div style="margin-top:10px; font-size:13.5px; line-height:1.95; color:#655C53;">背景として、お相手は現在求職中とのことです。</div>
+                </div>
+                <div style="padding:9px 14px 12px; border-top:1px solid #F1E9DC; font-size:10.5px; color:#6F675E;">お相手が書いた言葉そのものは含まれていません。</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px; margin-top:8px;">
+                <div style="max-width:78%; background:#F2E8D9; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.9;">また勝手に土曜に決めやがって</div>
+                <div style="font-size:10.5px; color:#6F675E;">ここに書いたことは、お相手には届きません</div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:9px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="max-width:82%; background:#FBF0DA; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.95;">そのお気持ち、受け止めました。<br>日程の話は、こちらで預かります。</div>
+              </div>
+            </div>
+            <div style="flex:none; padding:0 20px 8px; display:flex; align-items:center; gap:8px;">
+              <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 1.2 10.6 3v3.4c0 2.4-2 3.9-4.6 4.4C3.4 10.3 1.4 8.8 1.4 6.4V3L6 1.2z" stroke="#6F675E" stroke-width="1.1" stroke-linejoin="round"/></svg>
+              <span style="font-size:12.5px; color:#655C53;">相談できる公的な窓口</span>
+            </div>
+            <div style="flex:none; padding:0 20px 10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <span style="border:1px solid #E4DACA; border-radius:999px; padding:10px 15px; font-size:13.5px; color:#3F6B49; background:#FFFCF5;">日曜がいい</span>
+              <span style="border:1px solid #E4DACA; border-radius:999px; padding:10px 15px; font-size:13.5px; color:#3F6B49; background:#FFFCF5;">今は決めない</span>
+            </div>
+            <div style="flex:none; padding:8px 16px 12px; display:flex; align-items:flex-end; gap:10px; border-top:1px solid #F1E9DC;">
+              <div style="flex:1; min-height:44px; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:16px; padding:12px 14px; font-size:15px; color:#6F675E;">思っていることを書く</div>
+              <div style="width:44px; height:44px; flex:none; border-radius:16px; background:#C08F3C; display:flex; align-items:center; justify-content:center;"><svg width="17" height="17" viewBox="0 0 18 18" fill="none"><path d="M2.5 15.5 15.5 9 2.5 2.5v5L11 9l-8.5 1.5z" fill="#FFFCF5"/></svg></div>
+            </div>
+            <div style="flex:none; height:78px; border-top:1px solid #F1E9DC; background:#FFFCF5; display:flex; padding-top:8px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">ホーム</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#8A6212" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#8A6212;">相談</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">取り決め</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="3.5" y="5" width="15" height="13" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M3.5 9h15M7.5 3v4M14.5 3v4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">これから</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#6F675E" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">設定</span></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">タブバーを補いました。ヘッダの ⌄ は K-1 と同じ一覧をシートで開く操作にしています（別の相談へ移るために、いちいちタブへ戻らせない）。<br>選択肢のチップは1行に収まる2つまでに絞りました。3つ並ぶと、下から積み上がる要素が4段（窓口・チップ・入力・タブ）になり、会話が見える高さが400pxを割ります。</div>
+        </div>
+
+        <!-- K-3 登録した内容 -->
+        <div id="K3" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">K-3 ／ 設定 ＞ 登録した内容</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 18px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">登録した内容</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="font-size:13px; line-height:1.95; color:#655C53;">いつでも直せます。直すと、目安の金額が変わることがあります。</div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:0 18px;">
+                <div style="padding:16px 0; border-bottom:1px solid #F1E9DC;">
+                  <div style="display:flex; align-items:center;"><span style="font-size:11.5px; color:#6F675E;">いまの状況</span><span style="margin-left:auto; font-size:13px; color:#3F6B49;">直す</span></div>
+                  <div style="margin-top:6px; font-size:15px; line-height:1.75;">離婚したが、決めていない</div>
+                </div>
+                <div style="padding:16px 0; border-bottom:1px solid #F1E9DC;">
+                  <div style="display:flex; align-items:center;"><span style="font-size:11.5px; color:#6F675E;">同居</span><span style="margin-left:auto; font-size:13px; color:#3F6B49;">直す</span></div>
+                  <div style="margin-top:6px; font-size:15px;">一緒に暮らしている</div>
+                </div>
+                <div style="padding:16px 0;">
+                  <div style="display:flex; align-items:center;"><span style="font-size:11.5px; color:#6F675E;">お子さん</span><span style="margin-left:auto; font-size:13px; color:#3F6B49;">直す</span></div>
+                  <div style="margin-top:8px; display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:15px;">2015年4月生まれ</div>
+                    <div style="font-size:15px;">2019年11月生まれ</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:center;"><span style="font-size:11.5px; color:#6F675E;">ご自身の年収</span><span style="margin-left:auto; font-size:13px; color:#3F6B49;">直す</span></div>
+                <div style="margin-top:8px; font-size:19px;">4,380,000円</div>
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid #F1E9DC; display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:12px; color:#6F675E;">お相手に見えるのは</span>
+                  <span style="font-size:13.5px; color:#3F6B49;">425〜450万円</span>
+                </div>
+              </div>
+
+              <div style="background:#F7EFE1; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="display:flex; align-items:center;"><span style="font-size:11.5px; color:#6F675E;">お相手の年収</span></div>
+                <div style="margin-top:8px; font-size:15px; color:#655C53;">400〜425万円</div>
+                <div style="margin-top:10px; font-size:12px; line-height:1.9; color:#655C53;">お相手が入力された幅です。こちらから直すことはできません。</div>
+              </div>
+
+              <div style="border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                お子さんのこと以外は、直してもお相手にお知らせしません。
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">相手の年収も同じ画面に置きました。自分の値だけが見えていると「相手には自分の額が見えているのでは」という疑いが残るためです。幅だけが並んでいることで、対称性がその場で分かります。<br>直したときに相手に伝わるかどうかを、最後に1行で明示しています。ここが不明なままだと、直すこと自体が怖くなります。</div>
+        </div>
+
+        <!-- K-4 お子さんを直す -->
+        <div id="K4" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">K-4 ／ お子さんを直す</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 18px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">お子さん</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:12px; color:#6F675E;">1人目</span></div>
+                <div style="margin-top:14px; display:flex; gap:10px;">
+                  <div style="flex:1; background:#F7EFE1; border-radius:16px; padding:12px 14px;"><div style="font-size:11px; color:#6F675E;">生まれた年</div><div style="margin-top:4px; font-size:17px;">2015</div></div>
+                  <div style="flex:1; background:#F7EFE1; border-radius:16px; padding:12px 14px;"><div style="font-size:11px; color:#6F675E;">月</div><div style="margin-top:4px; font-size:17px;">4</div></div>
+                </div>
+                <div style="margin-top:10px; min-height:44px; background:#F7EFE1; border-radius:16px; padding:12px 14px; display:flex; align-items:center;"><span style="font-size:14.5px;">はると</span></div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:12px; color:#6F675E;">2人目</span></div>
+                <div style="margin-top:14px; display:flex; gap:10px;">
+                  <div style="flex:1; background:#F7EFE1; border-radius:16px; padding:12px 14px;"><div style="font-size:11px; color:#6F675E;">生まれた年</div><div style="margin-top:4px; font-size:17px;">2019</div></div>
+                  <div style="flex:1; background:#F7EFE1; border-radius:16px; padding:12px 14px;"><div style="font-size:11px; color:#6F675E;">月</div><div style="margin-top:4px; font-size:17px;">11</div></div>
+                </div>
+                <div style="margin-top:10px; min-height:44px; background:#F7EFE1; border-radius:16px; padding:12px 14px; display:flex; align-items:center;"><span style="font-size:14.5px; color:#6F675E;">お名前（任意）</span></div>
+              </div>
+
+              <div style="border:1px dashed #E2D7C6; border-radius:20px; padding:15px 18px; font-size:14.5px; color:#3F6B49;">＋ お子さんを追加</div>
+
+              <div style="background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                  <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:2px;">
+                  <div style="font-size:14.5px; line-height:1.9;">直すと、お相手には<br>「変更がありました」とだけ伝わります。</div>
+                </div>
+                <div style="margin-top:12px; font-size:12.5px; line-height:1.95; color:#655C53;">お子さんのことは、おふたりで共有している情報だからです。何をどう直したかは伝わりません。<br>お名前は共有されません。この端末でだけ表示されます。</div>
+              </div>
+
+              <div style="background:#F7EFE1; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                生まれ年を直すと、養育費の目安が変わることがあります。すでに合意済みの金額は、そのまま残ります。
+              </div>
+            </div>
+            <div style="flex:none; padding:12px 20px 24px; display:flex; flex-direction:column; gap:10px;">
+              <div style="border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:15px; text-align:center; font-size:15.5px; color:#3F6B49;">直す</div>
+              <div style="text-align:center; font-size:13.5px; color:#6F675E;">やめる</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">お子さんの情報だけは相手と共有されるので、直す前にそれを書きます。ただし「何をどう直したかは伝わりません」まで書き切ります。ここを曖昧にすると、直すことをためらいます。<br>名前は共有せず端末内だけ、という扱いも明示しました。合意済みの金額が勝手に変わらないことも同じ画面に置いています。</div>
+        </div>
+
+        <!-- K-5 項目の詳細 -->
+        <div id="K5" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">K-5 ／ 取り決めの項目詳細</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 18px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">養育費</span>
+              <span style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; border:1px solid #5B8A63; background:#EDF3E9; border-radius:11px; padding:4px 9px;"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.3 4.8 9.2 10 3.2" stroke="#3F6B49" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:11.5px; color:#3F6B49;">合意済</span></span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:0 18px;">
+                <div style="display:flex; padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;"><span style="width:82px; flex:none; color:#6F675E;">金額</span><span>月 50,000円</span></div>
+                <div style="display:flex; padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;"><span style="width:82px; flex:none; color:#6F675E;">支払日</span><span>毎月末日</span></div>
+                <div style="display:flex; padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px;"><span style="width:82px; flex:none; color:#6F675E;">終わり</span><span style="line-height:1.75;">はるとが満20歳に達する月</span></div>
+                <div style="display:flex; padding:15px 0; font-size:14.5px;"><span style="width:82px; flex:none; color:#6F675E;">合意日</span><span>2026年7月18日</span></div>
+              </div>
+
+              <div style="font-size:11.5px; letter-spacing:.08em; color:#6F675E;">これまでの経過</div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:4px 18px;">
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; display:flex; gap:12px;">
+                  <span style="flex:none; width:4px; border-radius:2px; background:#5B8A63;"></span>
+                  <div style="flex:1;"><div style="font-size:12px; color:#6F675E;">2026年7月18日</div><div style="margin-top:5px; font-size:14px; line-height:1.8;">月50,000円で合意しました</div></div>
+                </div>
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; display:flex; gap:12px;">
+                  <span style="flex:none; width:4px; border-radius:2px; background:#E2D7C6;"></span>
+                  <div style="flex:1;"><div style="font-size:12px; color:#6F675E;">2026年7月11日</div><div style="margin-top:5px; font-size:14px; line-height:1.8;">お相手から 45,000円の案がありました</div></div>
+                </div>
+                <div style="padding:15px 0; display:flex; gap:12px;">
+                  <span style="flex:none; width:4px; border-radius:2px; background:#E2D7C6;"></span>
+                  <div style="flex:1;"><div style="font-size:12px; color:#6F675E;">2026年7月2日</div><div style="margin-top:5px; font-size:14px; line-height:1.8;">お話しを始めました</div></div>
+                </div>
+              </div>
+
+              <div style="margin-top:4px; display:flex; flex-direction:column; gap:10px;">
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:14px; text-align:center; font-size:14.5px; color:#3F6B49;">この項目について相談する</div>
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:14px; text-align:center; font-size:14.5px; color:#655C53;">変更を申し出る</div>
+              </div>
+
+              <div style="font-size:12px; line-height:1.9; color:#6F675E;">変更には、お相手の同意が必要です。</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">経過は時系列で、左の細いバーだけで合意点を示します。「お相手から45,000円の案がありました」のように、金額は残しますが相手の言葉は残しません。<br>2つのボタンは同じ重さです。「変更を申し出る」を目立たせません（一度決まったものを動かす操作を、勧める形にしない）。</div>
+        </div>
+
+        <!-- K-6 変更申請を受ける -->
+        <div id="K6" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#834B32;">K-6 ／ 変更申請を受ける側（欠落していた画面）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E; position:relative;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:1; padding:20px 20px 0; display:flex; flex-direction:column; gap:16px; opacity:.35;">
+              <div style="display:flex; align-items:flex-start; gap:9px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="max-width:82%; background:#FBF0DA; border-radius:20px; padding:13px 15px; font-size:15.5px; line-height:1.95;">お相手から、取り決めの変更のご相談をお預かりしました。</div>
+              </div>
+            </div>
+            <div style="position:absolute; inset:auto 0 0 0; background:#FFFCF5; border-top:1px solid #EFE3D0; border-radius:26px 26px 0 0; padding:24px 20px 28px; display:flex; flex-direction:column; gap:18px;">
+              <div style="width:36px; height:4px; border-radius:2px; background:#E2D7C6; align-self:center;"></div>
+
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:3px;">
+                <div style="font-size:15.5px; line-height:1.95;">面会交流の取り決めを、変えたいというご相談です。<br><span style="font-size:13.5px; color:#655C53;">背景として、土曜に就業されることになったとのことです。</span></div>
+              </div>
+
+              <div style="background:#F7EFE1; border:1px solid #EFE3D0; border-radius:20px; padding:0 16px;">
+                <div style="padding:14px 0; border-bottom:1px solid #EDE2D2;">
+                  <div style="font-size:11.5px; color:#6F675E;">いまの取り決め</div>
+                  <div style="margin-top:5px; font-size:15px;">月1回・第2土曜</div>
+                </div>
+                <div style="padding:14px 0;">
+                  <div style="font-size:11.5px; color:#3F6B49;">変わったあと</div>
+                  <div style="margin-top:5px; font-size:15px; color:#3F6B49;">月1回・第3日曜</div>
+                </div>
+              </div>
+
+              <div style="font-size:12.5px; line-height:1.95; color:#655C53;">回数は変わりません。曜日と週が変わります。</div>
+
+              <div style="display:flex; flex-direction:column; gap:11px;">
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:20px; padding:15px 18px; font-size:15.5px;">この内容でよい</div>
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:20px; padding:15px 18px; font-size:15.5px;">別の案を出したい</div>
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:20px; padding:15px 18px; font-size:15.5px;">いまの取り決めのままにしたい</div>
+              </div>
+
+              <div style="text-align:center; font-size:12px; line-height:1.9; color:#6F675E;">いま決めなくてかまいません。<br>お返事があるまで、いまの取り決めが続きます。</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">3つの選択肢を<b style="font-weight:500;">すべて同じ見た目</b>にしました。法的合意の変更なので、「よい」を強調した時点でダークパターンになります。<br>「回数は変わりません。曜日と週が変わります」のように、何が変わって何が変わらないかを言葉で足しています。条文の差分を目で追わせません。<br>返事をしないあいだは現状が続くことを明示。放置が不利にならないと分かって、はじめて落ち着いて選べます。</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

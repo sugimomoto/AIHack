@@ -3,37 +3,41 @@
 import { useState } from "react";
 import Image from "next/image";
 import { PhoneFrame } from "@/components/ui/PhoneFrame";
+import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
 import {
   SITUATIONS,
+  SITUATION_FOOTNOTE,
   SITUATION_LABEL,
   SITUATION_NOTE,
   type Situation,
 } from "@/domain/case/situation";
 
 /**
- * はじめる
+ * I-1 状況の確認
  *
- * ★ここで最初の当事者が生まれる。
- *   まだ相手はいない。招待は次の画面で行う。
+ * ★2×2の表として聞かない。**平たい5択に崩す。**
+ *   「離婚していますか」「取り決めはありますか」という直接の問いを画面に出さない。
  *
- * ★役割を先に聞く。
- *   養育費の義務者・権利者が決まらないと、算定表を引けない。
+ * ★選択肢は面積・枠線・文字サイズをすべて同一にする。
+ *   「まだ、よく分からない」も同じ形で。最後だが小さくしない。
+ *
+ * ★「次へ」は選んだあとにだけ現れる。選ばせるために先に置かない。
  */
 export default function Page() {
   const [busy, setBusy] = useState(false);
   const [situation, setSituation] = useState<Situation | null>(null);
 
-  const start = async (role: "CUSTODIAL" | "NON_CUSTODIAL") => {
-    if (busy) return;
+  const proceed = async () => {
+    if (busy || !situation) return;
     setBusy(true);
     try {
       const res = await fetch("/api/cases", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ role, situation }),
+        body: JSON.stringify({ situation }),
       });
-      // ★お子さんと年収を伺ってから、状況に応じた次の一手へ進む
-      if (res.ok) window.location.href = "/onboarding/children";
+      // ★同居 → お子さん → 年収 の順にうかがう
+      if (res.ok) window.location.href = "/onboarding/living";
     } finally {
       setBusy(false);
     }
@@ -61,10 +65,12 @@ export default function Page() {
           </p>
         </div>
 
-        {/* ★状況の違いを、最初に吸収する。
-             「もう離婚して取り決めもある人」と「まだ相手と話していない人」を
-             同じ入口に通さない。 */}
-        <p style={{ fontSize: 13.5, fontWeight: 600, marginTop: 28 }}>いまの状況に近いものを選んでください。</p>
+        <OnboardingProgress step={1} />
+
+        <p style={{ fontSize: 13.5, fontWeight: 600, marginTop: 20 }}>
+          いまの状況に近いものを選んでください。
+        </p>
+
         <div className="mt-3 flex flex-col gap-2.5">
           {SITUATIONS.map((s) => (
             <button
@@ -87,37 +93,40 @@ export default function Page() {
           ))}
         </div>
 
-        <p style={{ fontSize: 13.5, fontWeight: 600, marginTop: 28 }}>お子さんと同居されていますか。</p>
-        <p style={{ fontSize: 12, lineHeight: 1.9, color: "var(--text-sub-2)", marginTop: 6 }}>
-          養育費の目安をお出しするために伺います。あとから変えられます。
+        {/* ★選択が資格の判定に見えないよう、必ず末尾に置く */}
+        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 18 }}>
+          {SITUATION_FOOTNOTE}
         </p>
 
-        <div className="mt-4 flex flex-col gap-2.5">
-          {[
-            { role: "CUSTODIAL" as const, label: "同居しています" },
-            { role: "NON_CUSTODIAL" as const, label: "同居していません" },
-          ].map((o) => (
-            <button
-              key={o.role}
-              type="button"
-              disabled={busy || !situation}
-              onClick={() => void start(o.role)}
-              className="disabled:opacity-50"
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border-strong)",
-                borderRadius: "var(--r-full)",
-                minHeight: 52,
-                fontSize: 15,
-              }}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
+        {/* ★選ばないと出ない。fade + 4px上昇 */}
+        {situation && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void proceed()}
+            className="anim-msg-in mt-4 disabled:opacity-50"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border-strong)",
+              borderRadius: "var(--r-full)",
+              minHeight: 52,
+              fontSize: 15,
+            }}
+          >
+            次へ
+          </button>
+        )}
 
-        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 20, textAlign: "center" }}>
-          {situation ? "お名前やご連絡先の入力は要りません。" : "まず、いまの状況をお選びください。"}
+        <p
+          style={{
+            fontSize: 11.5,
+            lineHeight: 1.9,
+            color: "var(--muted)",
+            marginTop: 16,
+            textAlign: "center",
+          }}
+        >
+          お名前やご連絡先の入力は要りません。
         </p>
       </div>
     </PhoneFrame>

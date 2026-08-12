@@ -3,6 +3,7 @@ import type {
   CaseId,
   ConsultationId,
   ContactInfo,
+  Party,
   PartyId,
   PartyRecord,
 } from "@/domain/case/types";
@@ -543,6 +544,21 @@ export async function saveChildren(
   await batch.commit();
 }
 
+/**
+ * 生まれ年月だけを読む。
+ *
+ * ★名前は返さない。**名前は共有しない情報である。**
+ *   受諾した側に相手の付けた呼び名を見せると、そこから越えてしまう。
+ *   算定表に要るのは年齢と人数だけなので、返さなくても困らない。
+ */
+export async function loadChildBirthDates(caseId: CaseId): Promise<string[]> {
+  const snap = await caseRef(caseId).collection("children").get();
+  return snap.docs
+    .map((d) => d.get("birthDate") as string)
+    .filter(Boolean)
+    .sort();
+}
+
 /** ケースの状況。★入口の分岐を記録する */
 export async function saveSituation(caseId: CaseId, situation: string): Promise<void> {
   await caseRef(caseId).set({ situation }, { merge: true });
@@ -551,4 +567,33 @@ export async function saveSituation(caseId: CaseId, situation: string): Promise<
 export async function loadSituation(caseId: CaseId): Promise<string | null> {
   const d = await caseRef(caseId).get();
   return (d.get("situation") ?? null) as string | null;
+}
+
+/**
+ * 同居の状況と、そこから決まる役割。
+ *
+ * ★役割が決まらないとき（お子さんによって違う／あとで答える）は、
+ *   **当てずっぽうで書き換えない。** 同居の記録だけを残す。
+ */
+export async function saveLiving(
+  caseId: CaseId,
+  input: { living: string; ownPartyId: string; role: Party | null },
+): Promise<void> {
+  const root = caseRef(caseId);
+  const batch = getDb().batch();
+  batch.set(root, { living: input.living, roleConfirmed: input.role !== null }, { merge: true });
+
+  if (input.role) {
+    const other: Party = input.role === "CUSTODIAL" ? "NON_CUSTODIAL" : "CUSTODIAL";
+    const parties = await root.collection("parties").get();
+    for (const p of parties.docs) {
+      batch.set(p.ref, { role: p.id === input.ownPartyId ? input.role : other }, { merge: true });
+    }
+  }
+  await batch.commit();
+}
+
+export async function loadLiving(caseId: CaseId): Promise<string | null> {
+  const d = await caseRef(caseId).get();
+  return (d.get("living") ?? null) as string | null;
 }

@@ -1,31 +1,48 @@
 import { describe, expect, it } from "vitest";
 import {
   SITUATIONS,
-  needsInvitation,
+  SITUATION_LABEL,
+  SITUATION_NOTE,
   needsTermsInput,
   nextStepFor,
+  parseSituation,
   topicsFor,
 } from "@/domain/case/situation";
 
 /**
  * ★入口の分岐
  *
- *   「もう離婚して取り決めもある人」と「まだ相手と話していない人」が
+ *   「もう離婚して取り決めもある人」と「これから話す人」が
  *   同じ画面から始まっていた。**状況の違いを吸収していなかった。**
  *
- * ★軸は2つ。離婚したか、取り決めがあるか。
- *
- * ★このテストは実装より先に書かれた
+ * ★第3弾で2点変えた。
+ *   1. 「まだ相手と話していない」を独立の問いにしない（招待をオンボーディングから外す）
+ *   2. 平たい5択にする（2×2の表として聞くと詰問になる）
  */
 
 describe("★状況の分類", () => {
-  it("4つある", () => {
+  it("5つある", () => {
     expect(SITUATIONS).toEqual([
-      "DIVORCED_WITH_TERMS",
-      "DIVORCED_NO_TERMS",
       "PREDIVORCE_NEGOTIATING",
-      "PREDIVORCE_CONSIDERING",
+      "PREDIVORCE_WITH_TERMS",
+      "DIVORCED_NO_TERMS",
+      "DIVORCED_WITH_TERMS",
+      "UNSURE",
     ]);
+  });
+
+  it("★すべての選択肢に、同じ形の見出しと補足がある（一つだけ小さくしない）", () => {
+    for (const s of SITUATIONS) {
+      expect(SITUATION_LABEL[s]).toBeTruthy();
+      expect(SITUATION_NOTE[s]).toBeTruthy();
+    }
+  });
+
+  it("★「離婚していますか」と直接問う文言を持たない", () => {
+    for (const s of SITUATIONS) {
+      const text = `${SITUATION_LABEL[s]}${SITUATION_NOTE[s]}`;
+      expect(text).not.toMatch(/ますか|ありますか/);
+    }
   });
 
   it("★取り決めがある人は、入力から始まる", () => {
@@ -33,28 +50,47 @@ describe("★状況の分類", () => {
     expect(needsTermsInput("DIVORCED_NO_TERMS")).toBe(false);
   });
 
-  it("★まだ相手と話していない人には、招待を求めない", () => {
-    expect(needsInvitation("PREDIVORCE_CONSIDERING")).toBe(false);
+  it("★離婚前で条件が決まっている人には、記録の入力を出さない（まだ確定していない）", () => {
+    expect(needsTermsInput("PREDIVORCE_WITH_TERMS")).toBe(false);
   });
 
-  it("条件を整理する人には招待が要る", () => {
-    expect(needsInvitation("DIVORCED_NO_TERMS")).toBe(true);
-    expect(needsInvitation("PREDIVORCE_NEGOTIATING")).toBe(true);
-  });
-
-  it("★取り決めがある人にも招待は要る（相手と運用するため）", () => {
-    expect(needsInvitation("DIVORCED_WITH_TERMS")).toBe(true);
+  it("★分からない人にも、何も入力させない", () => {
+    expect(needsTermsInput("UNSURE")).toBe(false);
   });
 });
 
 describe("★次に進む先", () => {
+  // ★招待はオンボーディングに含めない。着地はホーム。
   it.each([
+    ["PREDIVORCE_NEGOTIATING", "/app"],
+    ["PREDIVORCE_WITH_TERMS", "/app"],
+    ["DIVORCED_NO_TERMS", "/app"],
     ["DIVORCED_WITH_TERMS", "/onboarding/terms"],
-    ["DIVORCED_NO_TERMS", "/onboarding/invite"],
-    ["PREDIVORCE_NEGOTIATING", "/onboarding/invite"],
-    ["PREDIVORCE_CONSIDERING", "/app"],
+    ["UNSURE", "/app"],
   ])("%s → %s", (s, path) => {
     expect(nextStepFor(s as never)).toBe(path);
+  });
+
+  it("★どの状況でも、招待を通らせない", () => {
+    for (const s of SITUATIONS) {
+      expect(nextStepFor(s)).not.toContain("invite");
+    }
+  });
+});
+
+describe("★保存済みの値", () => {
+  it("そのまま読み戻せる", () => {
+    for (const s of SITUATIONS) expect(parseSituation(s)).toBe(s);
+  });
+
+  // ★選択肢を組み替えても、既に保存された値を落とさない
+  it("★やめた選択肢は、最も近いものに寄せる", () => {
+    expect(parseSituation("PREDIVORCE_CONSIDERING")).toBe("UNSURE");
+  });
+
+  it("知らない値は null", () => {
+    expect(parseSituation("WHATEVER")).toBeNull();
+    expect(parseSituation(null)).toBeNull();
   });
 });
 

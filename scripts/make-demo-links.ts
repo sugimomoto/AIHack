@@ -40,17 +40,53 @@ async function main() {
   if (!KEY) throw new Error("DEMO_LINK_SECRET が設定されていません");
   console.log(`対象: ${BASE}\n`);
 
-  const start = await call("/api/cases", { method: "POST", body: { role: "NON_CUSTODIAL" } });
+  const start = await call("/api/cases", {
+    method: "POST",
+    body: { situation: "DIVORCED_NO_TERMS" },
+  });
   if (start.status !== 200) throw new Error(`ケース作成に失敗: ${start.status}`);
   const caseId = start.body.caseId as string;
+  const cookieA = start.cookie!;
+
+  // ★オンボーディングを通す。
+  //   これが無いと算定表に届かず、確認する側が「目安が出ない」ところで止まる。
+  //   役割は同居からしか決まらない（I-2）。
+  await call(`/api/cases/${caseId}/living`, {
+    method: "POST",
+    cookie: cookieA,
+    body: { living: "APART" }, // → 作成者は非監護親
+  });
+  await call(`/api/cases/${caseId}/children`, {
+    method: "POST",
+    cookie: cookieA,
+    body: { children: [{ birthDate: "2015-04-01" }, { birthDate: "2009-08-01" }] },
+  });
+  await call("/api/profile", {
+    method: "POST",
+    cookie: cookieA,
+    body: { annualIncomeYen: 4_380_000 },
+  });
 
   const inv = await call("/api/invitations", {
     method: "POST",
-    cookie: start.cookie!,
+    cookie: cookieA,
     body: { method: "LINK", revealSenderName: true, senderName: "太郎" },
   });
   const token = String(inv.body.url).split("/invite/")[1];
-  await call(`/api/invite/${token}/accept`, { method: "POST", body: { action: "ACCEPT" } });
+  const accepted = await call(`/api/invite/${token}/accept`, {
+    method: "POST",
+    body: { action: "ACCEPT" },
+  });
+
+  // ★受諾した側の年収は、オンボーディングでは聞かない（H-2）。
+  //   確認用のケースでは、算定表まで見えるように入れておく。
+  if (accepted.cookie) {
+    await call("/api/profile", {
+      method: "POST",
+      cookie: accepted.cookie,
+      body: { annualIncomeYen: 2_100_000 },
+    });
+  }
 
   // ★確認用の印を付ける。これが無いとリンクは効かない
   if (!getApps().length) initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || "aida-505206" });

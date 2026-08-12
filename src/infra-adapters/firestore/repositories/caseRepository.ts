@@ -428,6 +428,60 @@ export async function appendException(
     .add({ topic, effect: "ONE_TIME", ...ex, createdAt: new Date().toISOString() });
 }
 
+/**
+ * 今回だけの変更（ONE_TIME）
+ *
+ * ★保存はしていたが、**読む経路がどこにも無かった。**
+ *   「今回だけ日曜に変えましょう」と合意しても、
+ *   その回だけ変わったことが「これから」に出ていなかった。
+ */
+export async function listExceptions(
+  caseId: CaseId,
+): Promise<{ id: string; topic: string; change: Record<string, unknown>; createdAt: string }[]> {
+  const snap = await caseRef(caseId)
+    .collection("adjustments")
+    .where("effect", "==", "ONE_TIME")
+    .get();
+  return snap.docs
+    .map((d) => ({
+      id: d.id,
+      topic: (d.get("topic") ?? "") as string,
+      change: (d.get("change") ?? {}) as Record<string, unknown>,
+      createdAt: (d.get("createdAt") ?? "") as string,
+    }))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * 軽い約束（L2）
+ *
+ * ★取り決めではない。**公正証書には載らない。**
+ *   だが「8月22日でOKです」と了承したものが、どこにも残らないのはおかしい。
+ *   「これから」にだけ載せる。
+ */
+export async function appendArrangement(
+  caseId: CaseId,
+  a: { threadId: string | null; date: string; label: string; byPartyId: PartyId },
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("arrangements")
+    .add({ ...a, createdAt: new Date().toISOString() });
+}
+
+export async function listArrangements(
+  caseId: CaseId,
+): Promise<{ id: string; date: string; label: string }[]> {
+  const snap = await caseRef(caseId).collection("arrangements").get();
+  return snap.docs
+    .map((d) => ({
+      id: d.id,
+      date: (d.get("date") ?? "") as string,
+      label: (d.get("label") ?? "") as string,
+    }))
+    .filter((x) => /^\d{4}-\d{2}-\d{2}$/.test(x.date))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
 /** 合意項目の承諾状態 */
 export async function setConsent(
   caseId: CaseId,

@@ -2,6 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { DEVIATION_LABELS } from "@/domain/obligation/deviation";
+import { describeChange } from "@/domain/adjustment/revision";
+
+const TOPIC_LABEL: Record<string, string> = {
+  CHILD_SUPPORT: "養育費のお支払い",
+  VISITATION: "面会交流",
+};
 import { EmptyUpcoming } from "@/components/ui/EmptyState";
 
 /**
@@ -17,12 +23,17 @@ type View = {
   rows: {
     key: string;
     dueDate: string;
-    amountYen: number;
+    topic: string;
+    amountYen: number | null;
     isOwnObligation: boolean;
     state: string;
     label: string;
     canReport: "PAID" | "RECEIVED" | null;
   }[];
+  /** ★「今回だけ」の変更。保存はしていたが読む経路が無かった */
+  exceptions: { id: string; topic: string; change: Record<string, unknown> }[];
+  /** ★取り決めではない軽い約束（L2）。公正証書には載らない */
+  arrangements: { id: string; date: string; label: string }[];
   reminders: { dueDate: string; amountYen: number }[];
   deviations: { key: string; dueDate: string; amountYen: number; daysPast: number }[];
   enforceability: { explanation: string; caveat?: string } | null;
@@ -133,6 +144,18 @@ export function SchedulePanel({
         </div>
       )}
 
+      {/* ★取り決めではないが、了承したもの。ここにだけ載る */}
+      {(v.arrangements ?? []).slice(0, 3).map((a) => (
+        <div key={a.id} style={{ padding: "9px 0", borderTop: "1px solid var(--border-subtle)" }}>
+          <span style={{ fontSize: 13 }}>
+            {md(a.date)} ／ {a.label}
+          </span>
+          <span style={{ display: "block", fontSize: 11.5, color: "var(--text-sub)" }}>
+            お約束として控えています
+          </span>
+        </div>
+      ))}
+
       {v.rows.slice(0, 4).map((r) => (
         <div
           key={r.key}
@@ -141,7 +164,11 @@ export function SchedulePanel({
         >
           <div className="min-w-0">
             <span style={{ fontSize: 13 }}>
-              {md(r.dueDate)} ／ {r.amountYen.toLocaleString()}円
+              {/* ★面会交流には金額が無い。無いものを 0 と書かない */}
+              {md(r.dueDate)} ／{" "}
+              {typeof r.amountYen === "number"
+                ? `${r.amountYen.toLocaleString()}円`
+                : TOPIC_LABEL[r.topic] ?? "お約束"}
             </span>
             <span
               style={{
@@ -166,6 +193,31 @@ export function SchedulePanel({
           )}
         </div>
       ))}
+      {/* ★「今回だけ第3土曜に変更（本来は第2土曜）」が分かる表示。
+             ONE_TIME を保存していたのに、画面に出る経路がどこにも無かった。 */}
+      {(v.exceptions ?? []).length > 0 && (
+        <div
+          className="mt-2"
+          style={{ borderTop: "1px dashed var(--border-dashed)", paddingTop: 9 }}
+        >
+          {v.exceptions.map((e) => {
+            const d = describeChange({}, e.change);
+            const to = d.changed.map((c) => `${c.label} ${c.to}`).join("、");
+            if (!to) return null;
+            return (
+              <p
+                key={e.id}
+                style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--attention-text)" }}
+              >
+                今回だけ {to} に変更（{TOPIC_LABEL[e.topic] ?? "取り決め"}）
+              </p>
+            );
+          })}
+          <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
+            取り決めそのものは変わっていません。
+          </p>
+        </div>
+      )}
     </div>
   );
 }

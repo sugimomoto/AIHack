@@ -2,6 +2,7 @@ import { asCaseId, asConsultationId, type PartyId } from "@/domain/case/types";
 import { respondTo } from "./dialogue";
 import { buildRelay } from "./relay";
 import {
+  appendArrangement,
   appendMediationEvent,
   appendSafetyEvent,
   appendMessage,
@@ -14,6 +15,8 @@ import {
 import { assertOwnParty, scopedInbound, scopedMessages, scopedOutbound } from "@/domain/case/scope";
 import { parseEffect } from "@/domain/adjustment/flow";
 import { consultationIdOf, parseThreadId } from "@/domain/consultation/thread";
+import { arrangementFrom } from "@/domain/obligation/arrangement";
+import { todayJst } from "@/lib/today";
 import { requiresAgreement } from "@/domain/topic/level";
 import { detectSafetyFlags, needsHumanReview, toSafetyEvent } from "@/domain/safety/detect";
 
@@ -201,6 +204,25 @@ async function relayIfNeeded(input: {
         to,
         { scenarioId: input.scenarioId ?? null, threadId: input.threadId, title: input.title ?? null },
       ).catch(() => {});
+    }
+
+    // ★L2（調整）で了承されたものを、軽い約束として残す。
+    //   取り決めにはしない（公正証書には載らない）が、
+    //   **了承した日付が消えるのはおかしい。**「これから」にだけ載せる。
+    if (!requiresAgreement(input.topic ?? "OTHER")) {
+      const a = arrangementFrom({
+        payload: relay.payload,
+        intents: input.intents,
+        today: todayJst(),
+      });
+      if (a) {
+        await appendArrangement(input.caseId, {
+          threadId: input.threadId ?? null,
+          date: a.date,
+          label: a.label,
+          byPartyId: input.partyId,
+        }).catch(() => {});
+      }
     }
 
     await appendMediationEvent(input.caseId, {

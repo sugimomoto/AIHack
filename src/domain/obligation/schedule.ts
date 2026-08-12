@@ -1,3 +1,4 @@
+import { visitationDatesOf } from "./visitation";
 /**
  * 予定と履行
  *
@@ -16,7 +17,8 @@
 export type Obligation = {
   topic: string;
   dueDate: string;
-  amountYen: number;
+  /** ★面会交流には金額が無い。お金の義務だけを予定にしていた（→ Issue #5） */
+  amountYen: number | null;
   obligorPartyId: string;
 };
 
@@ -55,7 +57,10 @@ export type AgreementItemInput = {
  * 合意から予定を作る。
  *
  * ★値が欠けていたら作らない。推測して期日や金額を作らない。
- * ★養育費以外は対象にしない（面会交流に「期日と金額」は無い）。
+ *
+ * ★面会交流も対象にする。
+ *   「期日が無い」と書いて外していたが、**それは誤りだった。**
+ *   「月1回・第2土曜」は日付に落ちる。
  */
 export function generateObligations(input: {
   items: readonly AgreementItemInput[];
@@ -68,26 +73,42 @@ export function generateObligations(input: {
   const [y0, m0] = input.from.split("-").map(Number);
 
   for (const item of input.items) {
-    if (item.topic !== "CHILD_SUPPORT" || item.status !== "AGREED") continue;
-
-    const amount = item.payload?.monthlyAmount;
-    const payDay = item.payload?.payDay;
-    if (typeof amount !== "number" || typeof payDay !== "string") continue;
-
+    if (item.status !== "AGREED") continue;
     // ★合意の始期が分からなければ作らない。
     //   いつからの義務か分からないものを「守られていない」と言えない。
     if (!item.agreedAt) continue;
     const since = item.agreedAt.slice(0, 10);
 
-    for (let k = 0; k < input.months; k++) {
-      const m = m0 + k;
-      const year = y0 + Math.floor((m - 1) / 12);
-      const month = ((m - 1) % 12) + 1;
-      const dueDate = dueDateOf(payDay, year, month);
-      if (!dueDate) continue;
-      // ★合意より前の期日は義務にしない
-      if (dueDate < since) continue;
-      out.push({ topic: item.topic, dueDate, amountYen: amount, obligorPartyId: input.obligorPartyId });
+    if (item.topic === "CHILD_SUPPORT") {
+      const amount = item.payload?.monthlyAmount;
+      const payDay = item.payload?.payDay;
+      if (typeof amount !== "number" || typeof payDay !== "string") continue;
+
+      for (let k = 0; k < input.months; k++) {
+        const m = m0 + k;
+        const year = y0 + Math.floor((m - 1) / 12);
+        const month = ((m - 1) % 12) + 1;
+        const dueDate = dueDateOf(payDay, year, month);
+        if (!dueDate) continue;
+        // ★合意より前の期日は義務にしない
+        if (dueDate < since) continue;
+        out.push({ topic: item.topic, dueDate, amountYen: amount, obligorPartyId: input.obligorPartyId });
+      }
+      continue;
+    }
+
+    if (item.topic === "VISITATION") {
+      const dates = visitationDatesOf({
+        payload: item.payload,
+        fromYear: y0,
+        fromMonth: m0,
+        months: input.months,
+      });
+      for (const dueDate of dates) {
+        if (dueDate < since) continue;
+        // ★金額は無い。**無いものを 0 と書かない**
+        out.push({ topic: item.topic, dueDate, amountYen: null, obligorPartyId: input.obligorPartyId });
+      }
     }
   }
   return out;

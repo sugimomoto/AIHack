@@ -162,5 +162,38 @@
         }
       }
     }
+  },
+  {
+    "id": "ps_schedule_v1",
+    "targetType": "RELAY_EXTRACTION",
+    "targetKey": "SCHEDULE",
+    "version": 1,
+    "status": "PUBLISHED",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "title": "できごと",
+          "description": "何の予定か。例: 送迎 / 受け渡し"
+        },
+        "date": {
+          "type": "string",
+          "title": "日付",
+          "description": "書かれたとおりに。例: 8月22日。年は書かれていなければ入れない"
+        },
+        "time": {
+          "type": "string",
+          "title": "時刻",
+          "description": "例: 14時"
+        },
+        "place": {
+          "type": "string",
+          "title": "場所"
+        }
+      }
+    }
   }
 ]

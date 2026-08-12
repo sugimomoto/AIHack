@@ -20,8 +20,14 @@ export type Deviation = {
   daysPast: number;
 };
 
-/** ★key と期日・金額だけを見る。義務の全体を要求しない */
-type Checkable = Pick<Obligation, "dueDate" | "amountYen"> & { key: string };
+/**
+ * ★key と期日・金額だけを見る。義務の全体を要求しない。
+ *
+ * ★金額のあるものだけを検査する。
+ *   面会交流には実施の記録がまだ無いため、**守られていないとは書けない。**
+ *   観測できないことを断定しない、という規律は面会交流でも同じである。
+ */
+type Checkable = Pick<Obligation, "dueDate"> & { key: string; amountYen: number };
 
 export function detectDeviations(
   obligations: readonly Checkable[],

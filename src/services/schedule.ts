@@ -12,6 +12,8 @@ import { assessEnforceability, detectDeviations } from "@/domain/obligation/devi
 import {
   listAgreementItems,
   loadForLlm,
+  listArrangements,
+  listExceptions,
   loadFulfillments,
   reportFulfillment,
 } from "@/infra-adapters/firestore/repositories/caseRepository";
@@ -47,8 +49,10 @@ const PRIORITY_CLAIM_TABLE = {
 
 export type ScheduleRow = {
   key: string;
+  topic: string;
   dueDate: string;
-  amountYen: number;
+  /** ★面会交流には金額が無い。無いものを 0 と書かない */
+  amountYen: number | null;
   isOwnObligation: boolean;
   state: FulfillmentState;
   label: string;
@@ -98,17 +102,33 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
     const isOwn = o.obligorPartyId === input.partyId;
     return {
       key,
+      topic: o.topic,
       dueDate: o.dueDate,
       amountYen: o.amountYen,
       isOwnObligation: isOwn,
       state,
       label: labelOf(state),
       // ★立場に合った種別だけ。義務者は支払い、権利者は入金
-      canReport: isOwn ? (f.paidBy ? null : "PAID") : f.receivedBy ? null : "RECEIVED",
+      // ★実施の記録は今回作っていない。面会交流では申告させない
+      canReport:
+        typeof o.amountYen !== "number"
+          ? null
+          : isOwn
+            ? f.paidBy
+              ? null
+              : "PAID"
+            : f.receivedBy
+              ? null
+              : "RECEIVED",
     };
   });
 
-  const keyed = obligations.map((o) => ({ ...o, key: `${o.topic}_${o.dueDate}` }));
+  // ★逸脱を見るのは、記録を申告できるものだけ。
+  //   面会交流には実施の記録がまだ無いので、**守られていないとは書けない。**
+  //   観測できないことを断定しない、という規律は面会交流でも同じである。
+  const keyed = obligations
+    .filter((o): o is typeof o & { amountYen: number } => typeof o.amountYen === "number")
+    .map((o) => ({ ...o, key: `${o.topic}_${o.dueDate}` }));
   const deviations = detectDeviations(keyed, fulfillments, { today: input.today });
 
   // ★先取特権の判定。閾値が未検証のあいだは注記が付く
@@ -119,8 +139,17 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
       ? assessEnforceability({ monthlyAmountYen: monthly, childCount }, PRIORITY_CLAIM_TABLE)
       : null;
 
+  const [exceptions, arrangements] = await Promise.all([
+    listExceptions(caseId).catch(() => []),
+    listArrangements(caseId).catch(() => []),
+  ]);
+
   return {
     rows,
+    // ★「今回だけ」の変更。保存はしていたが、読む経路がどこにも無かった
+    exceptions: exceptions.map((e) => ({ id: e.id, topic: e.topic, change: e.change })),
+    // ★取り決めではない軽い約束（L2）。公正証書には載らない
+    arrangements: arrangements.filter((a) => a.date >= monthsBefore(input.today, 1)),
     // ★自分の義務のぶんだけ。相手には出さない
     reminders: remindersFor(obligations, { partyId: input.partyId, today: input.today }).map((o) => ({
       dueDate: o.dueDate,

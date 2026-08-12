@@ -18,6 +18,29 @@ export default function Page() {
           ご登録済みのメールアドレスにリンクをお送りします。
         </p>
         <EmailLinkForm mode="signin" />
+
+        {/* ★「登録してから戻る」という順序を、先に伝える */}
+        <div
+          className="mt-7"
+          style={{
+            border: "1px dashed var(--border-dashed)",
+            borderRadius: "var(--r-md)",
+            padding: 14,
+          }}
+        >
+          <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub-2)" }}>
+            この画面は、<strong>すでにご利用中の方</strong>が別の端末からお戻りになるためのものです。
+            <br />
+            はじめての方は「はじめる」からお進みください。アプリの中で、メールアドレスをご登録いただけます。
+          </p>
+          <a
+            href="/start"
+            className="mt-3 grid place-items-center"
+            style={{ border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", minHeight: 44, fontSize: 14 }}
+          >
+            はじめる
+          </a>
+        </div>
       </div>
     </PhoneFrame>
   );

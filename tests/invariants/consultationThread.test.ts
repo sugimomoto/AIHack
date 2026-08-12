@@ -43,19 +43,27 @@ describe("★続きにするか、都度別にするか", () => {
     expect(a).not.toBe(b);
   });
 
-  it("トピックを選ばなければ既定のスレッド", () => {
-    expect(threadIdFor({ scenarioId: null, kind: null })).toBe(DEFAULT_THREAD_ID);
-    expect(threadIdFor({ scenarioId: "", kind: "ADJUSTMENT", token: "aaaa" })).toBe(
-      DEFAULT_THREAD_ID,
-    );
+  // ★既定のスレッドに入れると、前回の会話がそのまま続いてしまう
+  it("★トピックを選ばずに始めた相談も、毎回新しいスレッド", () => {
+    const a = threadIdFor({ scenarioId: null, kind: null, token: "aaaa" });
+    const b = threadIdFor({ scenarioId: null, kind: null, token: "bbbb" });
+    expect(a).not.toBe(b);
+    expect(a).not.toBe(DEFAULT_THREAD_ID);
   });
 
-  // ★Firestore のドキュメントIDになる
-  it("★使えない文字は受け付けない", () => {
-    for (const bad of ["../x", "sc/014", "sc 014"]) {
-      expect(threadIdFor({ scenarioId: bad, kind: "ADJUSTMENT", token: "aaaa" })).toBe(
-        DEFAULT_THREAD_ID,
-      );
+  it("鍵が無ければ既定のスレッド（過去の会話に到達するため）", () => {
+    expect(threadIdFor({ scenarioId: null, kind: null })).toBe(DEFAULT_THREAD_ID);
+  });
+
+  // ★Firestore のドキュメントIDになる。区切り文字やパスを混ぜさせない
+  it("★使えない文字はIDに入れない", () => {
+    for (const bad of ["../x", "sc/014", "sc 014", "a".repeat(41)]) {
+      const th = threadIdFor({ scenarioId: bad, kind: "ADJUSTMENT", token: "aaaa" });
+      expect(th).not.toContain("/");
+      expect(th).not.toContain(" ");
+      expect(th).not.toContain("..");
+      // ★不正なシナリオIDのかけらも残さない
+      expect(th).toBe("th_free_aaaa");
     }
     expect(parseThreadId("../other")).toBe(DEFAULT_THREAD_ID);
     expect(parseThreadId("cons_party_a")).toBe(DEFAULT_THREAD_ID);

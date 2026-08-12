@@ -4,6 +4,7 @@ import {
   MOMENT_CAPTION,
   MOMENT_FOLLOW_UP,
   MOMENT_LEAD,
+  momentFollowUp,
   momentFooter,
   momentLinesOf,
 } from "@/domain/agreement/moment";
@@ -76,5 +77,31 @@ describe("日付", () => {
 
   it("日付が読めなければ、日付を作らない", () => {
     expect(momentFooter("")).toBe("おふたりの記録に残ります");
+  });
+});
+
+/**
+ * ★面会交流の合意に「お支払いの日を『これから』に入れました」と出ていた。
+ *   決まっていないことを、決まったように書いてはいけない。
+ */
+describe("★論点ごとに書き分ける", () => {
+  it("養育費では、お支払いの日", () => {
+    expect(momentFollowUp("CHILD_SUPPORT")).toContain("お支払いの日");
+  });
+
+  it("★面会交流では、お会いになる日", () => {
+    expect(momentFollowUp("VISITATION")).toContain("お会いになる日");
+    expect(momentFollowUp("VISITATION")).not.toContain("お支払い");
+  });
+
+  // ★予定に入らない論点で「入れました」と書かない
+  it("★予定に入らない論点では、入れたと書かない", () => {
+    expect(momentFollowUp("OTHER")).not.toContain("入れました");
+  });
+
+  it("どの論点でも、変えられることは伝える", () => {
+    for (const t of ["CHILD_SUPPORT", "VISITATION", "OTHER"]) {
+      expect(momentFollowUp(t)).toContain("変えたくなったとき");
+    }
   });
 });

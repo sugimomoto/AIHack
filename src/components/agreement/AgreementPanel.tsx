@@ -112,7 +112,11 @@ export function AgreementPanel({
              祝わない。上下に線が1本ずつ引かれて、その中に内容が置かれるだけ。 */}
       {v.agreement && (
         <div className="mt-3">
-          <AgreementMoment payload={v.agreement.payload} agreedOn={v.agreement.agreedAt} />
+          <AgreementMoment
+            payload={v.agreement.payload}
+            agreedOn={v.agreement.agreedAt}
+            topic={topic}
+          />
         </div>
       )}
 

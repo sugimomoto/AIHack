@@ -23,9 +23,26 @@ export const MOMENT_RECORD_NOTE = "おふたりの記録に残ります";
 /**
  * ★変えたくなったときのことを、その場で言う。
  *   決まった瞬間に「もう変えられない」と感じさせない。
+ *
+ * ★論点ごとに書き分ける。
+ *   面会交流の合意に「お支払いの日を入れました」と出ていた。
+ *   **決まっていないことを、決まったように書いてはいけない。**
  */
-export const MOMENT_FOLLOW_UP =
-  "お支払いの日を「これから」に入れました。変えたくなったときは、いつでもおっしゃってください。";
+const FOLLOW_UP: Record<string, string> = {
+  CHILD_SUPPORT: "お支払いの日を「これから」に入れました。",
+  VISITATION: "お会いになる日を「これから」に入れました。",
+};
+
+export const MOMENT_CHANGE_NOTE = "変えたくなったときは、いつでもおっしゃってください。";
+
+export function momentFollowUp(topic: string): string {
+  const head = FOLLOW_UP[topic];
+  // ★予定に入らない論点で「入れました」と書かない
+  return head ? `${head}${MOMENT_CHANGE_NOTE}` : MOMENT_CHANGE_NOTE;
+}
+
+/** @deprecated 論点ごとに書き分ける。momentFollowUp を使う */
+export const MOMENT_FOLLOW_UP = momentFollowUp("CHILD_SUPPORT");
 
 /**
  * 祝う語。

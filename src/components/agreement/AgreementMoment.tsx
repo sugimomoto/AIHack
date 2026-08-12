@@ -1,8 +1,8 @@
 import Image from "next/image";
 import {
   MOMENT_CAPTION,
-  MOMENT_FOLLOW_UP,
   MOMENT_LEAD,
+  momentFollowUp,
   momentFooter,
   momentLinesOf,
 } from "@/domain/agreement/moment";
@@ -19,9 +19,12 @@ import {
 export function AgreementMoment({
   payload,
   agreedOn,
+  topic,
 }: {
   payload: Record<string, unknown>;
   agreedOn: string;
+  /** ★論点ごとに文を書き分ける（面会交流に「お支払いの日」と出ていた） */
+  topic: string;
 }) {
   const lines = momentLinesOf(payload);
   // ★読める行が一つも無ければ、何も出さない。空の枠を祝いの器にしない
@@ -72,7 +75,7 @@ export function AgreementMoment({
           style={{ flexShrink: 0 }}
         />
         <p style={{ fontSize: 13, lineHeight: 1.95, color: "var(--text-sub)" }}>
-          {MOMENT_FOLLOW_UP}
+          {momentFollowUp(topic)}
         </p>
       </div>
     </div>

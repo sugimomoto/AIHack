@@ -33,7 +33,12 @@ export function threadIdFor(input: {
   token?: string | null;
 }): string {
   const s = (input.scenarioId ?? "").trim();
-  if (!s || !/^[A-Za-z0-9_-]{1,40}$/.test(s)) return DEFAULT_THREAD_ID;
+  if (!s || !/^[A-Za-z0-9_-]{1,40}$/.test(s)) {
+    // ★トピックを選ばずに始めた相談も、**毎回新しく立てる。**
+    //   既定のスレッドに入れると、前回の会話がそのまま続いてしまう。
+    const free = (input.token ?? "").trim();
+    return /^[A-Za-z0-9]{4,24}$/.test(free) ? `th_free_${free}` : DEFAULT_THREAD_ID;
+  }
 
   if (isContinuing(input.kind)) return `th_${s}`;
 

@@ -25,7 +25,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
   const threadId = threadIdFor({
     scenarioId: sc?.id ?? null,
     kind: sc?.kind ?? null,
-    // ★件ごとに新しくする鍵。続く相談（FORMAL）では使われない
+    // ★件ごとに新しくする鍵。続く相談（FORMAL）では使われない。
+    //   トピックを選ばずに始めた相談にも渡す（既定のスレッドに入れない）。
     token: randomBytes(6).toString("hex"),
   });
 

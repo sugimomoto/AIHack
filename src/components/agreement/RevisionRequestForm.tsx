@@ -16,12 +16,43 @@ import { REVISION_REASONS, reasonTextOf } from "@/domain/adjustment/revision";
  *   **書いたものが黙って消える経路を残さない。**
  *   越えてよいカテゴリから選ぶ形にし、相手に出る文をその場で見せる。
  */
+/**
+ * ★養育費の項目に固定していた。
+ *   面会交流の「変更を申し出る」を開くと、**金額と支払日が出ていた。**
+ *   決まっていないものを、決められるように見せてはいけない。
+ */
 const PAY_DAYS = [
   { code: "LAST_DAY", label: "毎月末日" },
   { code: "DAY_5", label: "毎月5日" },
   { code: "DAY_10", label: "毎月10日" },
   { code: "DAY_25", label: "毎月25日" },
 ];
+
+const FREQUENCIES = [
+  { code: "MONTHLY_1", label: "月1回" },
+  { code: "MONTHLY_2", label: "月2回" },
+  { code: "WEEKLY_1", label: "週1回" },
+];
+
+const DAYS_OF_WEEK = [
+  { code: "SUN", label: "日曜日" },
+  { code: "MON", label: "月曜日" },
+  { code: "TUE", label: "火曜日" },
+  { code: "WED", label: "水曜日" },
+  { code: "THU", label: "木曜日" },
+  { code: "FRI", label: "金曜日" },
+  { code: "SAT", label: "土曜日" },
+];
+
+const WEEKS = [1, 2, 3, 4];
+
+const chip = (on: boolean): React.CSSProperties => ({
+  fontSize: 12.5,
+  padding: "7px 12px",
+  borderRadius: "var(--r-full)",
+  border: `1px solid ${on ? "var(--agree)" : "var(--border)"}`,
+  background: on ? "var(--agree-bg)" : "var(--surface-2)",
+});
 
 export function RevisionRequestForm({
   caseId,
@@ -40,15 +71,28 @@ export function RevisionRequestForm({
 }) {
   const [amount, setAmount] = useState("");
   const [payDay, setPayDay] = useState("");
+  const [frequency, setFrequency] = useState("");
+  const [dayOfWeek, setDayOfWeek] = useState("");
+  const [weekOfMonth, setWeekOfMonth] = useState<number | null>(null);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const isMoney = topic === "CHILD_SUPPORT";
+
   const change: Record<string, unknown> = {};
-  const yen = Number(amount.replace(/[^0-9]/g, ""));
-  if (amount !== "" && Number.isFinite(yen) && yen > 0 && yen !== current.monthlyAmount) {
-    change.monthlyAmount = yen;
+  if (isMoney) {
+    const yen = Number(amount.replace(/[^0-9]/g, ""));
+    if (amount !== "" && Number.isFinite(yen) && yen > 0 && yen !== current.monthlyAmount) {
+      change.monthlyAmount = yen;
+    }
+    if (payDay && payDay !== current.payDay) change.payDay = payDay;
+  } else {
+    if (frequency && frequency !== current.frequency) change.frequency = frequency;
+    if (dayOfWeek && dayOfWeek !== current.dayOfWeek) change.dayOfWeek = dayOfWeek;
+    if (weekOfMonth !== null && weekOfMonth !== current.weekOfMonth) {
+      change.weekOfMonth = weekOfMonth;
+    }
   }
-  if (payDay && payDay !== current.payDay) change.payDay = payDay;
   const canSend = Object.keys(change).length > 0;
 
   const send = async () => {
@@ -80,39 +124,80 @@ export function RevisionRequestForm({
         お返事があるまで、いまの取り決めが続きます。
       </p>
 
-      <input
-        inputMode="numeric"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        placeholder={`金額（いまは ${Number(current.monthlyAmount ?? 0).toLocaleString("ja-JP")}円）`}
-        className="mt-3 w-full"
-        style={{
-          background: "var(--surface-2)",
-          borderRadius: "var(--r-sm)",
-          padding: "10px 12px",
-          minHeight: 42,
-          fontSize: 14,
-        }}
-      />
-
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {PAY_DAYS.map((d) => (
-          <button
-            key={d.code}
-            type="button"
-            onClick={() => setPayDay(payDay === d.code ? "" : d.code)}
+      {isMoney ? (
+        <>
+          <input
+            inputMode="numeric"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder={`金額（いまは ${Number(current.monthlyAmount ?? 0).toLocaleString("ja-JP")}円）`}
+            className="mt-3 w-full"
             style={{
-              fontSize: 12.5,
-              padding: "7px 12px",
-              borderRadius: "var(--r-full)",
-              border: `1px solid ${payDay === d.code ? "var(--agree)" : "var(--border)"}`,
-              background: payDay === d.code ? "var(--agree-bg)" : "var(--surface-2)",
+              background: "var(--surface-2)",
+              borderRadius: "var(--r-sm)",
+              padding: "10px 12px",
+              minHeight: 42,
+              fontSize: 14,
             }}
-          >
-            {d.label}
-          </button>
-        ))}
-      </div>
+          />
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {PAY_DAYS.map((d) => (
+              <button
+                key={d.code}
+                type="button"
+                onClick={() => setPayDay(payDay === d.code ? "" : d.code)}
+                style={chip(payDay === d.code)}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          <p style={{ fontSize: 12, color: "var(--text-sub)", marginTop: 12 }}>回数</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {FREQUENCIES.map((f) => (
+              <button
+                key={f.code}
+                type="button"
+                onClick={() => setFrequency(frequency === f.code ? "" : f.code)}
+                style={chip(frequency === f.code)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          <p style={{ fontSize: 12, color: "var(--text-sub)", marginTop: 12 }}>曜日</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {DAYS_OF_WEEK.map((d) => (
+              <button
+                key={d.code}
+                type="button"
+                onClick={() => setDayOfWeek(dayOfWeek === d.code ? "" : d.code)}
+                style={chip(dayOfWeek === d.code)}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+
+          <p style={{ fontSize: 12, color: "var(--text-sub)", marginTop: 12 }}>第何週</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {WEEKS.map((w) => (
+              <button
+                key={w}
+                type="button"
+                onClick={() => setWeekOfMonth(weekOfMonth === w ? null : w)}
+                style={chip(weekOfMonth === w)}
+              >
+                第{w}週
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* ★自由記述にしない。
              書いた文は取次ぎの検査で必ず落ちるため、黙って消える経路になる。
@@ -142,7 +227,7 @@ export function RevisionRequestForm({
       <p style={{ fontSize: 11, lineHeight: 1.9, color: "var(--muted)", marginTop: 6 }}>
         {reason
           ? `お相手には「${reasonTextOf(reason)}」とだけ伝わります。`
-          : "選ばなくてもかまいません。金額や日付のほかは、何も伝わりません。"}
+          : "選ばなくてもかまいません。お変えになる項目のほかは、何も伝わりません。"}
       </p>
 
       <div className="mt-3 flex gap-2">

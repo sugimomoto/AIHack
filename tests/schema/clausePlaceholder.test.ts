@@ -61,12 +61,28 @@ describe("G-3｜条項ひな形とスキーマの整合", () => {
     }
   });
 
-  it("PUBLISHED のスキーマには対応するひな形がある", () => {
-    for (const s of schemas.filter((x) => x.status === "PUBLISHED")) {
+  /**
+   * ★条項になるのは合意のスキーマだけ。
+   *   取次ぎの抽出に使うスキーマ（RELAY_EXTRACTION）は条項にならない。
+   *   日常の連絡は合意を求めないが、**事実を構造化して渡すために**スキーマが要る。
+   */
+  it("PUBLISHED の合意スキーマには対応するひな形がある", () => {
+    for (const s of schemas.filter(
+      (x) => x.status === "PUBLISHED" && x.targetType === "AGREEMENT_TOPIC",
+    )) {
       expect(
         templates.some((t) => t.payloadSchemaId === s.id),
         `ひな形のないスキーマ: ${s.id}`,
       ).toBe(true);
+    }
+  });
+
+  // ★抽出用のスキーマを、合意の器と取り違えない
+  it("★取次ぎの抽出スキーマは、条項にも論点の enum にも紐づかない", () => {
+    const relay = schemas.filter((x) => x.targetType === "RELAY_EXTRACTION");
+    for (const s of relay) {
+      expect(templates.some((t) => t.payloadSchemaId === s.id)).toBe(false);
+      expect(AGREEMENT_TOPICS as readonly string[]).not.toContain(s.targetKey);
     }
   });
 });

@@ -22,14 +22,69 @@ describe("★構造化された提案から要約を組み立てる", () => {
   });
 
   /**
-   * ★ただし「起こりえない」わけではない。
-   *   本人が定型どおりの言い方で書けば、組み立て直した文とも一致しうる。
-   *   **だから safeSummary は、組み立て直したものにも同じ検査をかける。**
+   * ★金額・日付・時刻は、正しく伝えれば原文と一致して当たり前である。
+   *   組み立てた文**全体**を検査すると、事実を伝えること自体ができなくなる。
+   *   （実測：「10月8日の14時に小学校の体育館で開催されます」→ 何も渡らなかった）
    */
-  it("★定型どおりに書かれた原文とは一致しうる（検査を外さない理由）", () => {
+  it("★定型どおりの原文でも、金額と支払日は落とさない", () => {
     const raw = "養育費は月額40,000円、お支払いは毎月末日にしてほしいです";
-    const s = summaryFromPayload({ monthlyAmount: 40000, payDay: "LAST_DAY" })!;
-    expect(hasVerbatimRun(raw, s)).toBe(true);
+    expect(summaryFromPayload({ monthlyAmount: 40000, payDay: "LAST_DAY" }, raw)).toContain(
+      "40,000円",
+    );
+  });
+});
+
+describe("★お知らせ（日常の連絡）", () => {
+  it("日付・時刻・場所を助詞でつなぐ", () => {
+    expect(
+      summaryFromPayload({ date: "10月8日", time: "14時", place: "小学校の体育館", subject: "父母会" }),
+    ).toBe("10月8日14時に小学校の体育館で父母会とのことです。");
+  });
+
+  it("★「ご希望」と書かない（要求として誤解される）", () => {
+    const s = summaryFromPayload({ date: "10月8日", subject: "運動会" })!;
+    expect(s).not.toContain("ご希望");
+    expect(s).toContain("とのことです");
+  });
+
+  // ★書かれていない年を足すと、事実を作ることになる
+  it("★抽出が ISO で返しても、年を出さない", () => {
+    expect(summaryFromPayload({ date: "2023-10-08", subject: "父母会" })).toBe(
+      "10月8日に父母会とのことです。",
+    );
+  });
+
+  it("★「未記載」を事実として渡さない", () => {
+    expect(summaryFromPayload({ date: "今朝", time: "未記載", subject: "発熱" })).toBe(
+      "今朝に発熱とのことです。",
+    );
+  });
+
+  // ★自由記述からは原文の言い回しを越えさせる余地がある
+  it("★できごと・場所が原文と逐語一致したら、その項目を落とす", () => {
+    const raw = "あの人のせいで子どもがひどく体調を崩したんですけど";
+    const s = summaryFromPayload({ date: "今朝", subject: "あの人のせいで子どもがひどく体調を崩した" }, raw);
+    expect(s).not.toContain("あの人のせいで");
+  });
+
+  // ★読み取れない数字の塊を日付として出すと、
+  //   PII 除去が年収と誤認して〔伏せています〕に化ける（実測）
+  it("★読み取れない数字の塊を日付として出さない", () => {
+    expect(summaryFromPayload({ date: "20261205", subject: "発表会" })).toBe(
+      "発表会とのことです。",
+    );
+  });
+
+  it("いろいろな日付の書き方を月日に直す", () => {
+    for (const d of ["2026-12-05", "2026/12/05", "2026年12月5日", "12/5"]) {
+      expect(summaryFromPayload({ date: d, subject: "発表会" })).toBe(
+        "12月5日に発表会とのことです。",
+      );
+    }
+  });
+
+  it("日付だけでも文になる", () => {
+    expect(summaryFromPayload({ date: "10月8日" })).toBe("10月8日に予定があるとのことです。");
   });
 
   // ★G-3b と同じ規律

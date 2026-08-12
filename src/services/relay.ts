@@ -111,9 +111,11 @@ function safeSummary(
   const s = summary.trim();
   if (s && !hasVerbatimRun(raw, s)) return s;
 
-  const fromPayload = summaryFromPayload(payload);
-  // ★組み立て直したものにも同じ検査をかける（値がそのまま原文に出ていることがある）
-  if (fromPayload && !hasVerbatimRun(raw, fromPayload)) return fromPayload;
+  // ★検査は自由記述の項目だけにかける（summaryFromPayload の中で行う）。
+  //   組み立てた文全体を検査すると、日付や場所を正しく伝えるほど落ちてしまい、
+  //   **事実を伝えること自体ができなくなる。**
+  const fromPayload = summaryFromPayload(payload, raw);
+  if (fromPayload) return fromPayload;
 
   return "ご相談が来ています。";
 }

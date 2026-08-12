@@ -18,6 +18,11 @@ export const INTENTS = [
   "ACCEPT",
   "REJECT",
   "EMOTIONAL_EXPRESSION",
+  // ★お子さんのことを相手に知らせる意図。
+  //   これが無かったため、「体調を伝える」「学校からの連絡を共有する」
+  //   「写真・成長を共有する」が**一度も相手に届いていなかった。**
+  //   要求でも提案でもないが、**共有こそが目的**の発言である。
+  "INFO_SHARING",
   "INFO_QUERY",
   "REVISION_REQUEST",
   "OUT_OF_SCOPE",
@@ -47,7 +52,17 @@ export function isEmotional(intents: readonly Intent[]): boolean {
  * ★感情表現だけでは起こさない。**受け止めて終わる。**
  *   ここが true になると、感情が相手へ向かう経路が開く。
  */
-const RELAY_INTENTS: readonly Intent[] = ["REQUEST", "PROPOSAL", "ACCEPT", "REJECT", "REVISION_REQUEST"];
+const RELAY_INTENTS: readonly Intent[] = [
+  "REQUEST",
+  "PROPOSAL",
+  "ACCEPT",
+  "REJECT",
+  "REVISION_REQUEST",
+  // ★共有は、届かなければ意味が無い。
+  //   日常連絡（L3）は合意を求めないが、**取次ぎは起きる。**
+  //   合意を求めないことと、相手に届かないことは別である。
+  "INFO_SHARING",
+];
 
 export function needsRelay(intents: readonly Intent[]): boolean {
   return intents.some((i) => RELAY_INTENTS.includes(i));

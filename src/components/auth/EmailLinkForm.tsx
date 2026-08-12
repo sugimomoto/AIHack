@@ -44,7 +44,10 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
 
       // ★リンクを別のブラウザで開くと、送信時に保存したアドレスが無い。
       //   その場合は入力していただく（Firebase の仕様上、照合に必要）。
+      // ★確認用リンクは e2eEmail を載せている。手動確認のたびに入力させない
+      const fromQuery = new URLSearchParams(window.location.search).get("e2eEmail");
       const saved =
+        fromQuery ||
         window.localStorage.getItem(KEY) ||
         window.prompt("確認のため、リンクをお送りしたメールアドレスをご入力ください") ||
         "";

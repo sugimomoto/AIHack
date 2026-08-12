@@ -162,7 +162,29 @@ Next.js 16 / TypeScript / Tailwind CSS 4 / Firestore / Cloud Run（asia-northeas
 pnpm install && pnpm dev
 ```
 
-`pnpm test`（**497件**）／ `pnpm typecheck` ／ `pnpm lint` ／ `pnpm build`
+`pnpm test`（**505件**）／ `pnpm typecheck` ／ `pnpm lint` ／ `pnpm build`
+
+### E2E
+
+**メールを送らずに、メールリンク認証まで通して確認できます。**
+
+```bash
+pnpm e2e                                   # localhost に対して
+BASE_URL=https://… pnpm e2e                # 本番に対して
+```
+
+`generateSignInWithEmailLink` はリンクを**返すだけ**で送信しません。
+そこから `oobCode` を取り出して ID トークンに交換するため、**人手を介さずに確認できます。**
+
+ケース作成 → 招待 → 受諾 → 対話 → **C1の検証** → メール登録 → 別端末からの復帰 → 合意 → 原価まで。
+
+### 手動確認用のサインインリンク
+
+```bash
+pnpm test-links                            # 両当事者ぶんのリンクを作る
+```
+
+**それぞれ別のブラウザで開くだけ**で、両方の親としてログインできます。メールは送られません。
 
 ### 開発の進め方
 

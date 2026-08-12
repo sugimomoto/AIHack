@@ -8,10 +8,17 @@ export async function POST(req: Request, ctx: { params: Promise<{ caseId: string
   const { caseId } = await ctx.params;
   try {
     const partyId = await resolveParty(req);
-    const { text, effect } = (await req.json()) as { text?: string; effect?: string };
+    const { text, effect, scenarioId, title } = (await req.json()) as {
+      text?: string;
+      effect?: string;
+      scenarioId?: string;
+      title?: string;
+    };
     if (!text?.trim()) return NextResponse.json({ error: "内容を入力してください" }, { status: 400 });
 
-    return NextResponse.json(await postMessage({ caseId, partyId, text, effect }));
+    return NextResponse.json(
+      await postMessage({ caseId, partyId, text, effect, scenarioId, title }),
+    );
   } catch (e) {
     return errorResponse(e);
   }

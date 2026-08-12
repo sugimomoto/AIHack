@@ -199,11 +199,37 @@ export async function ensureConsultation(
   caseId: CaseId,
   consultationId: ConsultationId,
   partyId: PartyId,
+  meta?: { scenarioId?: string | null; title?: string | null },
 ): Promise<void> {
-  await caseRef(caseId)
-    .collection("consultations")
-    .doc(consultationId)
-    .set({ partyId, updatedAt: new Date().toISOString() }, { merge: true });
+  const patch: Record<string, unknown> = { partyId, updatedAt: new Date().toISOString() };
+  // ★題は最初に立てたときだけ入れる。あとから上書きして消さない
+  if (meta?.scenarioId) patch.scenarioId = meta.scenarioId;
+  if (meta?.title) patch.title = meta.title;
+  await caseRef(caseId).collection("consultations").doc(consultationId).set(patch, { merge: true });
+}
+
+/**
+ * 相談の一覧（K-1）
+ *
+ * ★自分の相談だけ。**未読の印も件数バッジも持たない。**
+ * ★並び順は更新の新しい順。上から片づけるものに見せない。
+ */
+export async function listConsultations(
+  caseId: CaseId,
+  partyId: PartyId,
+): Promise<
+  { id: string; title: string | null; scenarioId: string | null; status: string; updatedAt: string }[]
+> {
+  const snap = await caseRef(caseId).collection("consultations").where("partyId", "==", partyId).get();
+  return snap.docs
+    .map((d) => ({
+      id: d.id,
+      title: (d.get("title") ?? null) as string | null,
+      scenarioId: (d.get("scenarioId") ?? null) as string | null,
+      status: (d.get("status") ?? "OPEN") as string,
+      updatedAt: (d.get("updatedAt") ?? "") as string,
+    }))
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 /**

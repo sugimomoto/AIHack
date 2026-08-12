@@ -12,6 +12,7 @@ import {
 } from "@/infra-adapters/firestore/repositories/caseRepository";
 import { assertOwnParty, scopedInbound, scopedMessages } from "@/domain/case/scope";
 import { parseEffect } from "@/domain/adjustment/flow";
+import { consultationIdFor } from "@/domain/consultation/identity";
 import { requiresAgreement } from "@/domain/topic/level";
 import { detectSafetyFlags, needsHumanReview, toSafetyEvent } from "@/domain/safety/detect";
 
@@ -67,15 +68,25 @@ export async function postMessage(input: {
   text: string;
   /** ★「今回だけ」「今後も」の選択。判定できないうちは未指定 */
   effect?: string | null;
+  /** ★どの相談か。未指定なら既定の相談（K-1） */
+  scenarioId?: string | null;
+  title?: string | null;
 }): Promise<TurnResult> {
   const caseId = asCaseId(input.caseId);
   // ★当事者であることを先に確かめる（A-1）
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
 
-  // ★相談は当事者ごとに分かれている。セッションが跨がらない構造そのもの
-  const consultationId = asConsultationId(`cons_${input.partyId}`);
-  await ensureConsultation(caseId, consultationId, input.partyId);
+  // ★相談は当事者ごとに分かれている。セッションが跨がらない構造そのもの。
+  //   さらにシナリオごとに分かれる（K-1）。**提案は topic で引かれるため、
+  //   相談が増えても合意の判定は壊れない。**
+  const consultationId = asConsultationId(
+    consultationIdFor(input.partyId, input.scenarioId),
+  );
+  await ensureConsultation(caseId, consultationId, input.partyId, {
+    scenarioId: input.scenarioId ?? null,
+    title: input.title ?? null,
+  });
   await appendMessage(caseId, consultationId, {
     partyId: input.partyId,
     role: "USER",
@@ -187,12 +198,18 @@ async function relayIfNeeded(input: {
  * ★自分のメッセージと、自分宛の取次ぎだけを返す。
  *   相手の原文へ到達する経路が、この関数にも存在しない。
  */
-export async function loadView(input: { caseId: string; partyId: PartyId }) {
+export async function loadView(input: {
+  caseId: string;
+  partyId: PartyId;
+  scenarioId?: string | null;
+}) {
   const caseId = asCaseId(input.caseId);
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
 
-  const consultationId = asConsultationId(`cons_${input.partyId}`);
+  const consultationId = asConsultationId(
+    consultationIdFor(input.partyId, input.scenarioId),
+  );
   return {
     messages: scopedMessages(snap, consultationId, input.partyId).map((m) => ({
       role: m.role,

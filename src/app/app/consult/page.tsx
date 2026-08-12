@@ -1,21 +1,17 @@
 import { redirect } from "next/navigation";
 import { readSession } from "@/lib/session";
-import { CaseChat } from "@/components/chat/CaseChat";
-import { RevisionSheet } from "@/components/agreement/RevisionSheet";
+import { ConsultList } from "@/components/consult/ConsultList";
 
-/** 相談。★「対話」より一人称的で、相手と話す含みがない */
+/**
+ * K-1 相談の一覧
+ *
+ * ★相談タブは対話に直行しない。**一覧に着地する。**
+ *   「養育費」「面会の日程」「塾の費用」が同時に進む。
+ */
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const s = await readSession();
   if (!s) redirect("/");
-  return (
-    <>
-      <div className="flex min-h-0 flex-1 flex-col">
-        <CaseChat caseId={s.caseId} partyId={s.partyId} label="相談" />
-      </div>
-      {/* ★K-6：相手が変更を申し出ていれば、まずこれに答える */}
-      <RevisionSheet caseId={s.caseId} partyId={s.partyId} />
-    </>
-  );
+  return <ConsultList caseId={s.caseId} partyId={s.partyId} />;
 }

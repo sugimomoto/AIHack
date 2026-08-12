@@ -114,6 +114,16 @@ export async function listScenarios(): Promise<Scenario[]> {
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 }
 
+export type TopicCategory = { id: string; name: string; sortOrder?: number };
+
+/** 相談の分類。★取得の失敗で止めない（選ばなくても始められる） */
+export async function listTopicCategories(): Promise<TopicCategory[]> {
+  const snap = await getDb().collection("masters/topicCategories/items").get();
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as TopicCategory)
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+}
+
 export type SupportResource = {
   id: string;
   name: string;

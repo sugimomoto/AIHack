@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { OwnMessage } from "./OwnMessage";
 import { AiMessage } from "./AiMessage";
 import { RelayMessage } from "./RelayMessage";
@@ -32,12 +33,18 @@ export function CaseChat({
   label,
   onChanged,
   reloadKey,
+  scenarioId = null,
+  backHref,
 }: {
   caseId: string;
   partyId: string;
   label: string;
   onChanged?: () => void;
   reloadKey?: number;
+  /** ★どの相談か。未指定なら既定の相談（K-1） */
+  scenarioId?: string | null;
+  /** ★一覧に戻る導線。タブへ戻らせない（K-2） */
+  backHref?: string;
 }) {
   const [view, setView] = useState<View>({ messages: [], inbound: [] });
   const [text, setText] = useState("");
@@ -57,9 +64,10 @@ export function CaseChat({
   );
 
   const fetchView = useCallback(async (): Promise<View | null> => {
-    const res = await fetch(`/api/cases/${caseId}/view`, { headers: headers(), cache: "no-store" });
+    const q = scenarioId ? `?scenarioId=${encodeURIComponent(scenarioId)}` : "";
+    const res = await fetch(`/api/cases/${caseId}/view${q}`, { headers: headers(), cache: "no-store" });
     return res.ok ? ((await res.json()) as View) : null;
-  }, [caseId, headers]);
+  }, [caseId, headers, scenarioId]);
 
   const reload = useCallback(async () => {
     const v = await fetchView();
@@ -88,7 +96,7 @@ export function CaseChat({
       const res = await fetch(`/api/cases/${caseId}/messages`, {
         method: "POST",
         headers: headers(),
-        body: JSON.stringify({ text: body || "（選択）", effect }),
+        body: JSON.stringify({ text: body || "（選択）", effect, scenarioId, title: label }),
       });
       // ★C3：合意を参照して立てられた問い
       const d = res.ok ? ((await res.json()) as { effectQuestion?: string | null }) : null;
@@ -110,7 +118,15 @@ export function CaseChat({
         className="flex shrink-0 items-center justify-between px-4"
         style={{ minHeight: 48, borderBottom: "1px solid var(--border-subtle)" }}
       >
-        <span style={{ fontSize: 14.5, fontWeight: 600 }}>{label}</span>
+        <span className="flex items-center gap-2" style={{ fontSize: 14.5, fontWeight: 600 }}>
+          {/* ★別の相談へ移るために、いちいちタブへ戻らせない（K-2） */}
+          {backHref && (
+            <Link href={backHref} aria-label="相談の一覧へ" style={{ color: "var(--text-sub)" }}>
+              ‹
+            </Link>
+          )}
+          {label}
+        </span>
         {/* ★内部の識別子を画面に出さない。
              開発中の確認用に出していたものが、そのまま本番の画面に残っていた。 */}
         {process.env.NODE_ENV !== "production" && (

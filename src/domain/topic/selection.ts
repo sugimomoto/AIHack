@@ -12,6 +12,8 @@ export type Scenario = {
   id: string;
   title: string;
   kind: string;
+  /** ★4つの分類。相談の開始で束ねるために使う（設計 #4） */
+  categoryId?: string | null;
   linkedTopic: string | null;
   promptHint?: string;
   sortOrder?: number;

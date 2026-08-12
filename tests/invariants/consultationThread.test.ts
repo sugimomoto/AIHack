@@ -6,6 +6,7 @@ import {
   ownsConsultationId,
   parseThreadId,
   threadIdFor,
+  threadIdOfConsultation,
 } from "@/domain/consultation/thread";
 
 /**
@@ -65,8 +66,8 @@ describe("★スレッドは双方で同じ", () => {
   // ★これが揃わないと、取次ぎが相手側の別のスレッドに落ちる
   it("同じスレッドIDから、それぞれの相談IDが決まる", () => {
     const th = threadIdFor({ scenarioId: "sc_014", kind: "ADJUSTMENT", token: "abcd" });
-    expect(consultationIdOf("party_a", th)).toBe(`cons_party_a_${th}`);
-    expect(consultationIdOf("party_b", th)).toBe(`cons_party_b_${th}`);
+    expect(consultationIdOf("party_a", th)).toBe("cons_party_a_sc_014_abcd");
+    expect(consultationIdOf("party_b", th)).toBe("cons_party_b_sc_014_abcd");
   });
 
   // ★ここを変えると、過去に書いたものが読めなくなる
@@ -75,18 +76,46 @@ describe("★スレッドは双方で同じ", () => {
   });
 });
 
+/**
+ * ★スレッドを入れる前の相談は `cons_{partyId}_{scenarioId}` という名前だった。
+ *   ここが繋がらないと、**過去に書いたものに到達する URL が無くなる。**
+ *   （実測：デプロイ後、sc_009 の会話が開けなくなった）
+ */
+describe("★スレッドを入れる前の相談に、いまも到達できる", () => {
+  it("th_{シナリオ} は、これまでの相談IDを指す", () => {
+    expect(consultationIdOf("party_a", "th_sc_009")).toBe("cons_party_a_sc_009");
+  });
+
+  it("★古い相談IDから、開くための鍵を復元できる", () => {
+    expect(threadIdOfConsultation("cons_party_a_sc_009", "party_a")).toBe("th_sc_009");
+    expect(threadIdOfConsultation("cons_party_a", "party_a")).toBe(DEFAULT_THREAD_ID);
+  });
+
+  it("新しい形の相談IDでも、そのまま復元できる", () => {
+    const th = threadIdFor({ scenarioId: "sc_014", kind: "ADJUSTMENT", token: "abcd" });
+    const id = consultationIdOf("party_a", th);
+    expect(consultationIdOf("party_a", threadIdOfConsultation(id, "party_a"))).toBe(id);
+  });
+
+  it("★他人の相談IDからは復元しない", () => {
+    expect(threadIdOfConsultation("cons_party_b_sc_009", "party_a")).toBe(DEFAULT_THREAD_ID);
+  });
+});
+
 describe("★他人の相談を開かせない", () => {
   it("自分のものだけ真", () => {
     expect(ownsConsultationId("cons_party_a", "party_a")).toBe(true);
-    expect(ownsConsultationId("cons_party_a_th_sc_014_abcd", "party_a")).toBe(true);
+    expect(ownsConsultationId("cons_party_a_sc_014_abcd", "party_a")).toBe(true);
+    expect(ownsConsultationId("cons_party_a_sc_009", "party_a")).toBe(true);
   });
 
   it("★他人のものは偽", () => {
-    expect(ownsConsultationId("cons_party_b_th_sc_014_abcd", "party_a")).toBe(false);
+    expect(ownsConsultationId("cons_party_b_sc_014_abcd", "party_a")).toBe(false);
   });
 
+  // ★party_a と party_abc を取り違えない
   it("★接頭辞が一致するだけの別人を通さない", () => {
     expect(ownsConsultationId("cons_party_abc", "party_a")).toBe(false);
-    expect(ownsConsultationId("cons_party_abc_th_x", "party_a")).toBe(false);
+    expect(threadIdOfConsultation("cons_party_abc", "party_a")).toBe(DEFAULT_THREAD_ID);
   });
 });

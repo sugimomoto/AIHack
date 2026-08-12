@@ -53,16 +53,34 @@ export function parseThreadId(v: string | null | undefined): string {
 /**
  * その人の、そのスレッドの相談ID。
  *
- * ★既定のスレッドだけは、これまでのIDを保つ。
- *   ここを変えると**過去に書いたものが読めなくなる。**
+ * ★接頭辞 `th_` を外して組み立てる。
+ *   スレッドを入れる前の相談は `cons_{partyId}_{scenarioId}` という名前で、
+ *   **そのままでは到達する URL が無くなる。**
+ *   `th_{scenarioId}` → `cons_{partyId}_{scenarioId}` と対応させることで、
+ *   過去に書いたものがそのまま開ける。
+ *
+ * ★既定のスレッドも、これまでのIDを保つ。
  */
 export function consultationIdOf(partyId: string, threadId: string): string {
-  return threadId === DEFAULT_THREAD_ID ? `cons_${partyId}` : `cons_${partyId}_${threadId}`;
+  if (threadId === DEFAULT_THREAD_ID) return `cons_${partyId}`;
+  return `cons_${partyId}_${threadId.replace(/^th_/, "")}`;
+}
+
+/**
+ * 相談IDから、そのスレッドIDを復元する。
+ *
+ * ★スレッドを持たない古い相談に、開くための鍵を与える。
+ */
+export function threadIdOfConsultation(consultationId: string, partyId: string): string {
+  const prefix = `cons_${partyId}_`;
+  if (!consultationId.startsWith(prefix)) return DEFAULT_THREAD_ID;
+  const rest = consultationId.slice(prefix.length);
+  return rest ? (rest.startsWith("th_") ? rest : `th_${rest}`) : DEFAULT_THREAD_ID;
 }
 
 /** その相談IDが、その人のものか。★他人の相談を開かせない */
 export function ownsConsultationId(consultationId: string, partyId: string): boolean {
-  return consultationId === `cons_${partyId}` || consultationId.startsWith(`cons_${partyId}_th_`);
+  return consultationId === `cons_${partyId}` || consultationId.startsWith(`cons_${partyId}_`);
 }
 
 /** 既定の相談（トピックを選ばずに書き始めた人のもの） */

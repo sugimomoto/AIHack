@@ -3,7 +3,7 @@ import { resolveParty } from "@/lib/resolveParty";
 import { errorResponse } from "../messages/route";
 import { asCaseId } from "@/domain/case/types";
 import { assertOwnParty, scopedInbound } from "@/domain/case/scope";
-import { DEFAULT_TITLE } from "@/domain/consultation/thread";
+import { DEFAULT_TITLE, threadIdOfConsultation } from "@/domain/consultation/thread";
 import {
   listConsultations,
   loadForLlm,
@@ -27,7 +27,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ caseId: string 
       items: rows.map((r) => ({
         ...r,
         title: r.title ?? DEFAULT_TITLE,
-        // ★シナリオID から復元できるようにしておく（題は立てたときだけ書く）
+        // ★スレッドを持たない古い相談にも、開くための鍵を与える
+        threadId: r.threadId ?? threadIdOfConsultation(r.id, partyId),
       })),
       // ★届いているご相談。相手の言葉ではない
       inbound: scopedInbound(snap, partyId),

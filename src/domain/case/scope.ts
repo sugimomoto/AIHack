@@ -66,12 +66,14 @@ export function scopedInbound(
  * ★相談を指定しない呼び出し（一覧）では全件を返す。
  */
 function matchesScenario(
-  e: { threadId?: string | null },
+  e: { threadId?: string | null; scenarioId?: string | null },
   threadId: string | null | undefined,
 ): boolean {
   if (threadId === undefined) return true;
-  // ★スレッドを持たない古い取次ぎは、既定のスレッドに置く
-  return (e.threadId ?? "th_default") === (threadId || "th_default");
+  // ★スレッドを持たない古い取次ぎは、シナリオから寄せる。
+  //   そうしないと、過去の取次ぎが全部まとめて既定のスレッドに出る。
+  const of = e.threadId ?? (e.scenarioId ? `th_${e.scenarioId}` : "th_default");
+  return of === (threadId || "th_default");
 }
 
 /**

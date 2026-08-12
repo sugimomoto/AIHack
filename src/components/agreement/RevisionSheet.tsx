@@ -104,8 +104,7 @@ export function RevisionSheet({
             alt=""
             width={30}
             height={30}
-            style={{ flexShrink: 0 }}
-          />
+            style={{ width: 30, height: 30, flexShrink: 0 }} />
           <div className="min-w-0">
             <p style={{ fontSize: 13.5, lineHeight: 1.95 }}>
               {TOPIC_LABEL[topic] ?? "取り決め"}の取り決めを、変えたいというご相談です。

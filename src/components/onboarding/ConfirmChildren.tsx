@@ -189,8 +189,7 @@ export function ConfirmChildren({
           alt=""
           width={28}
           height={28}
-          style={{ flexShrink: 0 }}
-        />
+          style={{ width: 28, height: 28, flexShrink: 0 }} />
         <div>
           <p style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.8 }}>
             うかがうのは、ここまでです。

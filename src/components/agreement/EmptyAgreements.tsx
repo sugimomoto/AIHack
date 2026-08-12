@@ -36,8 +36,7 @@ export function EmptyAgreements() {
             width={40}
             height={40}
             className="rounded-full object-cover"
-            style={{ width: 40, height: 40, flexShrink: 0 }}
-          />
+            style={{ width: 40, height: 40, flexShrink: 0 }} />
           <div className="min-w-0">
             <p style={{ fontSize: 15, lineHeight: 1.8, fontWeight: 600 }}>
               {EMPTY_AGREEMENTS.lead}

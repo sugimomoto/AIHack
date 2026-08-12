@@ -58,7 +58,7 @@ export function InviteLanding({ view, token }: { view: InvitationPublicView; tok
           className="grid place-items-center overflow-hidden"
           style={{ width: 76, height: 76, borderRadius: 22, background: "var(--bubble-ai)" }}
         >
-          <Image src="/character/capybara-sit.png" alt="" width={62} height={62} />
+          <Image src="/character/capybara-sit.png" alt="" width={62} height={62} style={{ width: 62, height: 62, flexShrink: 0 }} />
         </div>
         <h1 style={{ fontSize: 20, lineHeight: 1.7, fontWeight: 600, marginTop: 16 }}>
           Aida は、おふたりのあいだに

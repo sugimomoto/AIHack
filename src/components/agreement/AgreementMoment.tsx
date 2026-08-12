@@ -38,8 +38,7 @@ export function AgreementMoment({
           alt=""
           width={26}
           height={26}
-          style={{ flexShrink: 0 }}
-        />
+          style={{ width: 26, height: 26, flexShrink: 0 }} />
         <p style={{ fontSize: 13.5, lineHeight: 1.95 }}>{MOMENT_LEAD}</p>
       </div>
 
@@ -72,8 +71,7 @@ export function AgreementMoment({
           alt=""
           width={26}
           height={26}
-          style={{ flexShrink: 0 }}
-        />
+          style={{ width: 26, height: 26, flexShrink: 0 }} />
         <p style={{ fontSize: 13, lineHeight: 1.95, color: "var(--text-sub)" }}>
           {momentFollowUp(topic)}
         </p>

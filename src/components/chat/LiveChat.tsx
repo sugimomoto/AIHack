@@ -92,7 +92,7 @@ export function LiveChat({ consultationId }: { consultationId: string }) {
         )}
         {busy && (
           <div className="flex items-center gap-[9px]">
-            <Image src="/character/capybara.png" alt="" width={28} height={28} />
+            <Image src="/character/capybara.png" alt="" width={28} height={28} style={{ width: 28, height: 28, flexShrink: 0 }} />
             <span style={{ fontSize: 13, color: "var(--text-sub)" }}>考えています…</span>
           </div>
         )}

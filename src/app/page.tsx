@@ -40,7 +40,7 @@ export default function Page() {
             className="grid place-items-center overflow-hidden"
             style={{ width: 76, height: 76, borderRadius: 22, background: "var(--bubble-ai)" }}
           >
-            <Image src="/character/capybara-sit.png" alt="" width={62} height={62} priority />
+            <Image src="/character/capybara-sit.png" alt="" width={62} height={62} priority style={{ width: 62, height: 62, flexShrink: 0 }} />
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.6, marginTop: 16 }}>Aida（あいだ）</h1>
           <p style={{ fontSize: 14.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}>

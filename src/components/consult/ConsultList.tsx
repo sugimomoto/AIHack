@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { RELAY_PROMISE, RELAY_PROMISE_RELAX } from "@/domain/ui/emptyState";
 import {
   CONSULT_NO_HURRY,
   CONSULT_STATE_LABEL,
@@ -108,10 +109,15 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-6">
       <h1 style={{ fontSize: 18, fontWeight: 600 }}>相談</h1>
-      {/* ★上から片づけるものに見せない */}
-      <p style={{ fontSize: 12.5, color: "var(--text-sub)", marginTop: 6 }}>
-        どれから話しても、順番はありません。
-      </p>
+      {/* ★上から片づけるものに見せない。
+             ただし「どれから話しても、順番はありません。」は抽象的で伝わらなかった。
+             何をしてよいのかを言う形にする。
+             1件しか無いときは順番の話にならないので、出さない。 */}
+      {open.length > 1 && (
+        <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 6 }}>
+          気になるものから開いてください。順に片づける必要はありません。
+        </p>
+      )}
 
       {/* ★別のことを相談する。相談が増えても、新しく始めにくくならないよう上に置く */}
       <Link
@@ -125,8 +131,7 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
           width={30}
           height={30}
           className="rounded-full object-cover"
-          style={{ width: 30, height: 30, flexShrink: 0 }}
-        />
+          style={{ width: 30, height: 30, flexShrink: 0 }} />
         <span style={{ fontSize: 14.5, flex: 1 }}>別のことを相談する</span>
         <span style={{ color: "var(--text-sub)" }}>▸</span>
       </Link>
@@ -202,8 +207,7 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
               width={40}
               height={40}
               className="rounded-full object-cover"
-              style={{ width: 40, height: 40, flexShrink: 0 }}
-            />
+              style={{ width: 40, height: 40, flexShrink: 0 }} />
             <div className="min-w-0">
               <p style={{ fontSize: 15, lineHeight: 1.8 }}>
                 思っていることから、書いていただけます。
@@ -211,7 +215,8 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
               <p
                 style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}
               >
-                ここに書いたことは、お相手には届きません。整えなくても、まとまっていなくてもかまいません。
+                {RELAY_PROMISE}
+                {RELAY_PROMISE_RELAX}
               </p>
             </div>
           </div>

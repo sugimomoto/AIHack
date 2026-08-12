@@ -77,7 +77,7 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8">
         {/* AI の一言 */}
         <div className="flex items-start gap-2.5 pt-4">
-          <Image src="/character/capybara.png" alt="" width={28} height={28} className="mt-0.5 shrink-0" />
+          <Image src="/character/capybara.png" alt="" width={28} height={28} className="mt-0.5 shrink-0" style={{ width: 28, height: 28, flexShrink: 0 }} />
           <div
             style={{
               background: "var(--bubble-ai)",

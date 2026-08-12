@@ -42,8 +42,7 @@ export default async function Page() {
           alt=""
           width={28}
           height={28}
-          style={{ flexShrink: 0 }}
-        />
+          style={{ width: 28, height: 28, flexShrink: 0 }} />
         <div>
           <p style={{ fontSize: 13, lineHeight: 1.95 }}>
             直すと、お相手には「変更がありました」とだけ伝わります。

@@ -28,8 +28,7 @@ export function InviteCard() {
           alt=""
           width={28}
           height={28}
-          style={{ flexShrink: 0 }}
-        />
+          style={{ width: 28, height: 28, flexShrink: 0 }} />
         <div className="min-w-0">
           <p style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.8 }}>
             お相手にも使っていただくとき

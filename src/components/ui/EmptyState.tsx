@@ -87,6 +87,9 @@ export function EmptyConsult() {
         <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}>
           {EMPTY_CONSULT.promise}
         </p>
+        <p style={{ fontSize: 12, lineHeight: 1.95, color: "var(--text-sub-2)", marginTop: 4 }}>
+          {EMPTY_CONSULT.relax}
+        </p>
       </DashedCard>
     </div>
   );

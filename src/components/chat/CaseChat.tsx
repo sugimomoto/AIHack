@@ -9,6 +9,7 @@ import { RelayMessage } from "./RelayMessage";
 import { RelaySent } from "./RelaySent";
 import { TopicSheet } from "@/components/topic/TopicSheet";
 import { EmptyConsult } from "@/components/ui/EmptyState";
+import { RELAY_PROMISE, RELAY_PROMISE_RELAX } from "@/domain/ui/emptyState";
 import { SupportLink } from "@/components/safety/SupportLink";
 
 /**
@@ -160,8 +161,7 @@ export function CaseChat({
                   alt=""
                   width={26}
                   height={26}
-                  style={{ flexShrink: 0 }}
-                />
+                  style={{ width: 26, height: 26, flexShrink: 0 }} />
                 <div className="min-w-0">
                   <p style={{ fontSize: 13.5, lineHeight: 1.95 }}>{opening}</p>
                   <p
@@ -172,7 +172,8 @@ export function CaseChat({
                       marginTop: 6,
                     }}
                   >
-                    ここに書いたことは、お相手には届きません。整えなくても、まとまっていなくてもかまいません。
+                    {RELAY_PROMISE}
+                    {RELAY_PROMISE_RELAX}
                   </p>
                 </div>
               </div>
@@ -285,7 +286,7 @@ export function CaseChat({
 
         {busy && (
           <div className="flex items-center gap-[9px]">
-            <Image src="/character/capybara.png" alt="" width={24} height={24} />
+            <Image src="/character/capybara.png" alt="" width={24} height={24} style={{ width: 24, height: 24, flexShrink: 0 }} />
             <span style={{ fontSize: 12.5, color: "var(--text-sub)" }}>考えています…</span>
           </div>
         )}

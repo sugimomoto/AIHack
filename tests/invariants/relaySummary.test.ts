@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { summaryFromPayload } from "@/domain/relay/summary";
 import { hasVerbatimRun } from "@/domain/relay/guard";
+import { RELAY_PROMISE, RELAY_PROMISE_SHORT } from "@/domain/ui/emptyState";
 
 /**
  * ★短く素直に書いた発言ほど、要約が原文と逐語一致して落ちる。
@@ -106,5 +107,36 @@ describe("★お知らせ（日常の連絡）", () => {
     expect(summaryFromPayload({ frequency: "MONTHLY_1", dayOfWeek: "SAT" })).toBe(
       "月1回、土曜日をご希望とのことです。",
     );
+  });
+});
+
+/**
+ * ★「お相手には届きません」だけでは、説明が足りない。
+ *   これだけを読むと「何も伝わらない」と受け取れるが、
+ *   実際には必要なことが整えた形で渡っている。
+ *   **約束と実際の動きが食い違うと、届いたときに驚かせる。**
+ */
+describe("★約束の言い方", () => {
+  it("そのままは渡らない、と言い切る", () => {
+    expect(RELAY_PROMISE).toContain("そのまま");
+  });
+
+  // ★これが無いと「何も伝わらない」と読める
+  it("★整えて伝えることまで書く", () => {
+    expect(RELAY_PROMISE).toContain("整えて");
+    expect(RELAY_PROMISE).toContain("お伝えします");
+  });
+
+  it("★短い形も同じことを言う（発言の直下）", () => {
+    expect(RELAY_PROMISE_SHORT).toContain("そのまま");
+    expect(RELAY_PROMISE_SHORT).toContain("整えて");
+  });
+
+  // ★直後に「お相手には、こう伝わりました」が並ぶ。言い切ると矛盾する
+  it("★「何も届きません」と言い切らない", () => {
+    for (const t of [RELAY_PROMISE, RELAY_PROMISE_SHORT]) {
+      expect(t).not.toMatch(/^お相手には届きません/);
+      expect(t).not.toContain("何も届きません");
+    }
   });
 });

@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { readSession } from "@/lib/session";
 import { CaseChat } from "@/components/chat/CaseChat";
 import { RevisionSheet } from "@/components/agreement/RevisionSheet";
-import { scenarioTitle } from "@/services/scenarioTitle";
+import { scenarioTitle, scenarioOutcomes } from "@/services/scenarioTitle";
+import { OutcomeCard } from "@/components/consult/OutcomeCard";
 
 /** K-2 対話 */
 export const dynamic = "force-dynamic";
@@ -15,10 +16,15 @@ export default async function Page({
   const session = await readSession();
   if (!session) redirect("/");
   const { s } = await searchParams;
-  const title = await scenarioTitle(s ?? null);
+  const [title, outcomes] = await Promise.all([
+    scenarioTitle(s ?? null),
+    scenarioOutcomes(s ?? null),
+  ]);
 
   return (
     <>
+      {/* ★何が決まるのか分からないまま書かせない */}
+      <OutcomeCard outcomes={outcomes} />
       <div className="flex min-h-0 flex-1 flex-col">
         <CaseChat
           caseId={session.caseId}

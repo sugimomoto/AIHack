@@ -6,6 +6,7 @@ import Link from "next/link";
 import { OwnMessage } from "./OwnMessage";
 import { AiMessage } from "./AiMessage";
 import { RelayMessage } from "./RelayMessage";
+import { RelaySent } from "./RelaySent";
 import { TopicSheet } from "@/components/topic/TopicSheet";
 import { EmptyConsult } from "@/components/ui/EmptyState";
 import { SupportLink } from "@/components/safety/SupportLink";
@@ -24,7 +25,9 @@ import { SupportLink } from "@/components/safety/SupportLink";
 
 type View = {
   messages: { role: "USER" | "AI"; content: string; createdAt: string }[];
-  inbound: { id: string; content: string }[];
+  inbound: { id: string; content: string; createdAt?: string }[];
+  /** ★自分が送ったものが、どう伝わったか */
+  outbound?: { id: string; content: string; createdAt?: string }[];
 };
 
 export function CaseChat({
@@ -46,7 +49,7 @@ export function CaseChat({
   /** ★一覧に戻る導線。タブへ戻らせない（K-2） */
   backHref?: string;
 }) {
-  const [view, setView] = useState<View>({ messages: [], inbound: [] });
+  const [view, setView] = useState<View>({ messages: [], inbound: [], outbound: [] });
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   // ★問いは「どの時点のものか」を持たせる。
@@ -139,18 +142,24 @@ export function CaseChat({
                「お相手には届きません」は、書いたあとではなく**書く前**に要る（L-1） */}
         {view.inbound.length === 0 && view.messages.length === 0 && <EmptyConsult />}
 
-        {/* ★自分宛の取次ぎ。相手の言葉ではないため封書として描く */}
-        {view.inbound.map((e) => {
-          // ★1行目が要約、2行目以降が背景（→ domain/relay/prompts.ts buildRelayText）
-          const [body, ...rest] = e.content.split("\n").filter(Boolean);
-          return <RelayMessage key={e.id} body={body} hearsay={rest.join("\n") || undefined} />;
-        })}
-
-        {view.messages.map((m, i) =>
-          m.role === "USER" ? (
-            <OwnMessage key={i} text={m.content} />
+        {/* ★3種を時系列で混ぜる。
+               「書いた → こう伝わった」が並んで初めて、
+               **AI を通すと何が起きるのかが分かる。** */}
+        {timeline(view).map((t) =>
+          t.kind === "INBOUND" ? (
+            // ★相手の言葉ではないため封書として描く
+            (() => {
+              const [body, ...rest] = t.content.split("\n").filter(Boolean);
+              return (
+                <RelayMessage key={t.key} body={body} hearsay={rest.join("\n") || undefined} />
+              );
+            })()
+          ) : t.kind === "OUTBOUND" ? (
+            <RelaySent key={t.key} text={t.content} />
+          ) : t.kind === "USER" ? (
+            <OwnMessage key={t.key} text={t.content} />
           ) : (
-            <AiMessage key={i} lines={m.content.split(/\n+/).filter(Boolean)} showMark />
+            <AiMessage key={t.key} lines={t.content.split(/\n+/).filter(Boolean)} showMark />
           ),
         )}
 
@@ -231,4 +240,38 @@ export function CaseChat({
       </div>
     </div>
   );
+}
+
+/**
+ * 発言・取次ぎを時系列に並べる。
+ *
+ * ★createdAt が無い古い記録は末尾に落とさず、その場の順を保つ。
+ */
+type Row = { key: string; kind: "USER" | "AI" | "INBOUND" | "OUTBOUND"; content: string; at: string };
+
+function timeline(v: View): Row[] {
+  const rows: Row[] = [
+    ...v.messages.map((m, i) => ({
+      key: `m${i}`,
+      kind: m.role as "USER" | "AI",
+      content: m.content,
+      at: m.createdAt ?? "",
+    })),
+    ...v.inbound.map((e) => ({
+      key: `i${e.id}`,
+      kind: "INBOUND" as const,
+      content: e.content,
+      at: e.createdAt ?? "",
+    })),
+    ...(v.outbound ?? []).map((e) => ({
+      key: `o${e.id}`,
+      kind: "OUTBOUND" as const,
+      content: e.content,
+      at: e.createdAt ?? "",
+    })),
+  ];
+  return rows
+    .map((r, i) => ({ r, i }))
+    .sort((a, b) => (a.r.at === b.r.at ? a.i - b.i : a.r.at.localeCompare(b.r.at)))
+    .map((x) => x.r);
 }

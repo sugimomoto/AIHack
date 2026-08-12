@@ -51,10 +51,45 @@ export function scopedMessages(
 export function scopedInbound(
   snap: CaseSnapshot,
   partyId: PartyId,
-): { id: string; content: string }[] {
+  /** ★相談ごとに分ける。指定しなければ全件（一覧・件数用） */
+  scenarioId?: string | null | undefined,
+): { id: string; content: string; createdAt: string }[] {
   return snap.mediationEvents
-    .filter((e) => e.toPartyId === partyId)
-    .map((e) => ({ id: e.id, content: e.content }));
+    .filter((e) => e.toPartyId === partyId && matchesScenario(e, scenarioId))
+    .map((e) => ({ id: e.id, content: e.content, createdAt: e.createdAt ?? "" }));
+}
+
+/**
+ * ★取次ぎは、出てきた相談と同じ相談に並べる。
+ *   絞らないと、**どの相談を開いても全部の取次ぎが出る。**
+ *
+ * ★相談を指定しない呼び出し（一覧）では全件を返す。
+ */
+function matchesScenario(
+  e: { scenarioId?: string | null },
+  scenarioId: string | null | undefined,
+): boolean {
+  if (scenarioId === undefined) return true;
+  return (e.scenarioId ?? null) === (scenarioId || null);
+}
+
+/**
+ * 自分が送った取次ぎ。
+ *
+ * ★「書いた言葉は届きません」だけを見せて、**何が届いたのかを見せていなかった。**
+ *   否定の約束しか見えないと、AI を通すと何が起きるのか分からないままになる。
+ *
+ * ★これは相手の情報ではない。**自分の言葉が変換された結果**であり、
+ *   本人に見せても越境にはならない。
+ */
+export function scopedOutbound(
+  snap: CaseSnapshot,
+  partyId: PartyId,
+  scenarioId?: string | null | undefined,
+): { id: string; content: string; createdAt: string }[] {
+  return snap.mediationEvents
+    .filter((e) => e.fromPartyId === partyId && matchesScenario(e, scenarioId))
+    .map((e) => ({ id: e.id, content: e.content, createdAt: e.createdAt ?? "" }));
 }
 
 /**

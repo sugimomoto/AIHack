@@ -44,3 +44,40 @@ export function assertNoForbiddenWords(text: string): void {
 export function sanitizeReception(text: string): string {
   return FORBIDDEN_WORDS.reduce((s, f) => s.split(f.word).join(f.replacement), text);
 }
+
+/**
+ * ★「お相手に伝えてみましょう」を落とす。
+ *
+ *   このアプリの中心は、**アプリが伝えること**である。
+ *   受け止めの応答が本人に伝達を促すと、
+ *   「AIが相手と調整してくれない」という体験になり、
+ *   **使っている意味そのものが失われる。**
+ *
+ * ★プロンプトで指示するだけでは漏れる（取次ぎと同じ方針）。
+ *   生成後に検査し、該当する文だけを落とす。
+ *   応答全体を捨てない。落としても受け止めは成立する。
+ */
+const SELF_CONVEYANCE =
+  /(お相手|相手|ご本人|自分)(に|へ)[^。！？\n]{0,12}(伝え|話し|相談し|連絡し|お伝え)[^。！？\n]{0,16}(ましょう|てください|てみて|てみる|るとよい|るといい|ることが大切|ることをおすすめ|るのがよい)/;
+
+export function stripSelfConveyance(text: string): string {
+  const kept = text
+    .split(/\n/)
+    .map((line) =>
+      line
+        // ★文単位で落とす。句点を保って読める形に戻す
+        .split(/(?<=[。！？])/)
+        .filter((sentence) => !SELF_CONVEYANCE.test(sentence))
+        .join(""),
+    )
+    .filter((line) => line.trim() !== "")
+    .join("\n")
+    .trim();
+
+  // ★全部落ちたときは、受け止めだけを残す
+  return kept === "" ? "そのお気持ち、受け止めました。" : kept;
+}
+
+export function hasSelfConveyance(text: string): boolean {
+  return SELF_CONVEYANCE.test(text);
+}

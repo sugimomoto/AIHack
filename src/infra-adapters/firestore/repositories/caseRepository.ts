@@ -96,8 +96,12 @@ export async function loadForLlm(caseId: CaseId): Promise<CaseSnapshot> {
     })),
     mediationEvents: mediationEvents.docs.map((d) => ({
       id: d.id,
+      // ★差出人。**送った本人に「何が伝わったか」を見せるために要る**
+      fromPartyId: d.get("fromPartyId") ? asPartyId(d.get("fromPartyId")) : undefined,
       toPartyId: asPartyId(d.get("toPartyId")),
       content: d.get("content"),
+      scenarioId: (d.get("scenarioId") ?? null) as string | null,
+      createdAt: (d.get("createdAt") ?? "") as string,
     })),
   };
 }
@@ -238,7 +242,14 @@ export async function listConsultations(
  */
 export async function appendMediationEvent(
   caseId: CaseId,
-  e: { fromPartyId: PartyId; toPartyId: PartyId; content: string; proposalId?: string },
+  e: {
+    fromPartyId: PartyId;
+    toPartyId: PartyId;
+    content: string;
+    proposalId?: string;
+    /** ★どの相談から出たか。相手側でも同じ相談に並べるために要る */
+    scenarioId?: string | null;
+  },
 ): Promise<string> {
   const ref = await caseRef(caseId)
     .collection("mediationEvents")

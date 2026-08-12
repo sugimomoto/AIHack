@@ -1,5 +1,9 @@
 import { DEFAULT_TITLE } from "@/domain/consultation/identity";
-import { listScenarios } from "@/infra-adapters/firestore/repositories/masterRepository";
+import {
+  findPublishedPayloadSchema,
+  listScenarios,
+} from "@/infra-adapters/firestore/repositories/masterRepository";
+import { outcomesOf, type Outcome } from "@/domain/agreement/outcome";
 
 /** ★題はマスタから引く。画面に直書きしない */
 export async function scenarioTitle(scenarioId: string | null): Promise<string> {
@@ -9,5 +13,23 @@ export async function scenarioTitle(scenarioId: string | null): Promise<string> 
     return all.find((s) => s.id === scenarioId)?.title ?? DEFAULT_TITLE;
   } catch {
     return DEFAULT_TITLE;
+  }
+}
+
+/**
+ * この相談で決まること。
+ *
+ * ★シナリオに論点が紐づいていなければ、何も出さない。
+ *   決まらないものを「決まる」と書かない。
+ */
+export async function scenarioOutcomes(scenarioId: string | null): Promise<Outcome[]> {
+  if (!scenarioId) return [];
+  try {
+    const sc = (await listScenarios()).find((s) => s.id === scenarioId);
+    if (!sc?.linkedTopic) return [];
+    const master = await findPublishedPayloadSchema(sc.linkedTopic);
+    return outcomesOf(master?.schema as never);
+  } catch {
+    return [];
   }
 }

@@ -10,7 +10,7 @@ import {
   findOtherPartyId,
   loadForLlm,
 } from "@/infra-adapters/firestore/repositories/caseRepository";
-import { assertOwnParty, scopedInbound, scopedMessages } from "@/domain/case/scope";
+import { assertOwnParty, scopedInbound, scopedMessages, scopedOutbound } from "@/domain/case/scope";
 import { parseEffect } from "@/domain/adjustment/flow";
 import { consultationIdFor } from "@/domain/consultation/identity";
 import { requiresAgreement } from "@/domain/topic/level";
@@ -131,6 +131,7 @@ export async function postMessage(input: {
     intents: r.intents,
     topic: r.topic,
     effect: parseEffect(input.effect),
+    scenarioId: input.scenarioId ?? null,
   });
 
   return { reply: r.reply, choices: r.choices, effectQuestion: r.effectQuestion, relayed };
@@ -145,6 +146,8 @@ async function relayIfNeeded(input: {
   intents: Parameters<typeof buildRelay>[0]["intents"];
   topic: string | null;
   effect: "ONE_TIME" | "PERMANENT" | null;
+  /** ★どの相談から出たか */
+  scenarioId?: string | null;
 }): Promise<string | null> {
   try {
     const relay = await buildRelay({
@@ -181,6 +184,7 @@ async function relayIfNeeded(input: {
     await appendMediationEvent(input.caseId, {
       fromPartyId: input.partyId,
       toPartyId: to, // ★宛先。scopedInbound の拠り所
+      scenarioId: input.scenarioId ?? null, // ★相手側でも同じ相談に並べる
       content: relay.content,
       ...(proposalId ? { proposalId } : {}),
     });
@@ -216,6 +220,8 @@ export async function loadView(input: {
       content: m.content,
       createdAt: m.createdAt,
     })),
-    inbound: scopedInbound(snap, input.partyId),
+    inbound: scopedInbound(snap, input.partyId, input.scenarioId ?? null),
+    // ★自分が送ったものが、どう伝わったか
+    outbound: scopedOutbound(snap, input.partyId, input.scenarioId ?? null),
   };
 }

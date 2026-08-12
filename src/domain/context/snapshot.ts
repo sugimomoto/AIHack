@@ -50,7 +50,14 @@ export type CaseSnapshot = {
     rationale?: string;
     status: string;
   }[];
-  mediationEvents: { id: string; toPartyId: PartyId; content: string }[];
+  mediationEvents: {
+    id: string;
+    fromPartyId?: PartyId;
+    toPartyId: PartyId;
+    content: string;
+    scenarioId?: string | null;
+    createdAt?: string;
+  }[];
   notifications?: { id: string; toPartyId: PartyId; content: string }[];
 };
 

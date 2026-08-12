@@ -2,7 +2,7 @@ import { callLlm, callLlmStructured } from "@/infra-adapters/llm/router";
 import { saveCallLog } from "@/infra-adapters/firestore/repositories/llmCallLogRepository";
 import { INTENT_SCHEMA, normalizeIntents, type Intent } from "@/domain/dialogue/intent";
 import { INTENT_SYSTEM_PROMPT, RECEPTION_SYSTEM_PROMPT } from "@/domain/dialogue/prompts";
-import { sanitizeReception } from "@/domain/dialogue/vocabulary";
+import { sanitizeReception, stripSelfConveyance } from "@/domain/dialogue/vocabulary";
 import { detectInjection } from "@/domain/security/guard";
 import { redactPii } from "@/domain/security/guard";
 import { choicesFor } from "@/domain/dialogue/choices";
@@ -56,7 +56,9 @@ export async function respondTo(input: {
   // ★プロンプトで指示するだけでは漏れる。生成後に言い換える。
   //   語彙の問題で応答を捨てると、当事者を待たせることになる。
   // ★最後の網。ContextBuilder が渡していない以上、本来は何も引っかからない
-  const reply = redactPii(sanitizeReception(res.content.trim()));
+  // ★「お相手に伝えてみましょう」を落とす。
+  //   アプリが伝えるのが中心であり、本人に伝達を促すと使う意味が無くなる。
+  const reply = redactPii(stripSelfConveyance(sanitizeReception(res.content.trim())));
 
   // ★C3：合意を参照しているからこそ立てられる問い
   const agreement = input.resolveAgreement ? await input.resolveAgreement(topic) : null;

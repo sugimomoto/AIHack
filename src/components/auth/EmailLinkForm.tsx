@@ -27,14 +27,18 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
 
   // ★メール内のリンクから戻ってきた場合の処理
   useEffect(() => {
-    const auth = firebaseAuth();
-    if (!isSignInWithEmailLink(auth, window.location.href)) return;
-
-    const saved = window.localStorage.getItem(KEY) ?? window.prompt("確認のため、メールアドレスをもう一度ご入力ください") ?? "";
-    if (!saved) return;
-
+    let alive = true;
     void (async () => {
-      // ★同期的に state を触らない（cascading render を避ける）
+      const auth = await firebaseAuth().catch(() => null);
+      if (!auth || !alive) return;
+      if (!isSignInWithEmailLink(auth, window.location.href)) return;
+
+      const saved =
+        window.localStorage.getItem(KEY) ??
+        window.prompt("確認のため、メールアドレスをもう一度ご入力ください") ??
+        "";
+      if (!saved) return;
+
       setState("working");
       try {
         const cred = await signInWithEmailLink(auth, saved, window.location.href);
@@ -58,6 +62,9 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
         setState("error");
       }
     })();
+    return () => {
+      alive = false;
+    };
   }, [mode]);
 
   const send = async () => {
@@ -65,7 +72,7 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
     if (!addr) return;
     setState("working");
     try {
-      await sendSignInLinkToEmail(firebaseAuth(), addr, {
+      await sendSignInLinkToEmail(await firebaseAuth(), addr, {
         url: `${window.location.origin}${window.location.pathname}`,
         handleCodeInApp: true,
       });

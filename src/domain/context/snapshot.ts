@@ -56,6 +56,7 @@ export type CaseSnapshot = {
     toPartyId: PartyId;
     content: string;
     scenarioId?: string | null;
+    threadId?: string | null;
     createdAt?: string;
   }[];
   notifications?: { id: string; toPartyId: PartyId; content: string }[];

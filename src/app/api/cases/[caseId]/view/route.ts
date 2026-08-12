@@ -9,8 +9,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ caseId: string 
   const { caseId } = await ctx.params;
   try {
     const partyId = await resolveParty(req);
-    const scenarioId = new URL(req.url).searchParams.get("scenarioId");
-    return NextResponse.json(await loadView({ caseId, partyId, scenarioId }));
+    const threadId = new URL(req.url).searchParams.get("threadId");
+    return NextResponse.json(await loadView({ caseId, partyId, threadId }));
   } catch (e) {
     return errorResponse(e);
   }

@@ -20,6 +20,7 @@ type Item = {
   id: string;
   title: string;
   scenarioId: string | null;
+  threadId: string | null;
   status: string;
   updatedAt: string;
 };
@@ -51,8 +52,14 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
 
   const open = d.items.filter((i) => i.status !== "CLOSED");
   const closed = d.items.filter((i) => i.status === "CLOSED");
-  const href = (i: Item) =>
-    i.scenarioId ? `/app/consult/talk?s=${encodeURIComponent(i.scenarioId)}` : "/app/consult/talk";
+  // ★一覧からは、そのスレッドをそのまま開く（新しく立てない）
+  const href = (i: Item) => {
+    const q = new URLSearchParams();
+    if (i.threadId) q.set("t", i.threadId);
+    if (i.scenarioId) q.set("s", i.scenarioId);
+    const qs = q.toString();
+    return qs ? `/app/consult/talk?${qs}` : "/app/consult/talk";
+  };
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-6">
@@ -100,7 +107,7 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
              「お相手には届きません」は、書いたあとではなく**書く前**に要る（L-1） */}
       {d.items.length === 0 && d.inbound.length === 0 && (
         <Link
-          href="/app/consult/talk"
+          href="/app/consult/start"
           className="mt-4 block"
           style={{
             background: "var(--bubble-ai)",

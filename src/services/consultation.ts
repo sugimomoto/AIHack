@@ -13,7 +13,7 @@ import {
 } from "@/infra-adapters/firestore/repositories/caseRepository";
 import { assertOwnParty, scopedInbound, scopedMessages, scopedOutbound } from "@/domain/case/scope";
 import { parseEffect } from "@/domain/adjustment/flow";
-import { consultationIdFor } from "@/domain/consultation/identity";
+import { consultationIdOf, parseThreadId } from "@/domain/consultation/thread";
 import { requiresAgreement } from "@/domain/topic/level";
 import { detectSafetyFlags, needsHumanReview, toSafetyEvent } from "@/domain/safety/detect";
 
@@ -71,6 +71,8 @@ export async function postMessage(input: {
   effect?: string | null;
   /** ★どの相談か。未指定なら既定の相談（K-1） */
   scenarioId?: string | null;
+  /** ★どのスレッドか。同じトピックでも件ごとに分かれる */
+  threadId?: string | null;
   title?: string | null;
 }): Promise<TurnResult> {
   const caseId = asCaseId(input.caseId);
@@ -81,11 +83,11 @@ export async function postMessage(input: {
   // ★相談は当事者ごとに分かれている。セッションが跨がらない構造そのもの。
   //   さらにシナリオごとに分かれる（K-1）。**提案は topic で引かれるため、
   //   相談が増えても合意の判定は壊れない。**
-  const consultationId = asConsultationId(
-    consultationIdFor(input.partyId, input.scenarioId),
-  );
+  const threadId = parseThreadId(input.threadId);
+  const consultationId = asConsultationId(consultationIdOf(input.partyId, threadId));
   await ensureConsultation(caseId, consultationId, input.partyId, {
     scenarioId: input.scenarioId ?? null,
+    threadId,
     title: input.title ?? null,
   });
   const userMessageId = await appendMessage(caseId, consultationId, {
@@ -133,6 +135,8 @@ export async function postMessage(input: {
     topic: r.topic,
     effect: parseEffect(input.effect),
     scenarioId: input.scenarioId ?? null,
+    threadId,
+    title: input.title ?? null,
   });
 
   // ★届いたかどうかを、その発言に残す。
@@ -153,6 +157,8 @@ async function relayIfNeeded(input: {
   effect: "ONE_TIME" | "PERMANENT" | null;
   /** ★どの相談から出たか */
   scenarioId?: string | null;
+  threadId?: string | null;
+  title?: string | null;
 }): Promise<string | null> {
   try {
     const relay = await buildRelay({
@@ -186,10 +192,22 @@ async function relayIfNeeded(input: {
         })
       : undefined;
 
+    // ★受け取る側にも同じスレッドの相談を用意する。
+    //   これが無いと、届いたのに**相手の一覧に行が立たない。**
+    if (input.threadId) {
+      await ensureConsultation(
+        input.caseId,
+        asConsultationId(consultationIdOf(to, input.threadId)),
+        to,
+        { scenarioId: input.scenarioId ?? null, threadId: input.threadId, title: input.title ?? null },
+      ).catch(() => {});
+    }
+
     await appendMediationEvent(input.caseId, {
       fromPartyId: input.partyId,
       toPartyId: to, // ★宛先。scopedInbound の拠り所
-      scenarioId: input.scenarioId ?? null, // ★相手側でも同じ相談に並べる
+      scenarioId: input.scenarioId ?? null,
+      threadId: input.threadId ?? null, // ★相手側でも同じスレッドに並べる
       content: relay.content,
       ...(proposalId ? { proposalId } : {}),
     });
@@ -210,15 +228,14 @@ async function relayIfNeeded(input: {
 export async function loadView(input: {
   caseId: string;
   partyId: PartyId;
-  scenarioId?: string | null;
+  threadId?: string | null;
 }) {
   const caseId = asCaseId(input.caseId);
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
 
-  const consultationId = asConsultationId(
-    consultationIdFor(input.partyId, input.scenarioId),
-  );
+  const threadId = parseThreadId(input.threadId);
+  const consultationId = asConsultationId(consultationIdOf(input.partyId, threadId));
   return {
     messages: scopedMessages(snap, consultationId, input.partyId).map((m) => ({
       role: m.role,
@@ -226,8 +243,8 @@ export async function loadView(input: {
       relayed: m.relayed,
       createdAt: m.createdAt,
     })),
-    inbound: scopedInbound(snap, input.partyId, input.scenarioId ?? null),
+    inbound: scopedInbound(snap, input.partyId, threadId),
     // ★自分が送ったものが、どう伝わったか
-    outbound: scopedOutbound(snap, input.partyId, input.scenarioId ?? null),
+    outbound: scopedOutbound(snap, input.partyId, threadId),
   };
 }

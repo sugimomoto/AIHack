@@ -3,7 +3,7 @@ import { resolveParty } from "@/lib/resolveParty";
 import { errorResponse } from "../messages/route";
 import { asCaseId } from "@/domain/case/types";
 import { assertOwnParty, scopedInbound } from "@/domain/case/scope";
-import { DEFAULT_TITLE } from "@/domain/consultation/identity";
+import { DEFAULT_TITLE } from "@/domain/consultation/thread";
 import {
   listConsultations,
   loadForLlm,

@@ -37,6 +37,7 @@ export function CaseChat({
   onChanged,
   reloadKey,
   scenarioId = null,
+  threadId = null,
   backHref,
 }: {
   caseId: string;
@@ -46,6 +47,8 @@ export function CaseChat({
   reloadKey?: number;
   /** ★どの相談か。未指定なら既定の相談（K-1） */
   scenarioId?: string | null;
+  /** ★どのスレッドか。同じトピックでも件ごとに分かれる */
+  threadId?: string | null;
   /** ★一覧に戻る導線。タブへ戻らせない（K-2） */
   backHref?: string;
 }) {
@@ -67,10 +70,10 @@ export function CaseChat({
   );
 
   const fetchView = useCallback(async (): Promise<View | null> => {
-    const q = scenarioId ? `?scenarioId=${encodeURIComponent(scenarioId)}` : "";
+    const q = threadId ? `?threadId=${encodeURIComponent(threadId)}` : "";
     const res = await fetch(`/api/cases/${caseId}/view${q}`, { headers: headers(), cache: "no-store" });
     return res.ok ? ((await res.json()) as View) : null;
-  }, [caseId, headers, scenarioId]);
+  }, [caseId, headers, threadId]);
 
   const reload = useCallback(async () => {
     const v = await fetchView();
@@ -99,7 +102,7 @@ export function CaseChat({
       const res = await fetch(`/api/cases/${caseId}/messages`, {
         method: "POST",
         headers: headers(),
-        body: JSON.stringify({ text: body || "（選択）", effect, scenarioId, title: label }),
+        body: JSON.stringify({ text: body || "（選択）", effect, scenarioId, threadId, title: label }),
       });
       // ★C3：合意を参照して立てられた問い
       const d = res.ok ? ((await res.json()) as { effectQuestion?: string | null }) : null;

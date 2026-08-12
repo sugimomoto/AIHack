@@ -11,11 +11,11 @@ export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ s?: string }>;
+  searchParams: Promise<{ s?: string; t?: string }>;
 }) {
   const session = await readSession();
   if (!session) redirect("/");
-  const { s } = await searchParams;
+  const { s, t } = await searchParams;
   const [title, outcomes] = await Promise.all([
     scenarioTitle(s ?? null),
     scenarioOutcomes(s ?? null),
@@ -31,6 +31,7 @@ export default async function Page({
           partyId={session.partyId}
           label={title}
           scenarioId={s ?? null}
+          threadId={t ?? null}
           backHref="/app/consult"
         />
       </div>

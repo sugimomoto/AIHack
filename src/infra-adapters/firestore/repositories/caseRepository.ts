@@ -103,6 +103,7 @@ export async function loadForLlm(caseId: CaseId): Promise<CaseSnapshot> {
       toPartyId: asPartyId(d.get("toPartyId")),
       content: d.get("content"),
       scenarioId: (d.get("scenarioId") ?? null) as string | null,
+      threadId: (d.get("threadId") ?? null) as string | null,
       createdAt: (d.get("createdAt") ?? "") as string,
     })),
   };
@@ -226,11 +227,12 @@ export async function ensureConsultation(
   caseId: CaseId,
   consultationId: ConsultationId,
   partyId: PartyId,
-  meta?: { scenarioId?: string | null; title?: string | null },
+  meta?: { scenarioId?: string | null; threadId?: string | null; title?: string | null },
 ): Promise<void> {
   const patch: Record<string, unknown> = { partyId, updatedAt: new Date().toISOString() };
   // ★題は最初に立てたときだけ入れる。あとから上書きして消さない
   if (meta?.scenarioId) patch.scenarioId = meta.scenarioId;
+  if (meta?.threadId) patch.threadId = meta.threadId;
   if (meta?.title) patch.title = meta.title;
   await caseRef(caseId).collection("consultations").doc(consultationId).set(patch, { merge: true });
 }
@@ -245,7 +247,14 @@ export async function listConsultations(
   caseId: CaseId,
   partyId: PartyId,
 ): Promise<
-  { id: string; title: string | null; scenarioId: string | null; status: string; updatedAt: string }[]
+  {
+    id: string;
+    title: string | null;
+    scenarioId: string | null;
+    threadId: string | null;
+    status: string;
+    updatedAt: string;
+  }[]
 > {
   const snap = await caseRef(caseId).collection("consultations").where("partyId", "==", partyId).get();
   return snap.docs
@@ -253,6 +262,7 @@ export async function listConsultations(
       id: d.id,
       title: (d.get("title") ?? null) as string | null,
       scenarioId: (d.get("scenarioId") ?? null) as string | null,
+      threadId: (d.get("threadId") ?? null) as string | null,
       status: (d.get("status") ?? "OPEN") as string,
       updatedAt: (d.get("updatedAt") ?? "") as string,
     }))
@@ -272,6 +282,7 @@ export async function appendMediationEvent(
     proposalId?: string;
     /** ★どの相談から出たか。相手側でも同じ相談に並べるために要る */
     scenarioId?: string | null;
+    threadId?: string | null;
   },
 ): Promise<string> {
   const ref = await caseRef(caseId)

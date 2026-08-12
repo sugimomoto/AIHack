@@ -90,7 +90,7 @@ export function NewConsult() {
                   {list.map((s, i) => (
                     <Link
                       key={s.id}
-                      href={`/app/consult/talk?s=${encodeURIComponent(s.id)}`}
+                      href={`/app/consult/start?s=${encodeURIComponent(s.id)}`}
                       className="block"
                       style={{
                         padding: "13px 16px",
@@ -115,7 +115,7 @@ export function NewConsult() {
       >
         {/* ★選ばずに書き始められる。ここが必須要件 */}
         <Link
-          href="/app/consult/talk"
+          href="/app/consult/start"
           className="flex items-center gap-3"
           style={{
             background: "var(--bubble-ai)",

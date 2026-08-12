@@ -1,4 +1,4 @@
-import { DEFAULT_TITLE } from "@/domain/consultation/identity";
+import { DEFAULT_TITLE } from "@/domain/consultation/thread";
 import {
   findPublishedPayloadSchema,
   listScenarios,

@@ -3,6 +3,7 @@ import {
   CONSULT_NO_HURRY,
   CONSULT_STATE_LABEL,
   CONSULT_STATES,
+  closedStateOf,
   consultStateOf,
   isSettled,
 } from "@/domain/consultation/state";
@@ -65,5 +66,52 @@ describe("★数で急かさない", () => {
   // ★急かす代わりに、急がなくてよいと書く
   it("届いている行に添える一文がある", () => {
     expect(CONSULT_NO_HURRY).toContain("急ぎません");
+  });
+});
+
+/**
+ * ★「済んだことにする」を押した相談に相手が新しく書いたとき、
+ *   沈めたままにすると、**閉じたことで見えなくなる。**
+ *   それは「消さない。沈めるだけ」という約束を破っている。
+ */
+describe("★閉じたあとに届いたものを埋もれさせない", () => {
+  const base = { status: "CLOSED", computed: "HELD" as const };
+
+  it("閉じたあとは沈む", () => {
+    expect(
+      closedStateOf({ ...base, closedAt: "2026-08-12T10:00:00Z", lastInboundAt: null }),
+    ).toBe("SETTLED");
+  });
+
+  it("閉じる前に届いていたものでは、浮かせない", () => {
+    expect(
+      closedStateOf({
+        ...base,
+        closedAt: "2026-08-12T10:00:00Z",
+        lastInboundAt: "2026-08-12T09:00:00Z",
+      }),
+    ).toBe("SETTLED");
+  });
+
+  // ★これが無いと、閉じたことで相手のご相談が見えなくなる
+  it("★閉じたあとに届いたら、また浮かぶ", () => {
+    expect(
+      closedStateOf({
+        ...base,
+        closedAt: "2026-08-12T10:00:00Z",
+        lastInboundAt: "2026-08-13T09:00:00Z",
+      }),
+    ).toBe("ARRIVED");
+  });
+
+  it("閉じていないものは、そのまま", () => {
+    expect(
+      closedStateOf({
+        status: "OPEN",
+        computed: "ARRIVED",
+        closedAt: null,
+        lastInboundAt: "2026-08-13T09:00:00Z",
+      }),
+    ).toBe("ARRIVED");
   });
 });

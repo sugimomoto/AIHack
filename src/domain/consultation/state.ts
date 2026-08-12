@@ -53,3 +53,27 @@ export function consultStateOf(input: {
 export function isSettled(s: ConsultState): boolean {
   return s === "SETTLED";
 }
+
+/**
+ * 閉じたものを沈める。
+ *
+ * ★ただし**閉じたあとに届いたものは埋もれさせない。**
+ *   「済んだことにする」を押した相談に相手が新しく書いたとき、
+ *   沈めたままにすると、**閉じたことで見えなくなる。**
+ *   それは「消さない。沈めるだけ」という約束を破っている。
+ */
+export function closedStateOf(input: {
+  status: string;
+  closedAt: string | null;
+  lastInboundAt: string | null;
+  computed: ConsultState;
+}): ConsultState {
+  if (input.status !== "CLOSED") return input.computed;
+
+  const arrivedAfterClosing =
+    input.lastInboundAt !== null &&
+    input.closedAt !== null &&
+    input.lastInboundAt > input.closedAt;
+
+  return arrivedAfterClosing ? "ARRIVED" : "SETTLED";
+}

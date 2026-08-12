@@ -251,7 +251,14 @@ export async function setConsultationStatus(
   await caseRef(caseId)
     .collection("consultations")
     .doc(consultationId)
-    .set({ status }, { merge: true });
+    .set(
+      {
+        status,
+        // ★いつ閉じたかを持つ。**閉じたあとに届いたものを埋もれさせないため。**
+        closedAt: status === "CLOSED" ? new Date().toISOString() : null,
+      },
+      { merge: true },
+    );
 }
 
 /**
@@ -270,6 +277,7 @@ export async function listConsultations(
     scenarioId: string | null;
     threadId: string | null;
     status: string;
+    closedAt: string | null;
     updatedAt: string;
   }[]
 > {
@@ -281,6 +289,7 @@ export async function listConsultations(
       scenarioId: (d.get("scenarioId") ?? null) as string | null,
       threadId: (d.get("threadId") ?? null) as string | null,
       status: (d.get("status") ?? "OPEN") as string,
+      closedAt: (d.get("closedAt") ?? null) as string | null,
       updatedAt: (d.get("updatedAt") ?? "") as string,
     }))
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));

@@ -286,14 +286,22 @@ export function ConsultList({ caseId, partyId }: { caseId: string; partyId: stri
                   {i.title}
                 </Link>
                 <span className="flex items-center gap-2" style={{ flexShrink: 0 }}>
-                  {/* ★消していない。戻せる */}
-                  <button
-                    type="button"
-                    onClick={() => void reopen(i.threadId)}
-                    style={{ fontSize: 11, color: "var(--agree-text)" }}
-                  >
-                    戻す
-                  </button>
+                  {/* ★戻せるのは、ご自身で閉じたものだけ。
+                         合意で済んだものに「戻す」を出しても何も起きず、
+                         **押しても戻らない**という体験になっていた。 */}
+                  {i.status === "CLOSED" ? (
+                    <button
+                      type="button"
+                      onClick={() => void reopen(i.threadId)}
+                      style={{ fontSize: 11, color: "var(--agree-text)" }}
+                    >
+                      戻す
+                    </button>
+                  ) : (
+                    <span style={{ fontSize: 11, color: "var(--agree-text)" }}>
+                      {CONSULT_STATE_LABEL.SETTLED}
+                    </span>
+                  )}
                   <span style={{ fontSize: 11, color: "var(--muted)" }}>{md(i.updatedAt)}</span>
                 </span>
               </div>

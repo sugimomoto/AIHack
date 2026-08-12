@@ -8,7 +8,7 @@ import {
   DEFAULT_TITLE,
   threadIdOfConsultation,
 } from "@/domain/consultation/thread";
-import { consultStateOf } from "@/domain/consultation/state";
+import { closedStateOf, consultStateOf } from "@/domain/consultation/state";
 import {
   listConsultations,
   loadForLlm,
@@ -73,15 +73,19 @@ export async function GET(req: Request, ctx: { params: Promise<{ caseId: string 
         ...r,
         threadId,
         title: r.title ?? DEFAULT_TITLE,
-        // ★本人が閉じたものは、状態にかかわらず沈める
-        state:
-          r.status === "CLOSED"
-            ? ("SETTLED" as const)
-            : consultStateOf({
-                lastOwnAt: lastOwn.get(r.id) ?? null,
-                lastInboundAt: lastIn.get(threadId) ?? null,
-                settled: Boolean(topic && agreed.has(topic)),
-              }),
+        // ★本人が閉じたものは沈める。
+        //   ただし**閉じたあとに届いたものは埋もれさせない。**
+        //   閉じたことで、相手からの新しいご相談が見えなくなってはいけない。
+        state: closedStateOf({
+          status: r.status,
+          closedAt: r.closedAt,
+          lastInboundAt: lastIn.get(threadId) ?? null,
+          computed: consultStateOf({
+            lastOwnAt: lastOwn.get(r.id) ?? null,
+            lastInboundAt: lastIn.get(threadId) ?? null,
+            settled: Boolean(topic && agreed.has(topic)),
+          }),
+        }),
         lastInbound: lastIn.get(threadId)
           ? (scopedInbound(snap, partyId, threadId).at(-1)?.content ?? null)
           : null,

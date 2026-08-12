@@ -16,6 +16,7 @@ export async function GET(req: Request) {
   if (!(await readSession())) {
     return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
   }
-  const since = new URL(req.url).searchParams.get("since") ?? undefined;
+  // ★既定でも期間を絞る。設計を変える前のログが混ざると実態を表さない
+  const since = new URL(req.url).searchParams.get("since") ?? process.env.METRICS_SINCE ?? undefined;
   return NextResponse.json(await computeMetrics({ since }));
 }

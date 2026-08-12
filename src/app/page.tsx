@@ -1,177 +1,124 @@
-"use client";
-
-import { useState } from "react";
-import { AgreementView } from "@/components/agreement/AgreementView";
-import { ChatView } from "@/components/chat/ChatView";
-import { HomeView } from "@/components/home/HomeView";
-import { ScopeSheet } from "@/components/scope/ScopeSheet";
-import { TopicPicker } from "@/components/topic/TopicPicker";
-import { BottomTab } from "@/components/ui/BottomTab";
-import { AGREEMENTS, CONSULTATION_TITLE, EVENTS, SCENES } from "@/mock/scenario";
-import { PARTY_LABEL, viewOf, type Party, type TabId } from "@/mock/types";
+import Link from "next/link";
+import Image from "next/image";
 
 /**
- * 体験モックのシェル
+ * 入口
  *
- * ★視点切替が本モックの最重要要件。
- *   「書いた言葉が相手に届かない」は、片側だけ見せても検証できない。
+ * ★何をするアプリかを、最初の1画面で言い切る。
+ *   「メッセージを転送しない」は説明を要する主張であり、
+ *   **先に言わないと、ただのチャットアプリに見える。**
  */
-export default function MockPage() {
-  const [i, setI] = useState(0);
-  const scene = SCENES[i];
+export const metadata = {
+  title: "Aida（あいだ）",
+  description: "離婚しても、子どもが健やかに育つための基盤になる。",
+};
 
-  const [party, setParty] = useState<Party>(scene.suggest);
-  const [tab, setTab] = useState<TabId>(scene.tab);
-  const [topic, setTopic] = useState(false);
+const ROUTES = [
+  {
+    href: "/start",
+    label: "はじめる",
+    note: "役割を選ぶと、招待用のリンクが作れます。お名前もご連絡先も要りません。",
+    primary: true,
+  },
+  { href: "/context", label: "AIに渡しているもの", note: "相手の言葉を持っていないことを、そのまま表示します。" },
+  { href: "/metrics", label: "原価", note: "CT-1〜CT-4。ルーティングなしとの比較を実測値で出します。" },
+  { href: "/knowledge", label: "取り決めについて知る", note: "制度の一般的な説明。個別の助言はしません。" },
+  { href: "/mock", label: "体験モック", note: "デザイン確認用。両当事者の視点を切り替えられます。" },
+];
 
-  // シーン移動時は推奨視点とタブに追従する
-  const go = (n: number) => {
-    const next = Math.max(0, Math.min(SCENES.length - 1, n));
-    setI(next);
-    setParty(SCENES[next].suggest);
-    setTab(SCENES[next].tab);
-    setTopic(false);
-  };
-
-  const events = viewOf(EVENTS.slice(0, scene.upto + 1), party);
-  const rows = AGREEMENTS[scene.agreements];
-
+export default function Page() {
   return (
-    <div className="flex min-h-dvh flex-col" style={{ background: "var(--surface-2)" }}>
-      {/* モック告知（常時表示） */}
-      <div
-        className="px-4 py-2 text-center"
-        style={{
-          background: "var(--muted-bg)",
-          borderBottom: "1px solid var(--border)",
-          fontSize: "11.5px",
-          lineHeight: 1.7,
-          color: "var(--text-sub-2)",
-        }}
-      >
-        これはデザイン確認用のモックです。実際には動作しません。
-        <br className="sm:hidden" />
-        <span className="hidden sm:inline"> </span>
-        AIの応答はあらかじめ用意した文章です。
-      </div>
+    <div className="min-h-dvh px-5 py-10" style={{ background: "var(--surface-2)" }}>
+      <div className="mx-auto w-full max-w-[560px]">
+        <div className="flex flex-col items-center text-center">
+          <div
+            className="grid place-items-center overflow-hidden"
+            style={{ width: 76, height: 76, borderRadius: 22, background: "var(--bubble-ai)" }}
+          >
+            <Image src="/character/capybara-sit.png" alt="" width={62} height={62} priority />
+          </div>
+          <h1 style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.6, marginTop: 16 }}>Aida（あいだ）</h1>
+          <p style={{ fontSize: 14.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}>
+            離婚しても、子どもが健やかに育つための基盤になる。
+          </p>
+        </div>
 
-      {/* 端末 */}
-      <div className="flex flex-1 items-center justify-center p-0 sm:p-6">
-        <div
-          className="flex w-full flex-col overflow-hidden sm:w-[390px]"
+        <section
+          className="mt-7"
           style={{
-            background: "var(--bg)",
-            height: "min(844px, calc(100dvh - 190px))",
-            borderRadius: "var(--r-device)",
-            border: "1px solid var(--border-strong)",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-lg)",
+            padding: 20,
           }}
         >
-          {tab === "home" && <HomeView events={events} rows={rows} />}
-
-          {tab === "chat" &&
-            (topic ? (
-              <TopicPicker />
-            ) : (
-              <div className="flex h-full flex-col">
-                <div className="min-h-0 flex-1">
-                  <ChatView events={events} title={CONSULTATION_TITLE} />
-                </div>
-                {scene.sheet === "scope" && <ScopeSheet />}
-              </div>
-            ))}
-
-          {tab === "agreement" && <AgreementView rows={rows} />}
-
-          {(tab === "schedule" || tab === "settings") && (
-            <div className="grid flex-1 place-items-center px-8 text-center">
-              <p style={{ fontSize: "14px", color: "var(--text-sub)", lineHeight: 1.9 }}>
-                この画面は準備中です。
-                <br />
-                今回のモックには含まれていません。
-              </p>
-            </div>
-          )}
-
-          <BottomTab
-            active={tab}
-            onChange={(t) => {
-              setTab(t);
-              setTopic(false);
+          <p style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.8 }}>
+            メッセージを、相手に転送しません。
+          </p>
+          <p style={{ fontSize: 13.5, lineHeight: 2.0, color: "var(--text-sub)", marginTop: 8 }}>
+            父はAIと話し、母もAIと話します。
+            <br />
+            書いた言葉そのものは、決して相手に届きません。
+            <br />
+            <strong>合意に必要な事実だけが、伝聞のかたちで越えます。</strong>
+          </p>
+          <div
+            className="mt-4"
+            style={{
+              background: "var(--muted-bg)",
+              borderRadius: "var(--r-sm)",
+              padding: "11px 13px",
+              fontSize: 12.5,
+              lineHeight: 1.95,
+              color: "var(--text-sub-2)",
             }}
-          />
-        </div>
-      </div>
+          >
+            <p>
+              入力：<span style={{ color: "var(--text)" }}>月3万が限界。こっちだって仕事切られて必死なんだよ。少しは考えろ</span>
+            </p>
+            <p style={{ marginTop: 6 }}>
+              相手に届くもの：
+              <br />
+              <span style={{ color: "var(--agree-text)" }}>
+                養育費について、月額3万円までを希望されているそうです。
+                <br />
+                背景として、現在は職を失っているとのことです。
+              </span>
+            </p>
+          </div>
+        </section>
 
-      {/* 操作パネル */}
-      <div
-        className="shrink-0 px-4 py-3"
-        style={{ background: "var(--surface)", borderTop: "1px solid var(--border)" }}
-      >
-        <div className="mx-auto flex max-w-[560px] flex-col gap-2.5">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => go(i - 1)}
-              disabled={i === 0}
-              className="grid shrink-0 place-items-center rounded-full disabled:opacity-30"
-              style={{ width: 44, height: 44, border: "1px solid var(--border)" }}
-              aria-label="前の場面"
+        <div className="mt-6 flex flex-col gap-2.5">
+          {ROUTES.map((r) => (
+            <Link
+              key={r.href}
+              href={r.href}
+              style={{
+                background: r.primary ? "var(--agree-bg)" : "var(--surface)",
+                border: `1px solid ${r.primary ? "var(--agree)" : "var(--border)"}`,
+                borderRadius: "var(--r-lg)",
+                padding: 16,
+              }}
             >
-              ◀
-            </button>
-            <div className="min-w-0 flex-1 text-center">
-              <p style={{ fontSize: "14.5px", fontWeight: 500 }}>
-                {scene.no}. {scene.caption}
+              <p
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: r.primary ? "var(--agree-text)" : "var(--text)",
+                }}
+              >
+                {r.label}
               </p>
-              {scene.note && (
-                <p style={{ fontSize: "11.5px", color: "var(--text-sub)" }}>
-                  {scene.note}
-                </p>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={() => go(i + 1)}
-              disabled={i === SCENES.length - 1}
-              className="grid shrink-0 place-items-center rounded-full disabled:opacity-30"
-              style={{ width: 44, height: 44, border: "1px solid var(--border)" }}
-              aria-label="次の場面"
-            >
-              ▶
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="shrink-0" style={{ fontSize: "12px", color: "var(--text-sub)" }}>
-              視点
-            </span>
-            {(["NON_CUSTODIAL", "CUSTODIAL"] as Party[]).map((p) => {
-              const on = party === p;
-              return (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setParty(p)}
-                  className="flex-1 rounded-full px-3"
-                  style={{
-                    minHeight: 44,
-                    fontSize: "13px",
-                    background: on ? "var(--agree-bg)" : "var(--surface)",
-                    border: `1px solid ${on ? "var(--agree)" : "var(--border)"}`,
-                    color: on ? "var(--agree-text)" : "var(--text-sub)",
-                    fontWeight: on ? 500 : 400,
-                  }}
-                  aria-pressed={on}
-                >
-                  {PARTY_LABEL[p]}の画面
-                </button>
-              );
-            })}
-            <span className="shrink-0" style={{ fontSize: "11.5px", color: "var(--text-sub)" }}>
-              {i + 1}/{SCENES.length}
-            </span>
-          </div>
+              <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 4 }}>
+                {r.note}
+              </p>
+            </Link>
+          ))}
         </div>
+
+        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 20, textAlign: "center" }}>
+          AI HACK 2026 提出作品。実在の人物の情報は含まれません。
+        </p>
       </div>
     </div>
   );

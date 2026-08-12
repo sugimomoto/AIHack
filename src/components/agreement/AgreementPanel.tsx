@@ -30,14 +30,22 @@ const STATE_LABEL: Record<View["state"], string> = {
   REJECTED: "見直しが必要です",
 };
 
+const TOPIC_LABEL: Record<string, string> = {
+  CHILD_SUPPORT: "養育費",
+  VISITATION: "面会交流",
+};
+
 export function AgreementPanel({
   caseId,
   partyId,
+  topic = "CHILD_SUPPORT",
   reloadKey,
   onChanged,
 }: {
   caseId: string;
   partyId: string;
+  /** ★養育費に固定していた。**面会交流には画面が一つも無かった。** */
+  topic?: string;
   reloadKey?: number;
   onChanged?: () => void;
 }) {
@@ -46,12 +54,12 @@ export function AgreementPanel({
   const [asking, setAsking] = useState(false);
 
   const fetchView = useCallback(async (): Promise<View | null> => {
-    const res = await fetch(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, {
+    const res = await fetch(`/api/cases/${caseId}/agreement?topic=${topic}`, {
       headers: { "x-dev-party": partyId },
       cache: "no-store",
     });
     return res.ok ? ((await res.json()) as View) : null;
-  }, [caseId, partyId]);
+  }, [caseId, partyId, topic]);
 
   useEffect(() => {
     let alive = true;
@@ -69,7 +77,7 @@ export function AgreementPanel({
       await fetch(`/api/cases/${caseId}/agreement`, {
         method: "POST",
         headers: { "content-type": "application/json", "x-dev-party": partyId },
-        body: JSON.stringify({ topic: "CHILD_SUPPORT", status }),
+        body: JSON.stringify({ topic, status }),
       });
       const r = await fetchView();
       if (r) setV(r);
@@ -89,7 +97,7 @@ export function AgreementPanel({
       style={{ borderTop: "1px solid var(--border-subtle)" }}
     >
       <div className="flex items-center justify-between">
-        <span style={{ fontSize: 13.5, fontWeight: 600 }}>養育費</span>
+        <span style={{ fontSize: 13.5, fontWeight: 600 }}>{TOPIC_LABEL[topic] ?? "取り決め"}</span>
         <span
           style={{
             fontSize: 11.5,
@@ -108,9 +116,13 @@ export function AgreementPanel({
         </div>
       )}
 
+      {/* ★算定表があるのは養育費だけ。
+             面会交流に「算定表の目安」と書くと、存在しない表を約束することになる。 */}
       {!v.ready && !v.agreement && (
         <p style={{ fontSize: 12, lineHeight: 1.85, color: "var(--text-sub)", marginTop: 6 }}>
-          おふたりのご提案が揃うと、算定表の目安をお示しします。
+          {topic === "CHILD_SUPPORT"
+            ? "おふたりのご提案が揃うと、算定表の目安をお示しします。"
+            : "おふたりのご意向が揃うと、ここに内容が並びます。"}
         </p>
       )}
 
@@ -205,6 +217,7 @@ export function AgreementPanel({
         <RevisionRequestForm
           caseId={caseId}
           partyId={partyId}
+          topic={topic}
           current={v.agreement.payload}
           onDone={() => {
             setAsking(false);

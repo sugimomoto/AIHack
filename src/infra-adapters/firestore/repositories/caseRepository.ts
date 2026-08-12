@@ -626,6 +626,40 @@ export async function loadChildBirthDates(caseId: CaseId): Promise<string[]> {
     .sort();
 }
 
+/**
+ * 画面の設定
+ *
+ * ★「お相手の呼び方」は**見ている本人の画面だけのもの。**
+ *   自分の当事者レコードに置き、相手には渡さない。
+ *   `displayNameForOther`（相手に見える自分の名）とは向きが逆であり、
+ *   混同すると、落ち着くために付けた呼び名が相手に届く。
+ *
+ * ★通知に本文を出すかは既定 OFF。DV・つきまといの文脈がある。
+ */
+export async function saveViewerSettings(
+  caseId: CaseId,
+  partyId: PartyId,
+  s: { partnerAlias?: string | null; notifyBody?: boolean },
+): Promise<void> {
+  const patch: Record<string, unknown> = {};
+  if (s.partnerAlias !== undefined) patch.partnerAlias = s.partnerAlias || null;
+  if (s.notifyBody !== undefined) patch.notifyBody = s.notifyBody;
+  if (Object.keys(patch).length === 0) return;
+  await caseRef(caseId).collection("parties").doc(partyId).set(patch, { merge: true });
+}
+
+export async function loadViewerSettings(
+  caseId: CaseId,
+  partyId: PartyId,
+): Promise<{ partnerAlias: string | null; notifyBody: boolean }> {
+  const d = await caseRef(caseId).collection("parties").doc(partyId).get();
+  return {
+    partnerAlias: (d.get("partnerAlias") ?? null) as string | null,
+    // ★既定 OFF。読めなかったときも OFF に倒す
+    notifyBody: d.get("notifyBody") === true,
+  };
+}
+
 /** ケースの状況。★入口の分岐を記録する */
 export async function saveSituation(caseId: CaseId, situation: string): Promise<void> {
   await caseRef(caseId).set({ situation }, { merge: true });

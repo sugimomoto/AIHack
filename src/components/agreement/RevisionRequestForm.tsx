@@ -26,12 +26,14 @@ const PAY_DAYS = [
 export function RevisionRequestForm({
   caseId,
   partyId,
+  topic,
   current,
   onDone,
   onCancel,
 }: {
   caseId: string;
   partyId: string;
+  topic: string;
   current: Record<string, unknown>;
   onDone: () => void;
   onCancel: () => void;
@@ -56,7 +58,7 @@ export function RevisionRequestForm({
       await fetch(`/api/cases/${caseId}/revision`, {
         method: "POST",
         headers: { "content-type": "application/json", "x-dev-party": partyId },
-        body: JSON.stringify({ topic: "CHILD_SUPPORT", change, reasonCode: reason || null }),
+        body: JSON.stringify({ topic, change, reasonCode: reason || null }),
       });
       onDone();
     } finally {

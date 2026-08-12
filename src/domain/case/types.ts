@@ -69,6 +69,12 @@ export type MessageRecord = {
   role: "USER" | "AI";
   /** 原文。FR-10 で保全する */
   content: string;
+  /**
+   * ★取次がれたか。undefined は記録が無い（過去の発言）。
+   *   届いたかどうかが画面から分からないと、
+   *   「取り次いでくれたのか」を当事者が判断できない。
+   */
+  relayed?: boolean;
   createdAt: string;
 };
 

@@ -51,6 +51,8 @@ export async function loadForLlm(caseId: CaseId): Promise<CaseSnapshot> {
           partyId: asPartyId(m.get("partyId")),
           role: m.get("role") as "USER" | "AI",
           content: m.get("content") as string,
+          // ★取次ぎの有無。undefined は「まだ記録が無い」（過去の発言）
+          relayed: m.get("relayed") as boolean | undefined,
           createdAt: m.get("createdAt") as string,
         }));
       }),
@@ -196,6 +198,27 @@ export async function appendMessage(
     .collection("messages")
     .add({ ...m, createdAt: new Date().toISOString() });
   return ref.id;
+}
+
+/**
+ * ★その発言が取次がれたかを記録する。
+ *
+ *   届いたか届かなかったかが画面から分からないと、
+ *   **「取り次いでくれたのか」が最後まで判断できない。**
+ *   届かなかったことも、届いたことと同じだけ明示する。
+ */
+export async function markMessageRelay(
+  caseId: CaseId,
+  consultationId: ConsultationId,
+  messageId: string,
+  relayed: boolean,
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("consultations")
+    .doc(consultationId)
+    .collection("messages")
+    .doc(messageId)
+    .set({ relayed }, { merge: true });
 }
 
 /** 相談が無ければ作る。★当事者ごとに1つ（セッションが分かれている） */

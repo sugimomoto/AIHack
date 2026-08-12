@@ -3,6 +3,7 @@ import { saveCallLog } from "@/infra-adapters/firestore/repositories/llmCallLogR
 import { needsRelay, type Intent } from "@/domain/dialogue/intent";
 import { sanitizeReception } from "@/domain/dialogue/vocabulary";
 import { redactPii } from "@/domain/security/guard";
+import { summaryFromPayload } from "@/domain/relay/summary";
 import { EXTRACTION_SCHEMA } from "@/domain/relay/schema";
 import { EXTRACTION_SYSTEM_PROMPT, buildRelayText } from "@/domain/relay/prompts";
 import { hasVerbatimRun, verifyRelay, type ContextCategory } from "@/domain/relay/guard";
@@ -72,8 +73,9 @@ export async function buildRelay(input: {
   }
 
   const v = verification!;
-  const summary = safeSummary(last!.summary, input.raw, topicLabel);
+  // ★payload を先に作る。要約が逐語一致で落ちたときの受け皿になる
   const payload = await structurePayload(input);
+  const summary = safeSummary(last!.summary, input.raw, topicLabel, payload);
 
   return {
     payload,
@@ -92,12 +94,28 @@ export async function buildRelay(input: {
 /**
  * ★要約にも同じ検査をかける。
  *   context だけを検査して summary を素通しすると、そこから原文が越える。
- *   落ちたら、話題だけを伝える最小形にする。
+ *
+ * ★落ちたら、まず**構造化された提案から組み立て直す。**
+ *   短く素直に書いた発言ほど要約が原文と一致して落ちるため、
+ *   **はっきり書いた人ほど、伝わる中身が減っていた。**
+ *   構造化された値は原文から作られていないので、逐語一致が起こりえない。
+ *
+ * ★それも作れないときだけ、話題だけを伝える最小形にする。
  */
-function safeSummary(summary: string, raw: string, topicLabel: string): string {
+function safeSummary(
+  summary: string,
+  raw: string,
+  topicLabel: string,
+  payload: Record<string, unknown> | null,
+): string {
   const s = summary.trim();
-  if (!s || hasVerbatimRun(raw, s)) return "ご相談が来ています。";
-  return s;
+  if (s && !hasVerbatimRun(raw, s)) return s;
+
+  const fromPayload = summaryFromPayload(payload);
+  // ★組み立て直したものにも同じ検査をかける（値がそのまま原文に出ていることがある）
+  if (fromPayload && !hasVerbatimRun(raw, fromPayload)) return fromPayload;
+
+  return "ご相談が来ています。";
 }
 
 /**

@@ -24,7 +24,7 @@ import { SupportLink } from "@/components/safety/SupportLink";
  */
 
 type View = {
-  messages: { role: "USER" | "AI"; content: string; createdAt: string }[];
+  messages: { role: "USER" | "AI"; content: string; relayed?: boolean; createdAt: string }[];
   inbound: { id: string; content: string; createdAt?: string }[];
   /** ★自分が送ったものが、どう伝わったか */
   outbound?: { id: string; content: string; createdAt?: string }[];
@@ -157,7 +157,16 @@ export function CaseChat({
           ) : t.kind === "OUTBOUND" ? (
             <RelaySent key={t.key} text={t.content} />
           ) : t.kind === "USER" ? (
-            <OwnMessage key={t.key} text={t.content} />
+            <div key={t.key} className="flex flex-col items-end gap-1">
+              <OwnMessage text={t.content} />
+              {/* ★届かなかったことも、届いたことと同じだけ明示する。
+                     何も書かないと「取り次いでくれたのか」が判断できない。 */}
+              {t.relayed === false && (
+                <p style={{ fontSize: 11, lineHeight: 1.8, color: "var(--muted)", maxWidth: "86%" }}>
+                  これは、お相手にはお渡ししていません。お気持ちを受け止めるだけの内容でした。
+                </p>
+              )}
+            </div>
           ) : (
             <AiMessage key={t.key} lines={t.content.split(/\n+/).filter(Boolean)} showMark />
           ),
@@ -247,7 +256,13 @@ export function CaseChat({
  *
  * ★createdAt が無い古い記録は末尾に落とさず、その場の順を保つ。
  */
-type Row = { key: string; kind: "USER" | "AI" | "INBOUND" | "OUTBOUND"; content: string; at: string };
+type Row = {
+  key: string;
+  kind: "USER" | "AI" | "INBOUND" | "OUTBOUND";
+  content: string;
+  at: string;
+  relayed?: boolean;
+};
 
 function timeline(v: View): Row[] {
   const rows: Row[] = [
@@ -255,6 +270,7 @@ function timeline(v: View): Row[] {
       key: `m${i}`,
       kind: m.role as "USER" | "AI",
       content: m.content,
+      relayed: m.relayed,
       at: m.createdAt ?? "",
     })),
     ...v.inbound.map((e) => ({

@@ -9,6 +9,7 @@ import {
   ensureConsultation,
   findOtherPartyId,
   loadForLlm,
+  markMessageRelay,
 } from "@/infra-adapters/firestore/repositories/caseRepository";
 import { assertOwnParty, scopedInbound, scopedMessages, scopedOutbound } from "@/domain/case/scope";
 import { parseEffect } from "@/domain/adjustment/flow";
@@ -87,7 +88,7 @@ export async function postMessage(input: {
     scenarioId: input.scenarioId ?? null,
     title: input.title ?? null,
   });
-  await appendMessage(caseId, consultationId, {
+  const userMessageId = await appendMessage(caseId, consultationId, {
     partyId: input.partyId,
     role: "USER",
     content: input.text,
@@ -133,6 +134,10 @@ export async function postMessage(input: {
     effect: parseEffect(input.effect),
     scenarioId: input.scenarioId ?? null,
   });
+
+  // ★届いたかどうかを、その発言に残す。
+  //   画面が「取り次がれたのか」を後から示せるようにする。
+  await markMessageRelay(caseId, consultationId, userMessageId, relayed !== null).catch(() => {});
 
   return { reply: r.reply, choices: r.choices, effectQuestion: r.effectQuestion, relayed };
 }
@@ -218,6 +223,7 @@ export async function loadView(input: {
     messages: scopedMessages(snap, consultationId, input.partyId).map((m) => ({
       role: m.role,
       content: m.content,
+      relayed: m.relayed,
       createdAt: m.createdAt,
     })),
     inbound: scopedInbound(snap, input.partyId, input.scenarioId ?? null),

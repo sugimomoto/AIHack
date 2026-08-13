@@ -26,6 +26,10 @@ const ORDER = [
   "date",
   "time",
   "place",
+  // ★調整（ADJUSTMENT）の項目。ORDER に無いと、
+  //   抽出できていても要約に出ず、「ご相談が来ています。」に落ちる。
+  "amountYen",
+  "shareText",
   "subject",
 ] as const;
 
@@ -38,23 +42,51 @@ const PHRASE: Record<string, (v: string) => string> = {
   date: (v) => `${v}`,
   time: (v) => `${v}`,
   place: (v) => `${v}`,
+  amountYen: (v) => `${v}`,
+  shareText: (v) => `${v}`,
   subject: (v) => `${v}`,
 };
 
 /** ★お知らせは「ご希望」ではない。事実として結ぶ */
-const INFO_KEYS = ["date", "time", "place", "subject"];
+const INFO_KEYS = ["date", "time", "place", "subject", "amountYen", "shareText"];
 
 /**
- * ★自由記述の項目。**ここだけ逐語一致を検査する。**
+ * ★自由記述の項目。ここだけ逐語一致を検査する。
  *
  *   金額・支払日・日付・時刻は、正しく伝えれば原文と一致して当たり前である。
  *   組み立てた文全体を検査すると、**事実を伝えること自体ができなくなる。**
  *   （実測：「10月8日の14時に小学校の体育館で開催されます」→ 何も渡らなかった）
  *
  *   一方 subject と place は LLM が自由に埋めるため、
- *   ここから原文の言い回しが越えうる。**この2つだけを検査する。**
+ *   ここから原文の言い回しが越えうる。
  */
 const FREE_TEXT_KEYS = ["subject", "place"];
+
+/**
+ * ★短い事実の語は通す。文を丸ごと入れてきたら落とす。
+ *
+ *   品目名は事実そのものなので、正しく伝えるほど原文と一致する。
+ *   「スマホ代と自転車代の領収書」は13文字あり、10文字の規則では落ちる。
+ *   落とすと、**何についての話かが相手に伝わらない。**
+ *   （実測：原文どおりに直したら、届いたのが「ご相談が来ています。」だけになった）
+ *
+ *   守りたいのは「原文を丸写しさせないこと」であって、
+ *   「品目名を言い換えさせること」ではない。言い換えさせた結果、
+ *   スマホ代がコピー代に化けた（実測）。
+ *
+ *   スキーマが求めているのは**短い名詞**である
+ *   （「何について。例: 入学金 / 塾の費用 / 医療費」）。
+ *   したがって、その長さを超えたものは**文を入れてきた**とみなし、
+ *   逐語一致を検査する。
+ *
+ *   実測の両端：
+ *     「スマホ代と自転車代の領収書」        13字 … 事実。通す
+ *     「あの人のせいで子どもがひどく体調を崩した」 20字 … 非難。落とす
+ *
+ * ⚠ 長さは代理指標にすぎない。**C-01 として未確定。**
+ *   非難かどうかを長さで判定しているわけではない。
+ */
+const FREE_TEXT_MAX = 16;
 
 /** ★抽出が埋めた「不明」の類を、事実として渡さない */
 const PLACEHOLDERS = ["未記載", "不明", "なし", "記載なし", "未定", "-", "—"];
@@ -66,7 +98,7 @@ function display(key: string, value: unknown): string | null {
   const codes = CODE_LABELS[key];
   if (codes) return codes[String(value)] ?? null; // ★未知のコードは通さない
 
-  if (key === "monthlyAmount" && typeof value === "number") {
+  if ((key === "monthlyAmount" || key === "amountYen") && typeof value === "number") {
     return `${value.toLocaleString("ja-JP")}円`;
   }
   if (typeof value === "number") return value.toLocaleString("ja-JP");
@@ -94,8 +126,11 @@ export function summaryFromPayload(
     if (!(k in payload)) return null;
     const v = display(k, payload[k]);
     if (v === null) return null;
-    // ★自由記述からは、原文の言い回しを越えさせない
-    if (FREE_TEXT_KEYS.includes(k) && raw && hasVerbatimRun(raw, v)) return null;
+    // ★自由記述からは、原文の言い回しを越えさせない。
+    //   ただし短い語（品目名など）は事実そのものなので通す。
+    if (FREE_TEXT_KEYS.includes(k) && raw && v.length > FREE_TEXT_MAX && hasVerbatimRun(raw, v)) {
+      return null;
+    }
     return v;
   };
 
@@ -143,6 +178,15 @@ function infoSentence(get: (k: string) => string | null): string | null {
   const time = get("time");
   const place = get("place");
   const subject = get("subject");
+  const amount = get("amountYen");
+  const share = get("shareText");
+
+  // ★費用の相談は、金額と分担が要点。日時の文型に押し込まない
+  if (amount || share) {
+    const head = [subject, amount].filter(Boolean).join(" ");
+    const tail = share ? `${share}にしたい` : "ご相談したい";
+    return `${head ? `${head}について、` : ""}${tail}とのことです。`;
+  }
 
   const when = [date ? jpDate(date) : null, time ? jpTime(time) : null]
     .filter((x): x is string => Boolean(x))

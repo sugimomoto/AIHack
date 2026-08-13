@@ -14,7 +14,7 @@ import { RevisionRequestForm } from "./RevisionRequestForm";
 type View = {
   ready: boolean;
   proposals: { isOwn: boolean; payload: Record<string, unknown> | null }[];
-  draft: { rangeText: string | null; explanation: string; unverified: boolean } | null;
+  draft: { rangeText: string | null; notice: string | null; unverified: boolean } | null;
   converged: boolean;
   state: "WAITING_BOTH" | "WAITING_OTHER" | "NEEDS_CONVERGENCE" | "AGREED" | "REJECTED";
   ownConsent: "PENDING" | "ACCEPTED" | "REJECTED";
@@ -145,18 +145,13 @@ export function AgreementPanel({
           {v.draft.rangeText && (
             <p style={{ fontSize: 12.5, lineHeight: 1.9, whiteSpace: "pre-wrap" }}>{v.draft.rangeText}</p>
           )}
-          <p
-            style={{
-              fontSize: 12.5,
-              lineHeight: 1.9,
-              color: "var(--text-sub-2)",
-              marginTop: v.draft.rangeText ? 10 : 0,
-              paddingTop: v.draft.rangeText ? 10 : 0,
-              borderTop: v.draft.rangeText ? "1px dashed var(--border-dashed)" : undefined,
-            }}
-          >
-            {v.draft.explanation}
-          </p>
+          {/* ★AI の説明文は出さない。範囲だけ（P3）。
+                 出せないときだけ、定型のお知らせを置く */}
+          {v.draft.notice && (
+            <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "var(--text-sub-2)" }}>
+              {v.draft.notice}
+            </p>
+          )}
         </div>
       )}
 

@@ -14,21 +14,32 @@ import type { AdjustmentEffect } from "./effect";
  */
 
 /**
- * ★問いに現在の取り決めを差し込む。
- *   合意を参照していることが、当事者から見えるようにする。
+ * ★★ 問いをやめ、お知らせにした。
+ *
+ *   「今後も変更する」は、**対話から取り決めを書き換える前提**の選択肢だった。
+ *   取り決めを対話から動かさないと決めたので、この選択肢は行き先を失う。
+ *   選べるように見せたまま何も起きないほうが、選べないことより悪い。
+ *
+ *   合意を参照して現在の取り決めを差し込むことは**続ける。**
+ *   これが C3 の本体であり、「今後も」の行き先（取り決めの画面）も示す。
  */
+export const ADJUSTMENT_NOTICE =
+  "取り決めでは{{current}}となっています。今回だけのご相談として承ります。" +
+  "取り決めそのものを変えるときは、取り決めの画面からお申し出ください。";
+
+/** ★旧：対話から取り決めを変えていたころの問い。経路が消えたので使わない */
 export const ADJUSTMENT_QUESTION =
   "取り決めでは{{current}}となっています。今回だけの変更にしますか、それとも今後も変更しますか。";
 
 /**
- * 問いを立てるべきか。
+ * お知らせを出すべきか。
  *
- * ★合意が無ければ問わない。変えるものが無い。
- * ★感情表現だけでは問わない。受け止めて終わる。
+ * ★合意が無ければ出さない。触れるものが無い。
+ * ★感情表現だけでは出さない。受け止めて終わる。
  */
 const CHANGE_INTENTS: readonly Intent[] = ["REQUEST", "PROPOSAL", "REVISION_REQUEST"];
 
-export function needsEffectQuestion(input: {
+export function needsAdjustmentNotice(input: {
   hasAgreement: boolean;
   intents: readonly Intent[];
 }): boolean {

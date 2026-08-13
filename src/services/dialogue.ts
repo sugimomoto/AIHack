@@ -6,8 +6,7 @@ import { sanitizeReception, stripSelfConveyance } from "@/domain/dialogue/vocabu
 import { detectInjection } from "@/domain/security/guard";
 import { redactPii } from "@/domain/security/guard";
 import { choicesFor } from "@/domain/dialogue/choices";
-import { ADJUSTMENT_QUESTION, needsEffectQuestion } from "@/domain/adjustment/flow";
-import { EFFECT_LABEL } from "@/domain/adjustment/effect";
+import { ADJUSTMENT_NOTICE, needsAdjustmentNotice } from "@/domain/adjustment/flow";
 
 /**
  * 対話
@@ -24,8 +23,12 @@ export type DialogueResult = {
   topic: string | null;
   reply: string;
   choices: { id: string; label: string }[];
-  /** ★合意がある論点への変更希望のとき、AIが立てる問い（C3） */
-  effectQuestion: string | null;
+  /**
+   * ★合意がある論点への変更希望のとき、AI が出すお知らせ（C3）。
+   *   以前は「今回だけ／今後も」を問うていたが、
+   *   **取り決めを対話から動かさなくなったので、選択肢が行き先を失った。**
+   */
+  effectNotice: string | null;
 };
 
 export async function respondTo(input: {
@@ -62,19 +65,15 @@ export async function respondTo(input: {
 
   // ★C3：合意を参照しているからこそ立てられる問い
   const agreement = input.resolveAgreement ? await input.resolveAgreement(topic) : null;
-  const effectQuestion =
-    agreement && agreement.topic === topic && needsEffectQuestion({ hasAgreement: true, intents })
-      ? ADJUSTMENT_QUESTION.replace("{{current}}", agreement.summary)
+  const effectNotice =
+    agreement && agreement.topic === topic && needsAdjustmentNotice({ hasAgreement: true, intents })
+      ? ADJUSTMENT_NOTICE.replace("{{current}}", agreement.summary)
       : null;
 
-  const choices = effectQuestion
-    ? [
-        { id: "one_time", label: EFFECT_LABEL.ONE_TIME },
-        { id: "permanent", label: EFFECT_LABEL.PERMANENT },
-      ]
-    : choicesFor(intents);
+  // ★お知らせは選択を求めない。いつもの選択肢を出す
+  const choices = choicesFor(intents);
 
-  return { intents, topic, reply, choices, effectQuestion };
+  return { intents, topic, reply, choices, effectNotice };
 }
 
 /** ★失敗しても落とさない。分類なしとして受け止めに進む */

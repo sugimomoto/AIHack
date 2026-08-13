@@ -1,5 +1,5 @@
-import { callLlm } from "@/infra-adapters/llm/router";
-import { saveCallLog } from "@/infra-adapters/firestore/repositories/llmCallLogRepository";
+// ★このファイルは LLM を呼ばない。
+//   取り決めに関わる経路から、AI を完全に外した（P3）。
 import { findSupportTable } from "@/infra-adapters/firestore/repositories/masterRepository";
 import {
   childrenKeyOf,
@@ -7,13 +7,6 @@ import {
   lookupChildSupport,
   type SupportRange,
 } from "@/domain/support/table";
-import {
-  MEDIATION_SYSTEM_PROMPT,
-  buildMediationInput,
-  verifyMediationText,
-} from "@/domain/support/mediation";
-import { redactPii } from "@/domain/security/guard";
-import { sanitizeReception } from "@/domain/dialogue/vocabulary";
 import {
   canFinalizeAgreement,
   consentStateOf,
@@ -24,14 +17,11 @@ import {
 import { asCaseId, type PartyId } from "@/domain/case/types";
 import { assertOwnParty } from "@/domain/case/scope";
 import { applyAdjustment, parseEffect } from "@/domain/adjustment/flow";
-import { createHash } from "node:crypto";
 import {
   appendException,
   appendRevision,
   finalizeAgreement,
   loadAgreementItem,
-  loadMediationDraft,
-  saveMediationDraft,
   listProposalsByTopic,
   loadConsents,
   loadForLlm,
@@ -54,11 +44,19 @@ export type MediationDraft = {
   range: SupportRange | null;
   /** 算定表の提示文。★注記を含む */
   rangeText: string | null;
-  /** LLM が生成した説明 */
-  explanation: string;
+  /**
+   * ★算定表が引けないときのお知らせ。**LLM を通さない定型文。**
+   *   以前は LLM に「おふたりの差」を説明させていた（explanation）。
+   */
+  notice: string | null;
   /** ★未検証の表を使ったか */
   unverified: boolean;
 };
+
+/** ★年収帯が揃っていないときのお知らせ。定型文 */
+const RANGE_UNAVAILABLE =
+  "算定表の目安をお示しできる情報がまだ揃っていません。" +
+  "おふたりの年収の帯が登録されると、目安をご案内できます。";
 
 export async function buildMediationDraft(input: {
   caseId: string;
@@ -71,18 +69,19 @@ export async function buildMediationDraft(input: {
 }): Promise<MediationDraft> {
   const range = await lookupRange(input.topic, input.payerBand, input.payeeBand, input.childAges ?? []);
 
-  const explanation = await explain({
-    caseId: input.caseId,
-    topicLabel: "養育費",
-    range,
-    proposals: input.proposals,
-  });
-
+  // ★★ LLM を呼ばない。
+  //
+  //   以前はここで LARGE モデルに「おふたりのご提案の差」を説明させていた。
+  //   生成後の検査（verifyMediationText）で守ってはいたが、
+  //   **AI が金額に触れる経路が残っている**ことに変わりはなかった。
+  //
+  //   P3（数字と条項を LLM に作らせない）を例外なく守るため、範囲の提示だけにする。
+  //   lookupChildSupport は決定的で、誤りようがない。
   return {
     range,
     // ★算定表の提示は LLM を通さない。formatRange が注記を必ず含める
     rangeText: range ? formatRange(range) : null,
-    explanation,
+    notice: range ? null : RANGE_UNAVAILABLE,
     unverified: range?.caveat !== undefined,
   };
 }
@@ -117,52 +116,19 @@ function bandLowerMan(band: string): number | null {
 }
 
 /**
- * ★レンジが引けないときは LLM を呼ばない。
- *   目安が無い状態で説明させると、**モデルが金額を作る余地ができる。**
+ * ★★ 調停案の生成（explain）は、丸ごと外した。
+ *
+ *   LARGE モデルに「おふたりのご提案の差」を説明させ、
+ *   生成後に verifyMediationText で検査していた。
+ *
+ *   検査は効いていたが、**AI が金額に触れる経路が残っていた**ことに変わりはない。
+ *   相談から取り決めを作るのをやめた以上、ここだけ例外にする理由が無い。
+ *
+ * ★domain 側（MEDIATION_SYSTEM_PROMPT / buildMediationInput / verifyMediationText）は
+ *   残してある。検査のロジックは、いつか調停の支援を作るときに要る。
+ *
+ * @see .steering/20260812-feedback-pivot/design.md §6
  */
-async function explain(input: {
-  caseId: string;
-  topicLabel: string;
-  range: SupportRange | null;
-  proposals: { payload: Record<string, unknown> }[];
-}): Promise<string> {
-  if (!input.range) {
-    return "算定表の目安をお示しできる情報がまだ揃っていません。おふたりの年収の帯が登録されると、目安をご案内できます。";
-  }
-
-  const allowed = {
-    amounts: input.proposals.flatMap((p) =>
-      Object.values(p.payload).filter((v): v is number => typeof v === "number"),
-    ),
-    rangeText: formatRange(input.range),
-  };
-
-  const res = await callLlm({
-    tier: "LARGE",
-    purpose: "MEDIATION_DRAFT",
-    system: MEDIATION_SYSTEM_PROMPT,
-    user: buildMediationInput({
-      topicLabel: input.topicLabel,
-      range: input.range,
-      proposals: input.proposals,
-    }),
-    caseId: input.caseId,
-    // ★推論モデルでは、思考トークンも出力枠を消費する（→ architecture.md §4.1a）。
-    //   900 では枠を使い切って本文が空になった。実測して余裕を持たせる。
-    maxOutputTokens: 3000,
-  });
-  await saveCallLog(res.log);
-
-  // ★生成後に検査する。プロンプトで指示するだけでは漏れる。
-  //   通らなければ、算定表の提示だけを返す（決定的で、誤りようがない）。
-  const text = redactPii(sanitizeReception(res.content.trim()));
-  const v = verifyMediationText(text, allowed);
-  if (!v.ok) {
-    console.warn(`[mediation] 生成文が検査に通りませんでした: ${v.reason} ${v.detail}`);
-    return `${allowed.rangeText}\nおふたりのご提案の差については、この目安を参考にお話し合いください。`;
-  }
-  return text;
-}
 
 // ---------------------------------------------------------------------------
 
@@ -218,29 +184,15 @@ export async function loadAgreementView(input: {
     b: (consents[parties[1]] ?? "PENDING") as "PENDING" | "ACCEPTED" | "REJECTED",
   };
 
-  // ★同じ提案の組み合わせなら作り直さない。
-  //   画面を開くたびに LARGE を呼んでおり、CT-1 が想定の4倍になっていた。
-  // ★鍵には、生成結果を変えるものすべてを入れる。
-  //   提案だけを鍵にしていたため、年収帯を後から登録しても
-  //   「情報が揃っていません」が恒久的に残っていた（レビューで検出）。
-  const draftKey = ready
-    ? `${input.topic}_${createHash("sha256")
-        .update(
-          JSON.stringify({
-            proposals: parties.map((id) => byParty.get(id)),
-            bands: parties.map((id) => bands[id] ?? null),
-            children: snap.children.map((c) => ageOf(c.birthDate)).sort(),
-          }),
-        )
-        .digest("hex")
-        .slice(0, 16)}`
-    : null;
-
-  const cached = draftKey ? await loadMediationDraft(caseId, draftKey) : null;
-
-  const draft = cached
-    ? (cached as unknown as MediationDraft)
-    : ready
+  // ★★ キャッシュをやめた。
+  //
+  //   LARGE モデルを呼んでいたころは、画面を開くたびの生成で CT-1 が想定の4倍になり、
+  //   同じ提案の組み合わせなら作り直さない仕組みが要った。
+  //
+  //   いまは LLM を呼ばない。算定表を引くだけで、決定的である。
+  //   **キャッシュは、正しさを固定する側にしか働かない。**
+  //   （実際、鍵の設計を誤って「情報が揃っていません」が恒久的に残る不具合を出した）
+  const draft = ready
     ? await buildMediationDraft({
         caseId: input.caseId,
         topic: input.topic,
@@ -252,12 +204,6 @@ export async function loadAgreementView(input: {
         proposals: parties.map((id) => ({ payload: byParty.get(id)! })),
       })
     : null;
-
-  // ★目安が出せなかった結果をキャッシュしない。
-  //   年収帯が登録されれば結果が変わるものを、固定してしまわない。
-  if (draftKey && draft && !cached && draft.range !== null) {
-    await saveMediationDraft(caseId, draftKey, draft as unknown as Record<string, unknown>);
-  }
 
   const payloads = parties.map((id) => byParty.get(id) ?? null);
 

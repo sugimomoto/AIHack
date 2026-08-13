@@ -7,7 +7,6 @@ import {
   appendMediationEvent,
   appendSafetyEvent,
   appendMessage,
-  appendProposal,
   ensureConsultation,
   findOtherPartyId,
   loadForLlm,
@@ -17,7 +16,9 @@ import { assertOwnParty, scopedInbound, scopedMessages, scopedOutbound } from "@
 import { parseEffect } from "@/domain/adjustment/flow";
 import { consultationIdOf, parseThreadId } from "@/domain/consultation/thread";
 import { arrangementFrom } from "@/domain/obligation/arrangement";
-import { assertNegotiable, canNegotiateAgreement } from "@/domain/consultation/negotiable";
+// ★assertNegotiable は使わなくなった（対話から取り決めへ行く経路が消えたため）。
+//   関数そのものは残してある。二重の歯止めとして無害で、消すと戻せない。
+import { canNegotiateAgreement } from "@/domain/consultation/negotiable";
 import { listScenarios } from "@/infra-adapters/firestore/repositories/masterRepository";
 import { todayJst } from "@/lib/today";
 import { requiresAgreement } from "@/domain/topic/level";
@@ -63,8 +64,8 @@ async function currentAgreementOf(
 export type TurnResult = {
   reply: string;
   choices: { id: string; label: string }[];
-  /** ★C3：合意を参照して立てた問い */
-  effectQuestion: string | null;
+  /** ★C3：合意を参照して出すお知らせ。選択は求めない */
+  effectNotice: string | null;
   /** ★相手に届いた内容。届かなかった場合は null */
   relayed: string | null;
 };
@@ -73,7 +74,10 @@ export async function postMessage(input: {
   caseId: string;
   partyId: PartyId;
   text: string;
-  /** ★「今回だけ」「今後も」の選択。判定できないうちは未指定 */
+  /**
+   * ★旧：「今回だけ」「今後も」の選択。
+   *   画面からは送られなくなった（選択肢をやめたため）。受け口だけ残す。
+   */
   effect?: string | null;
   /** ★どの相談か。未指定なら既定の相談（K-1） */
   scenarioId?: string | null;
@@ -103,7 +107,7 @@ export async function postMessage(input: {
     content: input.text,
   });
 
-  // ★現在の取り決めを渡す。これがあるからこそ「今回だけ？」と問える（C3）
+  // ★現在の取り決めを渡す。これがあるからこそ現在の内容を差し込める（C3）
   // ★先に分類して、その話題の合意を渡す
   // ★フラグを立てて記録するだけ。応答も画面も変えない。
   //   変えると「見抜かれた」という監視感が生まれる（§5.9）。
@@ -144,7 +148,9 @@ export async function postMessage(input: {
     raw: input.text,
     intents: r.intents,
     topic: r.topic,
-    effect: parseEffect(input.effect),
+    // ★お知らせで「今回だけのご相談として承ります」と伝えている。
+    //   記録もそのとおりにする。**言ったことと残るものを食い違わせない。**
+    effect: parseEffect(input.effect) ?? (r.effectNotice ? "ONE_TIME" : null),
     scenarioId: input.scenarioId ?? null,
     threadId,
     title: input.title ?? null,
@@ -155,7 +161,7 @@ export async function postMessage(input: {
   //   画面が「取り次がれたのか」を後から示せるようにする。
   await markMessageRelay(caseId, consultationId, userMessageId, relayed !== null).catch(() => {});
 
-  return { reply: r.reply, choices: r.choices, effectQuestion: r.effectQuestion, relayed };
+  return { reply: r.reply, choices: r.choices, effectNotice: r.effectNotice, relayed };
 }
 
 /** ★取次ぎの失敗で受け止めを巻き戻さない */
@@ -189,41 +195,21 @@ async function relayIfNeeded(input: {
     const to = await findOtherPartyId(input.caseId, input.partyId);
     if (!to) return null;
 
-    // ★日常連絡（L3）は合意を求めない。提案を作らない。
-    //   作ると、連絡のたびに承諾を求めることになる。
-    //   ただし取次ぎは起きる。**C1 の扱いは変わらない。**
+    // ★★ 取り決めは、対話から作らない。
     //
-    // ★payload が無ければ、合意する内容が無い。
-    //   分類を誤って L1 になっても、中身の無い提案を作らない。
-    //   承諾を求める対象が空になり、片側の承諾で確定しうる。
-    // ★設計どおり、帰結を kind で分ける。
-    //     FORMAL       → AgreementItem（公正証書になる）
-    //     ADJUSTMENT   → Adjustment（公正証書にならない）
-    //     NOTIFICATION → 取次ぎのみ
+    //   以前はここで appendProposal を呼び、抽出した値で取り決めを作っていた。
+    //   そこから実測で3つの欠陥が出た：
+    //     ・「進学費用」の相談が、合意済みの養育費の月額を書き換えうる状態だった
+    //     ・抽出が品目を言い換え、「スマホ代」が「コピー代」に化けた
+    //     ・はっきり書いた人ほど、逐語一致の検査で伝わる中身が減っていた
     //
-    //   実装は topic だけで分岐していたため、
-    //   「進学費用」の話が養育費への提案になり、
-    //   **合意済みの月額を書き換えうる状態だった。**
-    const negotiable = canNegotiateAgreement(input.scenarioKind);
-
-    let proposalId: string | undefined;
-    if (negotiable && requiresAgreement(input.topic ?? "OTHER") && relay.payload) {
-      // ★書き込みの直前で守る。分岐が増えても効くように
-      assertNegotiable(input.scenarioKind);
-      proposalId = await appendProposal(input.caseId, {
-        byPartyId: input.partyId,
-        topic: input.topic ?? "OTHER",
-        payload: relay.payload,
-        context: relay.context,
-        contextCategories: relay.categories,
-        status: "PENDING",
-        effect: input.effect,
-        // ★どの相談から出た提案か。混ざったときに追えるようにする
-        threadId: input.threadId ?? null,
-        scenarioId: input.scenarioId ?? null,
-      });
-    } else if (!negotiable && relay.payload && input.threadId) {
-      // ★ADJUSTMENT の行き先。取り決めには触れない
+    //   kind による歯止めは入れられる。だが**歯止めが要ること自体が構造の問題**だった。
+    //   取り決めは「取り決め」画面の入力だけで作る（仮案 → 了承）。
+    //   これで P3（数字と条項を LLM に作らせない）が例外なく守られる。
+    //
+    // ★相談の帰結は Adjustment だけ。公正証書には載らない。
+    // ★payload が無ければ、記録する内容が無い。
+    if (relay.payload && input.threadId) {
       await appendAdjustment(input.caseId, {
         threadId: input.threadId,
         scenarioId: input.scenarioId ?? null,
@@ -276,7 +262,6 @@ async function relayIfNeeded(input: {
       scenarioId: input.scenarioId ?? null,
       threadId: input.threadId ?? null, // ★相手側でも同じスレッドに並べる
       content: relay.content,
-      ...(proposalId ? { proposalId } : {}),
     });
 
     return relay.content;

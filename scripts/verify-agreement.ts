@@ -21,26 +21,14 @@ async function main() {
   });
 
   console.log(`\n算定表の提示（★LLMを通していない）:\n  ${d.rangeText?.split("\n").join("\n  ")}`);
-  console.log(`\nAIの説明:\n  ${d.explanation.split("\n").join("\n  ")}`);
 
   console.log("\n② 検証");
   const check = (l: string, ok: boolean) => console.log(`   ${l}: ${ok ? "✓" : "✗"}`);
   check("★検証済みの表では注記が付かない", !(d.rangeText ?? "").includes("未検証") && !d.unverified);
-  check("★説明が空でない              ", d.explanation.trim().length > 20);
   check("★出典（表番号）が併記される    ", (d.rangeText ?? "").includes("表1"));
   check("★レンジが算定表由来           ", d.range !== null);
-
-  // ★LLM が算定表以外の金額を作っていないか。
-  //   許される数値は「提案の値」と「算定表の提示文に現れる値」のみ。
-  //   表番号の「0〜14歳」も提示文に含まれるため、ここから拾う。
-  const allowed = new Set([
-    "30000", "40000", "3", "4",
-    ...((d.rangeText ?? "").match(/\d+/g) ?? []),
-  ]);
-  const nums = (d.explanation.match(/\d[\d,]*/g) ?? []).map((s) => s.replace(/,/g, ""));
-  const unknown = nums.filter((n) => !allowed.has(n));
-  check(`★説明に未知の数値が無い       `, unknown.length === 0);
-  if (unknown.length > 0) console.log(`      → ${unknown.join(", ")}`);
+  // ★AI の説明文は無くなった。範囲だけを出す（P3 を例外なく守る）
+  check("★AI の説明文が付かない        ", d.notice === null);
 
   console.log("\n③ 合意の成立");
   for (const c of [
@@ -61,8 +49,8 @@ async function main() {
     childAges: [8],
     proposals: [],
   });
-  console.log(`   ${n.explanation}`);
-  check("★レンジが引けないとき LLM を呼ばない", n.range === null);
+  console.log(`   ${n.notice}`);
+  check("★レンジが引けないとき、定型のお知らせだけ", n.range === null && n.notice !== null);
 }
 
 main().catch((e) => {

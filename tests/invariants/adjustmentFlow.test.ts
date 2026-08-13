@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
-  ADJUSTMENT_QUESTION,
+  ADJUSTMENT_NOTICE,
   applyAdjustment,
-  needsEffectQuestion,
+  needsAdjustmentNotice,
 } from "@/domain/adjustment/flow";
 import { outcomeOf } from "@/domain/adjustment/effect";
 
@@ -18,27 +18,31 @@ import { outcomeOf } from "@/domain/adjustment/effect";
  * ★このテストは実装より先に書かれた
  */
 
-describe("★問いを立てる条件", () => {
-  it("★合意がある論点への変更希望では、必ず問う", () => {
-    expect(needsEffectQuestion({ hasAgreement: true, intents: ["REQUEST"] })).toBe(true);
-    expect(needsEffectQuestion({ hasAgreement: true, intents: ["REVISION_REQUEST"] })).toBe(true);
+describe("★お知らせを出す条件", () => {
+  it("★合意がある論点への変更希望では、必ず出す", () => {
+    expect(needsAdjustmentNotice({ hasAgreement: true, intents: ["REQUEST"] })).toBe(true);
+    expect(needsAdjustmentNotice({ hasAgreement: true, intents: ["REVISION_REQUEST"] })).toBe(true);
   });
 
-  it("★合意が無ければ問わない（変えるものが無い）", () => {
-    expect(needsEffectQuestion({ hasAgreement: false, intents: ["REQUEST"] })).toBe(false);
+  it("★合意が無ければ出さない（触れるものが無い）", () => {
+    expect(needsAdjustmentNotice({ hasAgreement: false, intents: ["REQUEST"] })).toBe(false);
   });
 
-  it("★感情表現だけでは問わない", () => {
-    expect(needsEffectQuestion({ hasAgreement: true, intents: ["EMOTIONAL_EXPRESSION"] })).toBe(false);
+  it("★感情表現だけでは出さない", () => {
+    expect(needsAdjustmentNotice({ hasAgreement: true, intents: ["EMOTIONAL_EXPRESSION"] })).toBe(false);
   });
 
-  it("問いの文言に、今回だけ／今後も の両方がある", () => {
-    expect(ADJUSTMENT_QUESTION).toContain("今回だけ");
-    expect(ADJUSTMENT_QUESTION).toContain("今後も");
+  it("★お知らせが取り決めを引用している（合意を参照していることが見える）", () => {
+    expect(ADJUSTMENT_NOTICE).toContain("{{current}}");
   });
 
-  it("★問いが取り決めを引用している（合意を参照していることが見える）", () => {
-    expect(ADJUSTMENT_QUESTION).toContain("{{current}}");
+  it("★「今後も変更する」を選ばせない。行き先（取り決めの画面）を示す", () => {
+    expect(ADJUSTMENT_NOTICE).not.toContain("今後も変更");
+    expect(ADJUSTMENT_NOTICE).toContain("取り決めの画面");
+  });
+
+  it("★今回だけの相談として承ることを、はっきり言う", () => {
+    expect(ADJUSTMENT_NOTICE).toContain("今回だけ");
   });
 });
 

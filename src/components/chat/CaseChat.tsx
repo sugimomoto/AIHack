@@ -64,13 +64,13 @@ export function CaseChat({
   const [view, setView] = useState<View>({ messages: [], inbound: [], outbound: [] });
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
-  // ★問いは「どの時点のものか」を持たせる。
-  //   相手の送信で読み直したとき、前ターンの問いが残って別件に貼り付くのを防ぐ
+  // ★お知らせは「どの時点のものか」を持たせる。
+  //   相手の送信で読み直したとき、前ターンのものが残って別件に貼り付くのを防ぐ
   //   （レビューで検出）。
-  const [question, setQuestion] = useState<{ key: number; text: string } | null>(null);
-  const effectQuestion = question && question.key === (reloadKey ?? 0) ? question.text : null;
-  const setEffectQuestion = (text: string | null) =>
-    setQuestion(text ? { key: reloadKey ?? 0, text } : null);
+  const [notice, setNotice] = useState<{ key: number; text: string } | null>(null);
+  const effectNotice = notice && notice.key === (reloadKey ?? 0) ? notice.text : null;
+  const setEffectNotice = (text: string | null) =>
+    setNotice(text ? { key: reloadKey ?? 0, text } : null);
   const endRef = useRef<HTMLDivElement>(null);
 
   const headers = useCallback(
@@ -100,27 +100,27 @@ export function CaseChat({
     };
   }, [fetchView, reloadKey]);
 
-  const send = async (effect?: "ONE_TIME" | "PERMANENT") => {
+  const send = async () => {
     const body = text.trim();
-    if ((!body && !effect) || busy) return;
+    if (!body || busy) return;
     setText("");
     setBusy(true);
-    // ★前ターンの問いを必ず消す。残ると、無関係な発言に貼り付く
-    setEffectQuestion(null);
+    // ★前ターンのお知らせを必ず消す。残ると、無関係な発言に貼り付く
+    setEffectNotice(null);
     try {
       const res = await fetch(`/api/cases/${caseId}/messages`, {
         method: "POST",
         headers: headers(),
-        body: JSON.stringify({ text: body || "（選択）", effect, scenarioId, threadId, title: label }),
+        body: JSON.stringify({ text: body, scenarioId, threadId, title: label }),
       });
-      // ★C3：合意を参照して立てられた問い
-      const d = res.ok ? ((await res.json()) as { effectQuestion?: string | null }) : null;
-      setEffectQuestion(d?.effectQuestion ?? null);
+      // ★C3：合意を参照して出されたお知らせ
+      const d = res.ok ? ((await res.json()) as { effectNotice?: string | null }) : null;
+      setEffectNotice(d?.effectNotice ?? null);
       await reload();
       onChanged?.(); // ★相手側も読み直す
     } catch {
-      // ★失敗しても、問いが残ったままにしない
-      setEffectQuestion(null);
+      // ★失敗しても、お知らせが残ったままにしない
+      setEffectNotice(null);
     } finally {
       setBusy(false);
       requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
@@ -246,8 +246,11 @@ export function CaseChat({
           ),
         )}
 
-        {/* ★合意を参照しているからこそ立てられる問い（C3） */}
-        {effectQuestion && !busy && (
+        {/* ★合意を参照しているからこそ出せるお知らせ（C3）。
+               ★以前はここで「今回だけ／今後も」を選ばせていた。
+                 取り決めを対話から動かさなくなったので、「今後も」は行き先を失った。
+                 選べるように見せたまま何も起きないほうが、選べないことより悪い。 */}
+        {effectNotice && !busy && (
           <div
             style={{
               background: "var(--bubble-ai)",
@@ -256,31 +259,7 @@ export function CaseChat({
               padding: "11px 13px",
             }}
           >
-            <p style={{ fontSize: 13.5, lineHeight: 1.9 }}>{effectQuestion}</p>
-            <p style={{ fontSize: 11.5, lineHeight: 1.8, color: "var(--text-sub-2)", marginTop: 6 }}>
-              「今回だけ」を選んでも、取り決めは変わりません。
-            </p>
-            <div className="mt-2.5 flex gap-2">
-              {([
-                ["ONE_TIME", "今回だけ変更する"],
-                ["PERMANENT", "今後も変更する"],
-              ] as const).map(([e, label]) => (
-                <button
-                  key={e}
-                  type="button"
-                  onClick={() => void send(e)}
-                  className="flex-1 rounded-full"
-                  style={{
-                    border: "1px solid var(--border-strong)",
-                    background: "var(--surface)",
-                    minHeight: 38,
-                    fontSize: 12.5,
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <p style={{ fontSize: 13.5, lineHeight: 1.9 }}>{effectNotice}</p>
           </div>
         )}
 

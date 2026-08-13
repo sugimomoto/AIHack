@@ -1,3 +1,5 @@
+import { payloadsAgree } from "./consent";
+
 /**
  * 論点の画面が、いまどの状態か（A-2 の6状態）
  *
@@ -46,8 +48,12 @@ export function screenStateOf(i: ScreenInput): ScreenState {
   const hasOther = i.otherPayload !== null;
   const hasOwn = i.ownPayload !== null;
 
-  // ★双方に案がある＝一方が了承しなかった経路。**例外的**
-  if (hasOther && hasOwn && i.sharing === "SHARED") return "DIVERGED";
+  // ★双方に案があり、**内容が違う**とき。一方が了承しなかった経路。**例外的**
+  //   内容が同じなら、了承が済んで確定を待っているだけである。
+  //   ここを内容で見ないと、了承した直後に「別の案」と表示される（実機で検出）。
+  if (hasOther && hasOwn && i.sharing === "SHARED") {
+    return payloadsAgree([i.ownPayload, i.otherPayload]) ? "SHARED" : "DIVERGED";
+  }
   if (hasOther) return "INCOMING";
 
   if (i.sharing === "SHARED") return "SHARED";

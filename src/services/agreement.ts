@@ -232,8 +232,15 @@ export async function loadAgreementView(input: {
   return {
     topic: input.topic,
     ready,
-    /** ★自分の仮案の中身。下書きでも自分には見える */
-    ownPayload: mine && !mine.withdrawnAt ? mine.payload : null,
+    /**
+     * ★自分の仮案の中身。**下書きでも取り下げたあとでも、自分には見える。**
+     *
+     *   取り下げで消していたため、S-5（取り下げたあと）の画面が
+     *   帯だけになり、書き直す対象が無くなっていた（実機で検出）。
+     *   取り下げは「相手から見えなくする」ことであって、
+     *   **自分の手元から消すことではない。**
+     */
+    ownPayload: mine?.payload ?? null,
     /** ★お相手の案。渡されていなければ null */
     otherPayload: theirs?.payload ?? null,
     otherSharedOn: (theirs?.sharedAt ?? "").slice(0, 10) || null,
@@ -303,7 +310,14 @@ export async function recordConsent(input: {
 
   // ★提案が一致していなければ確定しない。
   //   合成すると、誰も合意していない内容が確定する。
-  const proposals = await listProposalsByTopic(caseId, input.topic);
+  //
+  // ★★ 合意になれるのは、**双方に見えている案だけ。**
+  //   下書きを数えると、おたがい渡していないのに
+  //   たまたま同じ内容を書いただけで合意が成立してしまう（実機で検出）。
+  //   合意は、見せて、了承されて、はじめて成り立つ。
+  const proposals = (await listProposalsByTopic(caseId, input.topic)).filter(
+    (p) => p.sharedAt !== null && p.withdrawnAt === null,
+  );
   const byParty = new Map<string, (typeof proposals)[number]>();
   for (const p of proposals) if (p.payload) byParty.set(p.byPartyId, p); // ★作成順なので最後が最新
   const payloads = parties.map((id) => byParty.get(id)?.payload ?? null);

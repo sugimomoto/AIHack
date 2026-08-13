@@ -161,3 +161,98 @@ describe("★サーバ側で落とす", () => {
     expect(approve).not.toMatch(/body\.payload/);
   });
 });
+
+/**
+ * ★実機で見つけた欠陥を固定する
+ *
+ * どれも「テストは通るが、通しで動かすと壊れている」種類のものだった。
+ */
+describe("★実機で見つけた欠陥", () => {
+  const service = readFileSync("src/services/agreement.ts", "utf8");
+  const route = readFileSync("src/app/api/cases/[caseId]/terms/route.ts", "utf8");
+  const repo = readFileSync(
+    "src/infra-adapters/firestore/repositories/caseRepository.ts",
+    "utf8",
+  );
+
+  it("★取り下げても、自分の手元からは消えない", () => {
+    // ★取り下げは「相手から見えなくする」ことであって、自分の下書きを消すことではない。
+    //   消していたため、S-5 の画面が帯だけになり、書き直す対象が無くなっていた。
+    expect(service).toContain("ownPayload: mine?.payload ?? null");
+  });
+
+  it("★合意になれるのは、双方に見えている案だけ", () => {
+    // ★下書きを数えると、おたがい渡していないのに
+    //   たまたま同じ内容を書いただけで合意が成立する。
+    const record = service.slice(service.indexOf("export async function recordConsent"));
+    expect(record).toMatch(/sharedAt !== null && p\.withdrawnAt === null/);
+  });
+
+  it("★了承は、確定の判定を通る（setConsent だけで終わらせない）", () => {
+    // ★直接 setConsent を呼んでいたため、了承しても取り決めが作られず、
+    //   公正証書の原案にも入らなかった。
+    const approve = route.slice(route.indexOf("async function approve"));
+    expect(approve).toContain("recordConsent");
+  });
+
+  it("★了承では承諾をやり直さない", () => {
+    // ★やり直すと、了承した瞬間に相手の承諾が消えて、いつまでも合意にならない。
+    //   payload はサーバが複製したものなので、内容は必ず同じである。
+    expect(repo).toContain("keepConsents");
+    const approve = route.slice(route.indexOf("async function approve"));
+    expect(approve).toContain("keepConsents: true");
+  });
+
+  it("★下書きの保存では、承諾をやり直す", () => {
+    // ★内容が違いうる経路。前回の ACCEPTED が残っていると、
+    //   片側1クリックで別の内容が確定する。
+    const save = route.slice(route.indexOf("async function save"), route.indexOf("async function latestOwn"));
+    expect(save).not.toContain("keepConsents");
+  });
+
+  it("★取り下げたものを、同じ行のまま出し直さない", () => {
+    // ★sharedAt を書き換えると、取り下げた記録が消える
+    const share = route.slice(route.indexOf("async function share"), route.indexOf("async function withdraw"));
+    expect(share).toMatch(/withdrawnAt !== null/);
+    expect(share).toContain("appendProposal");
+  });
+});
+
+describe("★了承した直後に「別の案」と出さない", () => {
+  it("内容が同じなら DIVERGED にしない", async () => {
+    const { screenStateOf } = await import("@/domain/agreement/screen");
+    const same = { monthlyAmount: 50000, payDay: "DAY_25", until: "AGE_20" };
+    expect(
+      screenStateOf({
+        agreed: false,
+        ownPayload: same,
+        otherPayload: { ...same },
+        sharing: "SHARED",
+      }),
+    ).toBe("SHARED");
+  });
+
+  it("内容が違えば DIVERGED", async () => {
+    const { screenStateOf } = await import("@/domain/agreement/screen");
+    expect(
+      screenStateOf({
+        agreed: false,
+        ownPayload: { monthlyAmount: 50000 },
+        otherPayload: { monthlyAmount: 30000 },
+        sharing: "SHARED",
+      }),
+    ).toBe("DIVERGED");
+  });
+
+  it("★合意済は、何よりも先に見える", async () => {
+    const { screenStateOf } = await import("@/domain/agreement/screen");
+    expect(
+      screenStateOf({
+        agreed: true,
+        ownPayload: { a: 1 },
+        otherPayload: { a: 2 },
+        sharing: "SHARED",
+      }),
+    ).toBe("AGREED");
+  });
+});

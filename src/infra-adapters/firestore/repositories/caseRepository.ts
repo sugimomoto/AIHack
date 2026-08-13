@@ -363,6 +363,17 @@ export async function appendProposal(
      *   下書きは相手から見えない（domain/agreement/sharing）。
      */
     sharedAt?: string | null;
+    /**
+     * ★承諾をやり直さない。**了承の経路だけで使う。**
+     *
+     *   了承では、相手の案を**サーバ側で複製**して積む。
+     *   内容が同じなのに承諾をやり直すと、
+     *   了承した瞬間に相手の承諾が消え、いつまでも合意にならない（実機で検出）。
+     *
+     *   ★内容が違いうる経路（下書きの保存）では、必ずやり直すこと。
+     *     前回の ACCEPTED が残っていると、片側1クリックで別の内容が確定する。
+     */
+    keepConsents?: boolean;
   },
 ): Promise<string> {
   const ref = await caseRef(caseId)
@@ -382,7 +393,14 @@ export async function appendProposal(
   await caseRef(caseId)
     .collection("agreementItems")
     .doc(p.topic)
-    .set({ topic: p.topic, consents: {}, updatedAt: new Date().toISOString() }, { merge: true });
+    .set(
+      {
+        topic: p.topic,
+        ...(p.keepConsents ? {} : { consents: {} }),
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    );
 
   return ref.id;
 }

@@ -100,11 +100,17 @@ function ConsultIcon({ color }: IconProps) {
   );
 }
 
+/**
+ * ★書面。中のチェックを外した。
+ *
+ *   「決まったこと」をチェックにしたところ、**隣り合う2つが同じ形に見えた。**
+ *   取り決めは**公正証書に入れる内容**であり、書面そのもののほうが正しい。
+ */
 function AgreementIcon({ color }: IconProps) {
   return (
     <svg {...base(color)} aria-hidden>
       <path d="M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
-      <path d="M9.5 12.5l1.8 1.8 3.4-3.6" />
+      <path d="M9 8h6M9 12h6M9 16h3.5" />
     </svg>
   );
 }

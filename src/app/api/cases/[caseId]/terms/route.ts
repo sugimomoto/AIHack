@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveParty } from "@/lib/resolveParty";
 import { errorResponse } from "../messages/route";
+import { recordConsent } from "@/services/agreement";
 import { asCaseId, type PartyId } from "@/domain/case/types";
 import { assertOwnParty } from "@/domain/case/scope";
 import { IMPLEMENTED_TOPICS, TOPIC_LABEL, isAgreementTopic } from "@/domain/agreement/topics";
@@ -138,11 +139,31 @@ async function share(
   topic: string,
 ) {
   const mine = await latestOwn(caseId, partyId, topic);
-  if (!mine || !canShare(mine)) {
+  if (!mine || !mine.payload) {
     return NextResponse.json({ error: "お渡しできる案がありません" }, { status: 400 });
   }
 
-  const at = await shareProposal(caseId, mine.id);
+  // ★一度取り下げたものを、そのまま出し直さない。
+  //   同じ行の sharedAt を書き換えると、**取り下げた記録が消える。**
+  //   複製して新しい仮案として出す。履歴は残る。
+  let id = mine.id;
+  if (mine.withdrawnAt !== null) {
+    id = await appendProposal(caseId, {
+      byPartyId: partyId,
+      topic,
+      payload: { ...mine.payload },
+      context: "",
+      contextCategories: [],
+      status: "PENDING",
+      effect: "PERMANENT",
+      sharedAt: null,
+    });
+    await setConsent(caseId, topic, partyId, "ACCEPTED");
+  } else if (!canShare(mine)) {
+    return NextResponse.json({ error: "すでにお渡ししています" }, { status: 400 });
+  }
+
+  const at = await shareProposal(caseId, id);
 
   const to = await findOtherPartyId(caseId, partyId);
   if (to) {
@@ -150,7 +171,7 @@ async function share(
       fromPartyId: partyId,
       toPartyId: to,
       content: shareNotice(TOPIC_LABEL[topic as keyof typeof TOPIC_LABEL]),
-      proposalId: mine.id,
+      proposalId: id,
     }).catch((e) => console.error("[terms] お知らせの保存に失敗しました", e));
   }
 
@@ -223,8 +244,16 @@ async function approve(
     effect: "PERMANENT",
     // ★了承は下書きではない。その場で相手に伝わってよい
     sharedAt: new Date().toISOString(),
+    // ★★ 承諾をやり直さない。
+    //   payload はこのサーバが複製したものであり、相手の案と必ず同じである。
+    //   やり直すと、了承した瞬間に相手の承諾が消えて合意にならない。
+    keepConsents: true,
   });
-  await setConsent(caseId, topic, partyId, "ACCEPTED");
 
-  return NextResponse.json({ ok: true, approved: true });
+  // ★★ setConsent だけでは合意にならない。**確定の判定を通す。**
+  //   直接 setConsent を呼んでいたため、了承しても取り決めが作られず、
+  //   公正証書の原案にも入らなかった（実機で検出）。
+  const view = await recordConsent({ caseId, partyId, topic, status: "ACCEPTED" });
+
+  return NextResponse.json({ ok: true, approved: true, state: view.state });
 }

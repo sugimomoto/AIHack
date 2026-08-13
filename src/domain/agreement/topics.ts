@@ -51,10 +51,20 @@ export const TOPIC_BENEFICIARY: Record<AgreementTopic, "CHILD" | "PARENT" | "SPO
   MARITAL_EXPENSES: "SPOUSE",
 };
 
-/** 今回実装する論点 */
+/**
+ * 今回実装する論点
+ *
+ * ★扱えないものを入口に出さない。
+ *   慰謝料は対象外と決めた。離婚への同意・親権者・婚姻費用は、
+ *   扱える設計になっていない。**並べるだけ並べて入力できないほうが不親切である。**
+ *
+ * ★順番に意味がある。子どものことを先に置く（TOPIC_BENEFICIARY）。
+ */
 export const IMPLEMENTED_TOPICS: readonly AgreementTopic[] = [
   "CHILD_SUPPORT",
   "VISITATION",
+  "PROPERTY_DIVISION",
+  "PENSION_SPLIT",
 ];
 
 export function isAgreementTopic(v: string): v is AgreementTopic {

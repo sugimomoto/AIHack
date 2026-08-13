@@ -1,20 +1,80 @@
 [
- {
-  "id": "ct_child_support_v1",
-  "payloadSchemaId": "ps_child_support_v1",
-  "topic": "CHILD_SUPPORT",
-  "order": 1,
-  "title": "養育費",
-  "condition": null,
-  "body": "甲は乙に対し、{{childrenRef}}の養育費として、{{monthlyAmount}}円を{{payDay}}限り、乙の指定する方法により支払う。\n前項の支払は、{{childrenRef}}がそれぞれ{{until}}に達する月まで継続する。"
- },
- {
-  "id": "ct_visitation_v1",
-  "payloadSchemaId": "ps_visitation_v2",
-  "topic": "VISITATION",
-  "order": 2,
-  "title": "面会交流",
-  "condition": null,
-  "body": "乙は甲に対し、甲が{{childrenRef}}と面会交流することを認める。\n面会交流は{{frequency}}とし、時間は{{timeRange}}、受け渡し場所は{{handoverPlace}}とする。\n面会交流の具体的な日程は、甲乙間で事前に協議して定める。"
- }
+  {
+    "id": "ct_child_support_v1",
+    "payloadSchemaId": "ps_child_support_v1",
+    "topic": "CHILD_SUPPORT",
+    "order": 1,
+    "title": "養育費",
+    "condition": null,
+    "body": "甲は乙に対し、{{childrenRef}}の養育費として、{{monthlyAmount}}円を{{payDay}}限り、乙の指定する方法により支払う。\n前項の支払は、{{childrenRef}}がそれぞれ{{until}}に達する月まで継続する。"
+  },
+  {
+    "id": "ct_visitation_v1",
+    "payloadSchemaId": "ps_visitation_v2",
+    "topic": "VISITATION",
+    "order": 2,
+    "title": "面会交流",
+    "condition": null,
+    "body": "乙は甲に対し、甲が{{childrenRef}}と面会交流することを認める。\n面会交流は{{frequency}}とし、時間は{{timeRange}}、受け渡し場所は{{handoverPlace}}とする。\n面会交流の具体的な日程は、甲乙間で事前に協議して定める。"
+  },
+  {
+    "id": "ct_property_division_lump_v1",
+    "payloadSchemaId": "ps_property_division_v1",
+    "topic": "PROPERTY_DIVISION",
+    "order": 3,
+    "title": "財産分与",
+    "condition": {
+      "field": "method",
+      "equals": "LUMP_SUM"
+    },
+    "body": "{{payerMark}}は{{payeeMark}}に対し、財産分与として金{{amountYen}}円を、{{dueDate}}限り、{{payeeMark}}の指定する方法により支払う。"
+  },
+  {
+    "id": "ct_property_division_settled_v1",
+    "payloadSchemaId": "ps_property_division_v1",
+    "topic": "PROPERTY_DIVISION",
+    "order": 4,
+    "title": "財産分与",
+    "condition": {
+      "field": "method",
+      "equals": "ALREADY_SETTLED"
+    },
+    "body": "甲及び乙は、財産分与について、本日までに協議のうえ清算が済んでいることを相互に確認する。"
+  },
+  {
+    "id": "ct_property_division_later_v1",
+    "payloadSchemaId": "ps_property_division_v1",
+    "topic": "PROPERTY_DIVISION",
+    "order": 5,
+    "title": "財産分与",
+    "condition": {
+      "field": "method",
+      "equals": "CONSULT_LATER"
+    },
+    "body": "甲及び乙は、財産分与について、別途協議して定める。"
+  },
+  {
+    "id": "ct_pension_split_ratio_v1",
+    "payloadSchemaId": "ps_pension_split_v1",
+    "topic": "PENSION_SPLIT",
+    "order": 6,
+    "title": "年金分割",
+    "condition": {
+      "field": "pensionMethod",
+      "equals": "HALF"
+    },
+    "body": "甲及び乙は、厚生年金保険法に基づく年金分割について、請求すべき按分割合を{{pensionMethod}}と定める。"
+  },
+  {
+    "id": "ct_pension_split_later_v1",
+    "payloadSchemaId": "ps_pension_split_v1",
+    "topic": "PENSION_SPLIT",
+    "order": 7,
+    "title": "年金分割",
+    "condition": {
+      "field": "pensionMethod",
+      "equals": "CONSULT_LATER"
+    },
+    "body": "甲及び乙は、厚生年金保険法に基づく年金分割の請求すべき按分割合について、別途協議して定める。"
+  }
 ]

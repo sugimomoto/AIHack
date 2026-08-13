@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   NOTARY_NOTICE,
+  UnresolvedConditionError,
   UnresolvedPlaceholderError,
   buildDocument,
   formatValue,
@@ -238,5 +239,126 @@ describe("★複数のお子さん", () => {
     // 算定表は「子○人」で総額を出す。割ると根拠を失う
     const d = buildDocument({ templates: T, items: [item(3)] });
     expect(d.clauses[0].body).toContain("30,000円");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ★条項を出す条件（財産分与・年金分割）
+// ---------------------------------------------------------------------------
+
+describe("★condition｜どの条項を出すか", () => {
+  const LUMP = {
+    id: "ct_pd_lump",
+    topic: "PROPERTY_DIVISION",
+    order: 1,
+    title: "財産分与",
+    condition: { field: "method", equals: "LUMP_SUM" },
+    body: "{{payerMark}}は{{payeeMark}}に対し、財産分与として金{{amountYen}}円を、{{dueDate}}限り、{{payeeMark}}の指定する方法により支払う。",
+  };
+  const SETTLED = {
+    id: "ct_pd_settled",
+    topic: "PROPERTY_DIVISION",
+    order: 2,
+    title: "財産分与",
+    condition: { field: "method", equals: "ALREADY_SETTLED" },
+    body: "甲及び乙は、財産分与について、本日までに協議のうえ清算が済んでいることを相互に確認する。",
+  };
+
+  const build = (payload: Record<string, unknown>) =>
+    buildDocument({
+      templates: [LUMP, SETTLED],
+      items: [{ topic: "PROPERTY_DIVISION", status: "AGREED", payload }],
+    });
+
+  it("★選んだ決め方の条項だけが出る", () => {
+    const d = build({
+      method: "LUMP_SUM",
+      payerSide: "NON_CUSTODIAL",
+      amountYen: 1000000,
+      dueDate: "2026-12-31",
+    });
+    expect(d.clauses).toHaveLength(1);
+    expect(d.clauses[0].templateId).toBe("ct_pd_lump");
+  });
+
+  it("★別の決め方なら、別の条項が出る", () => {
+    const d = build({ method: "ALREADY_SETTLED" });
+    expect(d.clauses).toHaveLength(1);
+    expect(d.clauses[0].templateId).toBe("ct_pd_settled");
+  });
+
+  it("★条件に使う値が無ければ、黙って落とさず例外にする", () => {
+    // ★合意した内容が文書から消えるほうが、例外で止まるより危険である
+    expect(() => build({ amountYen: 1000000 })).toThrow(UnresolvedConditionError);
+  });
+
+  it("★支払う向きが条項に出る（取り違えると法的文書が逆になる）", () => {
+    const 甲が払う = build({
+      method: "LUMP_SUM",
+      payerSide: "NON_CUSTODIAL",
+      amountYen: 1000000,
+      dueDate: "2026-12-31",
+    });
+    expect(甲が払う.clauses[0].body).toMatch(/^甲は乙に対し/);
+
+    const 乙が払う = build({
+      method: "LUMP_SUM",
+      payerSide: "CUSTODIAL",
+      amountYen: 1000000,
+      dueDate: "2026-12-31",
+    });
+    expect(乙が払う.clauses[0].body).toMatch(/^乙は甲に対し/);
+  });
+
+  it("★向きが決まっていなければ、条項を作らない", () => {
+    expect(() =>
+      build({ method: "LUMP_SUM", amountYen: 1000000, dueDate: "2026-12-31" }),
+    ).toThrow(UnresolvedPlaceholderError);
+  });
+
+  it("★日付を ISO 形式のまま条項に出さない", () => {
+    const d = build({
+      method: "LUMP_SUM",
+      payerSide: "NON_CUSTODIAL",
+      amountYen: 1000000,
+      dueDate: "2026-12-31",
+    });
+    expect(d.clauses[0].body).toContain("2026年12月31日");
+    expect(d.clauses[0].body).not.toContain("2026-12-31");
+  });
+
+  it("★年金分割を「しない」と決めたときは、条項が出ない", () => {
+    const d = buildDocument({
+      templates: [
+        {
+          id: "ct_ps_half",
+          topic: "PENSION_SPLIT",
+          order: 1,
+          title: "年金分割",
+          condition: { field: "pensionMethod", equals: "HALF" },
+          body: "甲及び乙は、厚生年金保険法に基づく年金分割について、請求すべき按分割合を{{pensionMethod}}と定める。",
+        },
+      ],
+      items: [{ topic: "PENSION_SPLIT", status: "AGREED", payload: { pensionMethod: "NONE" } }],
+    });
+    expect(d.clauses).toHaveLength(0);
+  });
+
+  it("★按分割合は表記に変換される（コード値をそのまま出さない）", () => {
+    const d = buildDocument({
+      templates: [
+        {
+          id: "ct_ps_half",
+          topic: "PENSION_SPLIT",
+          order: 1,
+          title: "年金分割",
+          condition: { field: "pensionMethod", equals: "HALF" },
+          body: "請求すべき按分割合を{{pensionMethod}}と定める。",
+        },
+      ],
+      items: [{ topic: "PENSION_SPLIT", status: "AGREED", payload: { pensionMethod: "HALF" } }],
+    });
+    expect(d.clauses[0].body).toContain("2分の1");
+    expect(d.clauses[0].body).not.toContain("HALF");
   });
 });

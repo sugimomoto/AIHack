@@ -12,7 +12,10 @@ import { usePathname } from "next/navigation";
  * ★語の選定には理由がある（第1弾）。
  *   - 「相談」…「対話」より一人称的で、相手と話す含みがない
  *   - 「取り決め」…「合意」は成立を前提とした語。係争中の項目に使うと嘘になる
- *   - 「これから」…「予定」だと支払期日の督促感が出る。過去の記録も同じ画面に並ぶ
+ *   - 「決まったこと」…もとは「これから」だった。
+ *     中身が「これから起きること」から**「決まったことの記録」**に変わったため。
+ *     「これから」のままだと**予定表だと思われる**（スコープ外にしたもの）。
+ *     ★アイコンもカレンダーからチェックに変えてある。同じ理由。
  *
  * ★バッジも件数も持たない。開かせるために数を見せない。
  */
@@ -20,7 +23,7 @@ const TABS = [
   { href: "/app", label: "ホーム", icon: HomeIcon },
   { href: "/app/consult", label: "相談", icon: ConsultIcon },
   { href: "/app/agreements", label: "取り決め", icon: AgreementIcon },
-  { href: "/app/upcoming", label: "これから", icon: UpcomingIcon },
+  { href: "/app/upcoming", label: "決まったこと", icon: DecidedIcon },
   { href: "/app/settings", label: "設定", icon: SettingsIcon },
 ] as const;
 
@@ -106,11 +109,11 @@ function AgreementIcon({ color }: IconProps) {
   );
 }
 
-function UpcomingIcon({ color }: IconProps) {
+/** ★カレンダーではなくチェック。カレンダーのままだと予定表に見える */
+function DecidedIcon({ color }: IconProps) {
   return (
     <svg {...base(color)} aria-hidden>
-      <rect x="3.5" y="5" width="17" height="15" rx="1.5" />
-      <path d="M3.5 10h17M8 3.5v3M16 3.5v3" />
+      <path d="M4 12.5 9.5 18 20 6.5" />
     </svg>
   );
 }

@@ -225,9 +225,21 @@ export async function loadAgreementView(input: {
   // ★N-1：成立した取り決めそのもの。祝うためではなく、何が決まったかを示すため
   const agreed = await loadAgreementItem(caseId, input.topic);
 
+  // ★お相手の案。**見えるものだけ。**下書きはここに入らない
+  const theirs =
+    [...proposals].reverse().find((p) => p.byPartyId !== input.partyId && p.payload) ?? null;
+
   return {
     topic: input.topic,
     ready,
+    /** ★自分の仮案の中身。下書きでも自分には見える */
+    ownPayload: mine && !mine.withdrawnAt ? mine.payload : null,
+    /** ★お相手の案。渡されていなければ null */
+    otherPayload: theirs?.payload ?? null,
+    otherSharedOn: (theirs?.sharedAt ?? "").slice(0, 10) || null,
+    ownSharedOn: (mine?.sharedAt ?? "").slice(0, 10) || null,
+    /** ★算定表の範囲。目盛を引くために数値で渡す（表示文は rangeText） */
+    range: draft?.range ? { minYen: draft.range.minYen, maxYen: draft.range.maxYen } : null,
     agreement: agreed
       ? { payload: agreed.payload, agreedAt: (agreed.agreedAt ?? "").slice(0, 10) }
       : null,

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#F0E7D6; font-family:"Zen Kaku Gothic New", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#3F6B49; text-decoration:none; }
+  a:hover { color:#2E5236; text-decoration:underline; }
+</style>
+</helmet>
+
+<div style="padding:64px 72px 120px; display:flex; flex-direction:column; gap:88px; background:#F0E7D6; color:#3A342E; min-width:5600px;">
+
+  <section style="display:flex; flex-direction:column; gap:88px;">
+
+    <div id="7a" style="display:flex; flex-direction:column; gap:14px; max-width:1000px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:24px; padding:0 9px; border-radius:6px; background:#3A342E; color:#FDF8EF; font-size:12px; font-weight:500; letter-spacing:.06em;">7a</span>
+        <span style="font-size:12px; letter-spacing:.14em; color:#6F675E;">AIDA ／ 取り決めを入力で作る（第4弾）</span>
+      </div>
+      <h1 style="margin:0; font-size:38px; font-weight:500; letter-spacing:.02em; line-height:1.4;">並べない。同じ地図に置く。</h1>
+      <p style="margin:0; font-size:15px; line-height:2; color:#655C53; text-wrap:pretty;">最重要の<a href="#A2d">「内容が異なる」</a>から書きます。<b style="font-weight:500;">二つの金額を左右に並べるのをやめました。</b>並べた時点で交渉の卓になります。<br>代わりに、算定表の範囲を一本の帯として先に敷き、そこに二つの入力を<b style="font-weight:500;">上下の目盛として置きます</b>。向かい合わせではなく、同じものを見ている二人の位置になります。差額も計算しません。<br>フォームが詰問にならないための規律は<a href="#A2">A-2</a>の冒頭に。年金分割の入口は<a href="#A2e">A-2e</a>に置きました。</p>
+    </div>
+
+    <!-- ============ A-2 論点ごとの画面 ============ -->
+    <div id="A2" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#834B32;">優先 1</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">A-2 ／ 論点ごとの画面</h2>
+        <span style="font-size:13px; color:#6F675E;">5つの状態</span>
+      </div>
+
+      <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:24px; padding:24px 28px; max-width:1200px;">
+        <div style="font-size:13px; font-weight:500; margin-bottom:10px;">フォームを詰問にしないための4つ</div>
+        <div style="display:flex; gap:26px; flex-wrap:wrap; font-size:12.5px; line-height:2; color:#655C53;">
+          <div style="width:260px;"><b style="font-weight:500; color:#3A342E;">飛ばせることを、先に見せる</b><br>各カードの見出しの右に「あとでも」と常時置きます。入力してから初めて分かるのでは遅い。</div>
+          <div style="width:260px;"><b style="font-weight:500; color:#3A342E;">必須の印を持たない</b><br>アスタリスクも「必須」ラベルも使いません。全項目が任意です。</div>
+          <div style="width:260px;"><b style="font-weight:500; color:#3A342E;">進捗を出さない</b><br>1/4も○%も出しません。順に埋めるものに見せないためです。</div>
+          <div style="width:260px;"><b style="font-weight:500; color:#3A342E;">空欄を欠落として描かない</b><br>未入力は破線の枠と「—」。赤も感嘆符も使いません。</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:36px; flex-wrap:wrap; align-items:flex-start;">
+
+        <!-- A-2a 未入力 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-2a ／ 未入力（養育費）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">養育費</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="font-size:13px; line-height:1.95; color:#655C53;">公正証書に入れる内容です。お書きになった時点では、まだお相手には届きません。</div>
+
+              <div style="background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:20px; padding:16px 18px;">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                  <img src="assets/capybara.png" alt="" width="26" height="26" style="flex:none; width:26px; height:26px; border-radius:50%; object-fit:cover; margin-top:2px;">
+                  <div style="font-size:13.5px; line-height:1.95;">目安の範囲をお出しできます。<span style="color:#655C53;">お子さんのことと、おふたりの年収が分かればです。</span></div>
+                </div>
+                <div style="margin-top:12px; font-size:13px; color:#3F6B49;">目安を出すために答える ▸</div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:12px; color:#6F675E;">月額</span><span style="margin-left:auto; font-size:11.5px; color:#6F675E;">あとでも</span></div>
+                <div style="margin-top:10px; display:flex; align-items:baseline; gap:8px; border-bottom:1px dashed #E2D7C6; padding-bottom:12px;">
+                  <span style="font-size:24px; color:#A99D8C;">—</span><span style="font-size:15px; color:#655C53;">円</span>
+                </div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:12px; color:#6F675E;">お支払いの日</span><span style="margin-left:auto; font-size:11.5px; color:#6F675E;">あとでも</span></div>
+                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">毎月末日</span>
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">毎月5日</span>
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">ほかの日</span>
+                </div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:12px; color:#6F675E;">いつまで</span><span style="margin-left:auto; font-size:11.5px; color:#6F675E;">あとでも</span></div>
+                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">満20歳に達する月</span>
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">大学を卒業する月</span>
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">ほかの決め方</span>
+                </div>
+              </div>
+            </div>
+            <div style="flex:none; padding:12px 20px 24px; display:flex; flex-direction:column; gap:10px;">
+              <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:15px; text-align:center; font-size:15px; color:#A99D8C;">記録する</div>
+              <div style="text-align:center; font-size:12px; line-height:1.8; color:#6F675E;">ひとつでも書けば、記録できます。</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">未入力は破線の下線と「—」。空欄をエラーとして描きません。<br>各カードの右上の「あとでも」が、飛ばせることを入力前に示します。目安の導線は最上部の破線カードに置き、<b style="font-weight:500;">フォームより先に「答えなくてもよい問い」として見せています</b>。<br>「記録する」は書くまで淡いまま。押せないのではなく、まだ押す段階でないという見え方です。</div>
+        </div>
+
+        <!-- A-2b こちらの記録 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-2b ／ こちらの記録・お相手のご記入待ち</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">養育費</span>
+              <span style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; border:1px dashed #C4B8A7; border-radius:11px; padding:4px 9px;"><span style="font-size:11.5px; color:#6F675E;">こちらの記録</span></span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:4px 18px;">
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:98px; flex:none;">月額</span><span style="font-size:16px;">50,000円</span></div>
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:98px; flex:none;">お支払いの日</span><span style="font-size:16px;">毎月末日</span></div>
+                <div style="padding:15px 0; display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:98px; flex:none;">いつまで</span><span style="font-size:16px;">満20歳に達する月</span></div>
+              </div>
+
+              <div style="display:flex; gap:10px;">
+                <div style="flex:1; border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:14px; text-align:center; font-size:14.5px; color:#3A342E;">直す</div>
+                <div style="flex:1; border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:14px; text-align:center; font-size:14.5px; color:#3A342E;">このことを相談する</div>
+              </div>
+
+              <div style="background:#F7EFE1; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="font-size:14.5px; line-height:1.85;">お相手のご記入をお待ちしています</div>
+                <div style="margin-top:10px; font-size:12.5px; line-height:1.95; color:#655C53;">お相手が同じ内容を記録されると、合意になります。<br>こちらからお尋ねすることはありません。お待たせしているわけでもありません。</div>
+              </div>
+
+              <div style="border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                いま記録されているのは、ご自身の控えです。公正証書に載るのは、合意になったものだけです。
+              </div>
+
+              <div style="margin-top:auto; margin-bottom:18px;">
+                <div style="font-size:11.5px; letter-spacing:.08em; color:#6F675E; margin-bottom:10px;">目安の範囲</div>
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                  <div style="font-size:13.5px; line-height:1.9; color:#655C53;">お子さん2人・おふたりの年収から、<b style="font-weight:500; color:#3A342E;">月4万〜6万円</b>の範囲とされています。</div>
+                  <div style="margin-top:9px; font-size:11.5px; line-height:1.8; color:#6F675E;">家庭裁判所が公表している表によるものです。この範囲で決めなければならない、というものではありません。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">「お相手のご記入をお待ちしています」に<b style="font-weight:500;">「お待たせしているわけでもありません」</b>を足しました。待ちの表示は、放っておくと相手の不作為を責める形になります。<br>「直す」と「このことを相談する」を同じ重さで並べ、取り決めと相談が別物であることを、この画面から示しています。</div>
+        </div>
+
+        <!-- A-2d 内容が異なる ★ -->
+        <div id="A2d" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#834B32;">A-2d ／ 内容が異なる（★ 最重要）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">養育費</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:16px; overflow:hidden;">
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:2px;">
+                <div style="font-size:15.5px; line-height:1.9;">月額について、<br>お書きになった内容が違っています。</div>
+              </div>
+
+              <!-- 目盛 -->
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:20px 18px 18px;">
+                <div style="font-size:11.5px; letter-spacing:.06em; color:#6F675E;">目安とされている範囲</div>
+
+                <div style="margin-top:18px; position:relative; height:96px;">
+                  <!-- 上のマーカー -->
+                  <div style="position:absolute; left:12%; top:0; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:5px;">
+                    <div style="font-size:11px; color:#6F675E; white-space:nowrap;">お相手のご記入</div>
+                    <div style="font-size:15.5px; white-space:nowrap;">3万円</div>
+                    <div style="width:1px; height:12px; background:#A99D8C;"></div>
+                  </div>
+                  <!-- 帯 -->
+                  <div style="position:absolute; left:0; right:0; top:60px; height:8px; border-radius:4px; background:#F1E9DC;"></div>
+                  <div style="position:absolute; left:28%; width:44%; top:60px; height:8px; border-radius:4px; background:#CFDEC9;"></div>
+                  <!-- 下のマーカー -->
+                  <div style="position:absolute; left:61%; top:56px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:5px;">
+                    <div style="width:1px; height:12px; background:#A99D8C; margin-top:-12px;"></div>
+                    <div style="font-size:15.5px; white-space:nowrap; margin-top:12px;">5万円</div>
+                    <div style="font-size:11px; color:#6F675E; white-space:nowrap;">ご自身のご記入</div>
+                  </div>
+                </div>
+
+                <div style="margin-top:34px; display:flex; align-items:baseline;">
+                  <span style="font-size:11.5px; color:#6F675E;">緑の帯 ＝ 月4万〜6万円</span>
+                </div>
+                <div style="margin-top:10px; font-size:12px; line-height:1.9; color:#655C53;">お子さん2人と、おふたりの年収から、家庭裁判所が公表している表で求めた範囲です。この範囲で決めなければならない、というものではありません。</div>
+              </div>
+
+              <div style="border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                どちらかが正しい、というものではありません。事情が違えば、見ているものも違います。
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:15px; text-align:center; font-size:15px;">このことを相談する</div>
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:15px; text-align:center; font-size:15px;">ご自身の記録を直す</div>
+              </div>
+              <div style="font-size:12px; line-height:1.9; color:#6F675E;">お書きになった内容は、どちらも残ります。どちらかに寄せる必要はありません。</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;"><b style="font-weight:500;">左右に並べません。</b>二つの数字を横に並べた瞬間、交渉の卓になります。<br>代わりに算定表の範囲を一本の帯として先に敷き、二つの入力を<b style="font-weight:500;">その上下に目盛として置きます</b>。向かい合わせではなく、同じ地図の上の二点です。第三者の範囲が地になるので、比べる相手が互いではなくなります。<br>色は同じ。太さも同じ。<b style="font-weight:500;">差額を計算しません</b>（「2万円の開き」と書けば、それが争点として立ちます）。<br>相手の入力を上に置いたのは、自分の値を下から見上げる形にしないためです。上下の位置に優劣の含みは持たせていません。</div>
+        </div>
+
+        <!-- A-2d' 面会交流版 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-2d′ ／ 内容が異なる（数量でない論点）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">面会交流</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:16px; overflow:hidden;">
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:2px;">
+                <div style="font-size:15.5px; line-height:1.9;">5つのうち、3つは同じでした。</div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:4px 18px;">
+                <div style="padding:14px 0; border-bottom:1px solid #F1E9DC; display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:88px; flex:none;">回数</span><span style="font-size:15.5px;">月1回</span><span style="margin-left:auto; font-size:11.5px; color:#3F6B49;">同じ</span></div>
+                <div style="padding:14px 0; border-bottom:1px solid #F1E9DC; display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:88px; flex:none;">第何週</span><span style="font-size:15.5px;">第2週</span><span style="margin-left:auto; font-size:11.5px; color:#3F6B49;">同じ</span></div>
+                <div style="padding:14px 0; border-bottom:1px solid #F1E9DC; display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:88px; flex:none;">時間</span><span style="font-size:15.5px;">10時〜17時</span><span style="margin-left:auto; font-size:11.5px; color:#3F6B49;">同じ</span></div>
+                <div style="padding:14px 0; border-bottom:1px solid #F1E9DC;">
+                  <div style="display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:88px; flex:none;">曜日</span><span style="font-size:15.5px; color:#655C53;">まだ揃っていません</span></div>
+                  <div style="margin-top:10px; margin-left:88px; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:baseline; gap:10px;"><span style="font-size:11px; color:#6F675E; width:70px; flex:none;">お相手</span><span style="font-size:14.5px;">日曜日</span></div>
+                    <div style="display:flex; align-items:baseline; gap:10px;"><span style="font-size:11px; color:#6F675E; width:70px; flex:none;">ご自身</span><span style="font-size:14.5px;">土曜日</span></div>
+                  </div>
+                </div>
+                <div style="padding:14px 0;">
+                  <div style="display:flex; align-items:baseline;"><span style="font-size:12.5px; color:#6F675E; width:88px; flex:none;">受け渡し</span><span style="font-size:15.5px; color:#655C53;">まだ揃っていません</span></div>
+                  <div style="margin-top:10px; margin-left:88px; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:baseline; gap:10px;"><span style="font-size:11px; color:#6F675E; width:70px; flex:none;">お相手</span><span style="font-size:14.5px;">○○駅</span></div>
+                    <div style="display:flex; align-items:baseline; gap:10px;"><span style="font-size:11px; color:#6F675E; width:70px; flex:none;">ご自身</span><span style="font-size:14.5px;">ご自宅の前</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                揃っていない2つだけ、お話しになれば足ります。
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:15px; text-align:center; font-size:15px;">この2つを相談する</div>
+                <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:15px; text-align:center; font-size:15px;">ご自身の記録を直す</div>
+              </div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">金額でない論点は帯が引けないので、<b style="font-weight:500;">合っている項目を先に、多く見せます</b>。「5つのうち3つは同じでした」から始めることで、違いが全体ではなく一部だと分かります。<br>違う項目だけ、同じ書式・同じ文字サイズで2行に。左右に置かず、上下に。ここでも順序は相手が先です。<br>「揃っていない2つだけ、お話しになれば足ります」で、残りの作業量を示しています。</div>
+        </div>
+
+        <!-- A-2e 年金分割 -->
+        <div id="A2e" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-2e ／ 年金分割（制度を知らない前提）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">年金分割</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:12px; overflow-y:auto; overflow-x:hidden;">
+
+              <div style="flex:none; background:#F7EFE1; border:1px solid #EFE3D0; border-radius:20px; padding:16px;">
+                <div style="font-size:14.5px; line-height:1.9;">結婚していたあいだに納めた厚生年金の記録を、おふたりで分けるかどうか、という話です。</div>
+                <div style="margin-top:9px; font-size:12.5px; line-height:1.9; color:#655C53;">いま受け取っている額が動くわけではありません。将来受け取る年金の計算に使う記録を、分けるということです。</div>
+              </div>
+
+              <div style="flex:none; font-size:11.5px; letter-spacing:.08em; color:#6F675E;">どうされますか</div>
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:14px 16px;">
+                <div style="font-size:15.5px;">分ける</div>
+                <div style="margin-top:5px; font-size:12.5px; line-height:1.8; color:#655C53;">記録を分けることに、おふたりで合意します</div>
+              </div>
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:14px 16px;">
+                <div style="font-size:15.5px;">分けない</div>
+                <div style="margin-top:5px; font-size:12.5px; line-height:1.8; color:#655C53;">それぞれの記録を、そのままにします</div>
+              </div>
+
+              <div style="flex:none; background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:14px 16px; opacity:.55;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:12px; color:#6F675E;">分ける割合</span><span style="margin-left:auto; font-size:11.5px; color:#6F675E;">「分ける」を選ぶと</span></div>
+                <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">半分ずつ（0.5）</span>
+                  <span style="border:1px solid #E4DACA; border-radius:999px; padding:9px 14px; font-size:13.5px; color:#655C53;">別途協議する</span>
+                </div>
+              </div>
+
+              <div style="flex:none; background:#F6EFE5; border:1px solid #E5DBCA; border-radius:20px; padding:14px 16px;">
+                <div style="font-size:12.5px; line-height:1.9; color:#655C53;">お手続きは年金事務所でご確認ください。期限や必要な書類があるとされています。ここでの記録は、おふたりの合意を残すためのものです。</div>
+              </div>
+
+              <div style="flex:none; padding-bottom:4px; font-size:13px; color:#3F6B49;">年金分割について読む ▸</div>
+            </div>
+            <div style="flex:none; padding:12px 20px 24px;">
+              <div style="border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:15px; text-align:center; font-size:15px; color:#A99D8C;">記録する</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;"><b style="font-weight:500;">「按分割合」という語を、選択の前に出しません。</b>最初に置くのは制度の説明2文だけ。何を聞かれているかが分かってから選択肢に入ります。<br>割合の欄は「分ける」を選ぶまで淡く、右上に条件を書いています。順序を先に見せることで、いきなり数字を問われる感じを避けました。<br>年金事務所の注記は<b style="font-weight:500;">恒久的な枠として組んで</b>あります（無効色の面）。外す前提のレイアウトにしていません。<br>「いま受け取っている額が動くわけではありません」は、誤解が最も多い点なので先に置きました。</div>
+        </div>
+
+        <!-- A-2f 財産分与 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-2f ／ 財産分与</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">財産分与</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="background:#F7EFE1; border:1px solid #EFE3D0; border-radius:20px; padding:18px;">
+                <div style="font-size:14.5px; line-height:1.95;">結婚していたあいだに築いた財産を、どう分けるか。その結論だけを記録します。</div>
+                <div style="margin-top:10px; font-size:12.5px; line-height:1.95; color:#655C53;">内訳を書いていただく必要はありません。何をどう分けたかは、おふたりのあいだのことです。</div>
+              </div>
+
+              <div style="font-size:11.5px; letter-spacing:.08em; color:#6F675E;">どうされますか</div>
+              <div style="background:#FFFCF5; border:1px solid #5B8A63; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:15.5px; color:#3F6B49;">一括で支払う</div>
+                <div style="margin-top:12px; display:flex; gap:10px;">
+                  <div style="flex:1.4; background:#F7EFE1; border-radius:16px; padding:12px 14px;"><div style="font-size:11px; color:#6F675E;">金額</div><div style="margin-top:4px; font-size:17px;">1,200,000</div></div>
+                  <div style="flex:1; background:#F7EFE1; border-radius:16px; padding:12px 14px;"><div style="font-size:11px; color:#6F675E;">期限</div><div style="margin-top:4px; font-size:17px;">9月末</div></div>
+                </div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:15.5px;">清算済み</div>
+                <div style="margin-top:6px; font-size:12.5px; line-height:1.85; color:#655C53;">すでに分け終えている</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:15.5px;">別途協議する</div>
+                <div style="margin-top:6px; font-size:12.5px; line-height:1.85; color:#655C53;">この件は、これから決める</div>
+              </div>
+
+              <div style="border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                「別途協議する」も、記録として残ります。決まっていないことを決まっていないまま書面にできます。
+              </div>
+            </div>
+            <div style="flex:none; padding:12px 20px 24px;">
+              <div style="border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:15px; text-align:center; font-size:15.5px; color:#3F6B49;">記録する</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">3択のうち「一括で支払う」だけが金額欄を持ち、選ぶと枠が合意色に変わって欄が現れます。他の2つと面積を揃え、推奨には見せていません。<br><b style="font-weight:500;">「内訳を書いていただく必要はありません」を先に書いています。</b>不動産や預貯金を一つずつ問われるのではないと分かって、はじめて開けます。<br>「別途協議する」も正当な結論だと明示しました。ここが逃げ道ではなく選択肢であることは、この論点では特に重要です。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ A-1 一覧 ============ -->
+    <div id="A1" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#834B32;">優先 2</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">A-1 ／ 一覧</h2>
+        <span style="font-size:13px; color:#6F675E;">4論点＋状態</span>
+      </div>
+
+      <div style="display:flex; gap:36px; flex-wrap:wrap; align-items:flex-start;">
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-1 ／ 進行中</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 18px;">
+              <div style="font-size:22px; font-weight:500;">取り決め</div>
+              <div style="margin-top:8px; font-size:13px; line-height:1.9; color:#655C53;">公正証書に入れる内容です。順番はありません。</div>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:10px; overflow:hidden;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;">
+                <div style="font-size:16px;">養育費</div>
+                <div style="margin-top:7px; font-size:13px; color:#655C53;">まだ入力されていません</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;">
+                <div style="font-size:16px;">面会交流</div>
+                <div style="margin-top:7px; font-size:13px; color:#655C53;">こちらの記録として残っています</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;">
+                <div style="font-size:16px;">財産分与</div>
+                <div style="margin-top:7px; font-size:13px; color:#655C53;">お相手のご記入をお待ちしています</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;">
+                <div style="font-size:16px;">年金分割</div>
+                <div style="margin-top:7px; font-size:13px; color:#3F6B49;">合意できています</div>
+              </div>
+
+              <div style="margin-top:8px; border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                ひとつ合意できれば、それだけで書面にできます。全部が揃うのを待つ必要はありません。
+              </div>
+
+              <div style="margin-top:auto; margin-bottom:16px; border:1px solid #EFE3D0; background:#FFFCF5; border-radius:16px; padding:15px; text-align:center; font-size:14.5px; color:#3A342E; line-height:1.7;">公正証書の原案を見る<br><span style="font-size:11.5px; color:#6F675E;">合意できた内容だけが入ります</span></div>
+            </div>
+            <div style="flex:none; height:78px; border-top:1px solid #F1E9DC; background:#FFFCF5; display:flex; padding-top:8px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">ホーム</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">相談</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#8A6212" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#8A6212" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#8A6212;">取り決め</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M4 11.5 9 16.5 18 6.5" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">決まったこと</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#6F675E" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">設定</span></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">状態は1行の文で書き、チップも数字も進捗バーも持ちません。「合意できています」だけが合意色です。<br>見出しの下に「順番はありません」、下部に「ひとつ合意できれば、それだけで書面にできます」。上から埋めるものに見せないための2箇所です。<br>タブの4つ目が「決まったこと」に変わり、アイコンもチェックに変えました（カレンダーのままだと予定表に見えます）。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-1 ／ 何も無いとき</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 18px;">
+              <div style="font-size:22px; font-weight:500;">取り決め</div>
+              <div style="margin-top:8px; font-size:13px; line-height:1.9; color:#655C53;">公正証書に入れる内容です。</div>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                  <img src="assets/capybara.png" alt="" width="28" height="28" style="flex:none; width:28px; height:28px; border-radius:50%; object-fit:cover; margin-top:2px;">
+                  <div style="font-size:14.5px; line-height:1.9;">全部を決める必要は、ありません。</div>
+                </div>
+                <div style="margin-top:12px; font-size:12.5px; line-height:1.95; color:#655C53;">ご事情によって、当てはまらない項目があります。ひとつ決まれば、それだけで書面にできます。</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;"><div style="font-size:16px;">養育費</div><div style="margin-top:7px; font-size:13px; color:#655C53;">まだ入力されていません</div></div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;"><div style="font-size:16px;">面会交流</div><div style="margin-top:7px; font-size:13px; color:#655C53;">まだ入力されていません</div></div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;"><div style="font-size:16px;">財産分与</div><div style="margin-top:7px; font-size:13px; color:#655C53;">まだ入力されていません</div></div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;"><div style="font-size:16px;">年金分割</div><div style="margin-top:7px; font-size:13px; color:#655C53;">まだ入力されていません</div></div>
+              <div style="font-size:12px; line-height:1.9; color:#6F675E;">それぞれ、どういうものかを読めます。</div>
+            </div>
+            <div style="flex:none; height:78px; border-top:1px solid #F1E9DC; background:#FFFCF5;"></div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">4件なので、第1弾L-2のように沈めずそのまま並べます（8件と違い、宿題の一覧には見えません）。<br>「全部を決める必要は、ありません」は最上部のまま。4という数を見た直後に効かせます。</div>
+        </div>
+
+        <!-- A-3 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">A-3 ／ 途中で伺う（お子さん・同居・年収）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:4px 20px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="width:44px; height:44px; margin-left:-12px; display:flex; align-items:center; justify-content:center; color:#6F675E; font-size:17px;">‹</span>
+              <span style="font-size:15px; color:#655C53;">目安を出すために</span>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:14px; overflow:hidden;">
+              <div style="font-size:13.5px; line-height:2; color:#655C53;">3つ伺えば、目安の範囲をお出しできます。<br>どれも飛ばせます。飛ばした場合、範囲が出ないだけです。</div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:15px;">お子さんのこと</span><span style="margin-left:auto; font-size:11.5px; color:#3F6B49;">伺いました</span></div>
+                <div style="margin-top:7px; font-size:12.5px; color:#655C53;">2人 ／ 2015年4月・2019年11月</div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #5B8A63; border-radius:20px; padding:18px;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:15px;">お子さんと、いま一緒に暮らしていますか</span></div>
+                <div style="margin-top:8px; font-size:12px; line-height:1.85; color:#655C53;">養育費をどちらが受け取る側になるか、この一点だけのためです。</div>
+                <div style="margin-top:14px; display:flex; flex-direction:column; gap:9px;">
+                  <div style="border:1px solid #EFE3D0; background:#FDF8EF; border-radius:16px; padding:13px 15px; font-size:14.5px;">一緒に暮らしている</div>
+                  <div style="border:1px solid #EFE3D0; background:#FDF8EF; border-radius:16px; padding:13px 15px; font-size:14.5px;">暮らしていない</div>
+                  <div style="border:1px solid #EFE3D0; background:#FDF8EF; border-radius:16px; padding:13px 15px; font-size:14.5px;">お子さんによって違う</div>
+                </div>
+              </div>
+
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px; opacity:.55;">
+                <div style="display:flex; align-items:baseline;"><span style="font-size:15px;">ご自身の年収</span><span style="margin-left:auto; font-size:11.5px; color:#6F675E;">このあと</span></div>
+                <div style="margin-top:7px; font-size:12.5px; color:#655C53;">金額そのものは、お相手には見えません</div>
+              </div>
+
+              <div style="border:1px dashed #E2D7C6; border-radius:20px; padding:16px 18px; font-size:12.5px; line-height:1.95; color:#655C53;">
+                目安が無くても、月額はお決めになれます。
+              </div>
+            </div>
+            <div style="flex:none; padding:12px 20px 24px; display:flex; flex-direction:column; gap:10px;">
+              <div style="text-align:center; font-size:14px; color:#6F675E;">この質問を飛ばす</div>
+              <div style="text-align:center; font-size:13.5px; color:#6F675E; padding-top:6px; border-top:1px solid #F1E9DC;">目安は出さずに入力へ戻る</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">3つを1枚に積み、いま答えるものだけを合意色の枠で開きます。答え終わった項目は上に畳まれ、これからのものは淡いまま。<b style="font-weight:500;">残りが何問かが、常に見えている状態</b>です。<br>出口が2つあります。「この質問を飛ばす」（次へ進む）と「目安は出さずに入力へ戻る」（全部やめる）。後者が無いと、入り込んだ人が抜けられません。<br>「目安が無くても、月額はお決めになれます」を破線で置き、実質的な強制になることを避けています。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ B オンボーディング ============ -->
+    <div id="B" style="display:flex; flex-direction:column; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:16px; border-bottom:1px solid #D8CEBF; padding-bottom:12px;">
+        <span style="font-size:12px; letter-spacing:.16em; color:#8A6212;">優先 4</span>
+        <h2 style="margin:0; font-size:22px; font-weight:500; letter-spacing:.04em;">B ／ オンボーディング 3枚</h2>
+        <span style="font-size:13px; color:#6F675E;">状況・同居・お子さん・年収は取り決め画面へ移動</span>
+      </div>
+
+      <div style="display:flex; gap:36px; flex-wrap:wrap; align-items:flex-start;">
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">B-1 ／ アプリの説明</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:1; min-height:0; padding:0 24px; display:flex; flex-direction:column; justify-content:center; gap:24px;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+                <img src="assets/capybara-sit.png" alt="" width="76" height="76" style="width:76px; height:76px; border-radius:22px; object-fit:cover;">
+                <div style="font-size:20px; line-height:1.75; text-align:center;">書いた言葉は、そのまま<br>お相手には届きません。</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:6px 18px;">
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px; line-height:1.85;">思っていることは、そのまま書いていただけます。</div>
+                <div style="padding:15px 0; border-bottom:1px solid #F1E9DC; font-size:14.5px; line-height:1.85;">取り決めは、ご自身で書いて残します。</div>
+                <div style="padding:15px 0; font-size:14.5px; line-height:1.85;">おふたりの記録が同じになったとき、合意になります。</div>
+              </div>
+              <div style="font-size:12.5px; line-height:1.95; color:#655C53; text-align:center;">おふたりが直接やりとりすることには、なりません。</div>
+            </div>
+            <div style="flex:none; padding:16px 24px 28px;">
+              <div style="border:1px solid #5B8A63; background:#EDF3E9; border-radius:16px; padding:15px; text-align:center; font-size:15.5px; color:#3F6B49;">はじめる</div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">3行のうち2行目・3行目が、今回の方針転換そのものです。取り決めは自分で書くこと、合意は記録が一致したときに成ること。<b style="font-weight:500;">この2つを最初に伝えておかないと、A-2の画面が唐突になります。</b></div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">B-3 ／ お相手を招待しますか</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:1; min-height:0; padding:20px 24px 0; display:flex; flex-direction:column; gap:20px;">
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <img src="assets/capybara.png" alt="" width="30" height="30" style="flex:none; width:30px; height:30px; border-radius:50%; object-fit:cover; margin-top:4px;">
+                <div style="font-size:19px; line-height:1.75;">お相手に、ご案内を<br>お渡しになりますか</div>
+              </div>
+
+              <div style="background:#FBF0DA; border:1px dashed #DCC7A6; border-radius:20px; padding:16px 18px; font-size:13.5px; line-height:1.95;">
+                お渡しになるまで、お相手には何も届きません。
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;">
+                  <div style="font-size:16px;">いま渡す</div>
+                  <div style="margin-top:7px; font-size:12.5px; line-height:1.85; color:#655C53;">リンクをご自身で渡すか、メールでお送りするかを選べます</div>
+                </div>
+                <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:17px 18px;">
+                  <div style="font-size:16px;">あとにする</div>
+                  <div style="margin-top:7px; font-size:12.5px; line-height:1.85; color:#655C53;">ひとりで書きはじめて、渡すかどうかはあとで決められます</div>
+                </div>
+              </div>
+
+              <div style="font-size:12.5px; line-height:1.95; color:#655C53;">どちらを選んでも、書けることは変わりません。</div>
+            </div>
+            <div style="flex:none; padding:16px 24px 28px; font-size:11.5px; line-height:1.9; color:#6F675E;">ご関係の状態は、うかがいません。</div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">第3弾で外した招待を戻すにあたり、3つの歯止めを入れています。<br>①関係の状態を一切聞かない（最下部に明記）。②2つの選択肢を枠線・面積・文字サイズまで揃える。③<b style="font-weight:500;">「お渡しになるまで、お相手には何も届きません」を選択肢より先に置く</b>。<br>「あとにする」の説明を「ひとりで書きはじめて」としたのは、待機ではなく通常の使い方だと示すためです。</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:12px; letter-spacing:.12em; color:#6F675E;">C ／ 決まったこと（旧「これから」）</div>
+          <div style="width:390px; height:844px; background:#FDF8EF; border:1px solid #E0D5C4; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; color:#3A342E;">
+            <div style="height:44px; flex:none;"></div>
+            <div style="flex:none; padding:6px 20px 18px;">
+              <div style="font-size:22px; font-weight:500;">決まったこと</div>
+              <div style="margin-top:8px; font-size:13px; line-height:1.9; color:#655C53;">お話し合いで決まったことの控えです。</div>
+            </div>
+            <div style="flex:1; min-height:0; padding:0 20px; display:flex; flex-direction:column; gap:10px; overflow:hidden;">
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:11.5px; color:#6F675E;">8月22日</div>
+                <div style="margin-top:6px; font-size:15px;">送迎</div>
+                <div style="margin-top:8px; font-size:12.5px; color:#655C53;">お約束として控えています</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:11.5px; color:#6F675E;">9月3日</div>
+                <div style="margin-top:6px; font-size:15px;">14時　小学校　父母会</div>
+                <div style="margin-top:8px; font-size:12.5px; color:#655C53;">お約束として控えています</div>
+              </div>
+              <div style="background:#FFFCF5; border:1px solid #EFE3D0; border-radius:20px; padding:16px 18px;">
+                <div style="font-size:15px; line-height:1.8;">今回だけ　曜日 日曜日 に変更</div>
+                <div style="margin-top:8px; font-size:12.5px; color:#655C53;">面会交流</div>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #F1E9DC; font-size:12px; line-height:1.85; color:#655C53;">取り決めそのものは変わっていません。</div>
+              </div>
+              <div style="margin-top:8px; font-size:12px; line-height:1.9; color:#6F675E;">公正証書に入るのは「取り決め」のほうです。ここにあるのは、その回だけのお約束です。</div>
+            </div>
+            <div style="flex:none; height:78px; border-top:1px solid #F1E9DC; background:#FFFCF5; display:flex; padding-top:8px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 9.5 11 3.5l7.5 6v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">ホーム</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M3.5 5.5A2 2 0 0 1 5.5 3.5h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H8l-4.5 3.5V5.5z" stroke="#6F675E" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#6F675E;">相談</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="4" y="3" width="14" height="16" rx="2" stroke="#6F675E" stroke-width="1.5"/><path d="M7.5 9h7M7.5 13h4" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">取り決め</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><path d="M4 11.5 9 16.5 18 6.5" stroke="#8A6212" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:10.5px; color:#8A6212;">決まったこと</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;"><svg width="21" height="21" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="#6F675E" stroke-width="1.5"/><path d="M11 3.5v2.5M11 16v2.5M3.5 11h2.5M16 11h2.5M5.7 5.7l1.8 1.8M14.5 14.5l1.8 1.8M16.3 5.7l-1.8 1.8M7.5 14.5l-1.8 1.8" stroke="#6F675E" stroke-width="1.5" stroke-linecap="round"/></svg><span style="font-size:10.5px; color:#6F675E;">設定</span></div>
+            </div>
+          </div>
+          <div style="width:390px; font-size:12.5px; line-height:2; color:#655C53; text-wrap:pretty;">引き算だけです。履行の記録、支払日、リマインド、逸脱の表示をすべて外しました。<br>各件の「お約束として控えています」は、済んだかどうかを問わない書き方です。押されないボタンを置かない代わりに、<b style="font-weight:500;">状態を持たない文</b>にしています。<br>末尾の1行が「取り決め」との区別を担います。タブが隣り合うので、この画面に居る人にその場で伝える必要があります。<br>アイコンはカレンダーからチェックへ。予定表に見えないための変更です。</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

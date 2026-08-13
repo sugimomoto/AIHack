@@ -16,6 +16,7 @@ import {
 
 import { asCaseId, type PartyId } from "@/domain/case/types";
 import { assertOwnParty } from "@/domain/case/scope";
+import { isVisibleTo, sharingStateOf } from "@/domain/agreement/sharing";
 import { applyAdjustment, parseEffect } from "@/domain/adjustment/flow";
 import {
   appendException,
@@ -166,15 +167,29 @@ export async function loadAgreementView(input: {
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
 
-  const [proposals, consents, bands] = await Promise.all([
+  const [all, consents, bands] = await Promise.all([
     listProposalsByTopic(caseId, input.topic),
     loadConsents(caseId, input.topic),
     loadIncomeBands(caseId),
   ]);
 
+  // ★★ ここで落とす。画面で隠さない。
+  //
+  //   下書きは、相手に見えてはならない。
+  //   画面側で隠す実装にすると、API を直接見れば読める。
+  //   **C1（原文が渡らない）と同じ強さで守る。**
+  //
+  // ★取り下げたものも、相手からは見えなくなる。
+  //   ただし「見なかったこと」にはならない（取り下げた事実は伝わる）。
+  const proposals = all.filter((p) => isVisibleTo(p, input.partyId));
+
   // 当事者ごとの最新の提案
   const byParty = new Map<string, Record<string, unknown>>();
   for (const p of proposals) if (p.payload) byParty.set(p.byPartyId, p.payload); // ★作成順なので最後が最新
+
+  // ★自分の最新の仮案が、いまどの状態か（下書き／渡してある／取り下げた）
+  const mine = [...all].reverse().find((p) => p.byPartyId === input.partyId) ?? null;
+  const sharing = sharingStateOf(mine);
 
   const parties = snap.parties.map((p) => p.id);
   const ready = parties.length === 2 && parties.every((id) => byParty.has(id));
@@ -220,6 +235,9 @@ export async function loadAgreementView(input: {
       isOwn: id === input.partyId,
       payload: byParty.get(id) ?? null,
     })),
+    // ★自分の仮案の状態。下書きが相手に見えていないことを、画面が言い切れるように
+    sharing,
+    ownProposalId: mine?.id ?? null,
     draft,
     // ★提案が一致しているかも状態に含める
     converged: payloadsAgree(payloads),

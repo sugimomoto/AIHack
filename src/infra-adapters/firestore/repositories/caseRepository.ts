@@ -358,11 +358,23 @@ export async function appendProposal(
      */
     threadId?: string | null;
     scenarioId?: string | null;
+    /**
+     * ★相手に渡したか。**既定は下書き（null）。**
+     *   下書きは相手から見えない（domain/agreement/sharing）。
+     */
+    sharedAt?: string | null;
   },
 ): Promise<string> {
   const ref = await caseRef(caseId)
     .collection("proposals")
-    .add({ ...p, effect: p.effect ?? null, createdAt: new Date().toISOString() });
+    .add({
+      ...p,
+      effect: p.effect ?? null,
+      // ★既定で下書き。書いた時点で相手に見えることは無い
+      sharedAt: p.sharedAt ?? null,
+      withdrawnAt: null,
+      createdAt: new Date().toISOString(),
+    });
 
   // ★新しい提案が出たら、承諾をやり直す。
   //   前回の ACCEPTED が残っていると、片側1クリックで別の内容が確定する
@@ -393,6 +405,10 @@ export async function listProposalsByTopic(
     byPartyId: PartyId;
     payload: Record<string, unknown> | null;
     effect: "ONE_TIME" | "PERMANENT" | null;
+    /** ★渡した時刻。null なら下書き（相手に見えていない） */
+    sharedAt: string | null;
+    /** ★取り下げた時刻 */
+    withdrawnAt: string | null;
     createdAt: string;
   }[]
 > {
@@ -403,9 +419,34 @@ export async function listProposalsByTopic(
       byPartyId: asPartyId(d.get("byPartyId")),
       payload: (d.get("payload") ?? null) as Record<string, unknown> | null,
       effect: (d.get("effect") ?? null) as "ONE_TIME" | "PERMANENT" | null,
+      sharedAt: (d.get("sharedAt") ?? null) as string | null,
+      withdrawnAt: (d.get("withdrawnAt") ?? null) as string | null,
       createdAt: (d.get("createdAt") ?? "") as string,
     }))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+/**
+ * ★仮案をお相手に渡す。
+ *
+ *   渡すまで相手には見えない。渡して初めて、相手の画面に現れる。
+ */
+export async function shareProposal(caseId: CaseId, proposalId: string): Promise<string> {
+  const at = new Date().toISOString();
+  await caseRef(caseId).collection("proposals").doc(proposalId).update({ sharedAt: at });
+  return at;
+}
+
+/**
+ * ★仮案を取り下げる。
+ *
+ *   **「見ていない状態」には戻せない。**
+ *   取り下げたことは相手にも見える（domain/agreement/sharing）。
+ */
+export async function withdrawProposal(caseId: CaseId, proposalId: string): Promise<string> {
+  const at = new Date().toISOString();
+  await caseRef(caseId).collection("proposals").doc(proposalId).update({ withdrawnAt: at });
+  return at;
 }
 
 /** 合意の改訂履歴。★PERMANENT のときだけ積まれる */

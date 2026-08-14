@@ -6,6 +6,7 @@ import Link from "next/link";
 import { OwnMessage } from "./OwnMessage";
 import { AiMessage } from "./AiMessage";
 import { RelayMessage } from "./RelayMessage";
+import { useRefreshOnFocus } from "./useRefreshOnFocus";
 import { RelaySent } from "./RelaySent";
 import { TopicSheet } from "@/components/topic/TopicSheet";
 import { EmptyConsult } from "@/components/ui/EmptyState";
@@ -99,6 +100,10 @@ export function CaseChat({
       alive = false;
     };
   }, [fetchView, reloadKey]);
+
+  // ★★ 開いたまま置いたタブに、あとから届いたものが出なかった（実測）。
+  //   届くことが主題である以上、**見ているのに古いまま**は許容できない。
+  useRefreshOnFocus(reload);
 
   const send = async () => {
     const body = text.trim();

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRefreshOnFocus } from "@/components/chat/useRefreshOnFocus";
 import { ADJUSTMENT_LABEL, ADJUSTMENT_NOTE, type AdjustmentState } from "@/domain/adjustment/record";
 import { describeChange } from "@/domain/adjustment/revision";
 
@@ -32,18 +33,20 @@ export function AdjustmentPanel({
 }) {
   const [v, setV] = useState<View | null>(null);
 
-  useEffect(() => {
-    let alive = true;
-    void fetch(`/api/cases/${caseId}/adjustment?threadId=${encodeURIComponent(threadId)}`, {
+  const load = useCallback(async () => {
+    const r = await fetch(`/api/cases/${caseId}/adjustment?threadId=${encodeURIComponent(threadId)}`, {
       headers: { "x-dev-party": partyId },
       cache: "no-store",
-    })
-      .then((r) => (r.ok ? (r.json() as Promise<View>) : null))
-      .then((r) => alive && r && setV(r));
-    return () => {
-      alive = false;
-    };
-  }, [caseId, partyId, threadId, reloadKey]);
+    });
+    if (r.ok) setV((await r.json()) as View);
+  }, [caseId, partyId, threadId]);
+
+  useEffect(() => {
+    void load();
+  }, [load, reloadKey]);
+
+  // ★お相手のご意向は、あとから届く。**開いたままの画面にも出す**
+  useRefreshOnFocus(load);
 
   // ★まだ何も出していないうちは、枠を出さない
   if (!v || !v.ownChange) return null;

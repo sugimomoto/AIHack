@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { StartButton } from "@/components/onboarding/StartButton";
+import { EmailLinkForm } from "@/components/auth/EmailLinkForm";
 
 /**
  * 入口
@@ -30,7 +31,57 @@ const ROUTES = [
   { href: "/signin", label: "お戻りになる", note: "ご登録済みのメールアドレスにリンクをお送りします。" },
 ];
 
-export default function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // ★★ メールのリンクから戻ってきたときは、**説明を出さない。**
+  //
+  //   この人は、もう説明を読んで押した人である。
+  //   もう一度読ませたうえ、確認の欄が**説明の下に埋もれる**のは筋が悪い。
+  //   ★用があるのは1つだけなので、それだけを出す。
+  const q = await searchParams;
+  const fromEmailLink = q.mode === "signIn" && typeof q.oobCode === "string";
+
+  if (fromEmailLink) {
+    return (
+      <div
+        className="grid min-h-dvh place-items-center px-5 py-10"
+        style={{ background: "var(--surface-2)" }}
+      >
+        <div className="w-full max-w-[420px]">
+          <div className="flex flex-col items-center text-center">
+            <Image
+              src="/character/capybara-sit.png"
+              alt=""
+              width={56}
+              height={56}
+              priority
+              style={{ width: 56, height: 56 }}
+            />
+            <h1 style={{ fontSize: 19, fontWeight: 600, lineHeight: 1.7, marginTop: 12 }}>
+              Aida（あいだ）
+            </h1>
+          </div>
+          <div
+            className="mt-6"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--r-lg)",
+              padding: 20,
+            }}
+          >
+            {/* ★StartButton の前置き（「リンクをお送りします」）は、
+                   もう送り終えたこの場面には合わない。フォームだけを出す */}
+            <EmailLinkForm mode="signup" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-dvh px-5 py-10" style={{ background: "var(--surface-2)" }}>
       <div className="mx-auto w-full max-w-[560px]">

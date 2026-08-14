@@ -61,10 +61,12 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
       try {
         const cred = await signInWithEmailLink(auth, saved, window.location.href);
         const idToken = await cred.user.getIdToken();
+        // ★リンクに載せたトークン。Cookie が無いときの拠り所になる
+        const linkToken = new URLSearchParams(window.location.search).get("lt");
         const res = await fetch(`/api/auth/${mode}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ idToken }),
+          body: JSON.stringify({ idToken, ...(linkToken ? { linkToken } : {}) }),
         });
         window.localStorage.removeItem(KEY);
         if (res.ok) {
@@ -100,8 +102,20 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
     if (!addr) return;
     setState("working");
     try {
+      // ★★ 結びつけのときは、当事者を指す短命トークンをリンクに載せる。
+      //   リンクは**別のブラウザで開かれることがある**（メールアプリの内蔵ブラウザ等）。
+      //   Cookie が無くても「誰の当事者か」が分かるようにしておく。
+      //   ★トークン単体では何もできない。oobCode と揃って初めて結びつく。
+      let back = `${window.location.origin}${window.location.pathname}`;
+      if (mode === "link") {
+        const t = await fetch("/api/auth/link-token", { method: "POST" })
+          .then((r) => (r.ok ? (r.json() as Promise<{ token: string }>) : null))
+          .catch(() => null);
+        if (t?.token) back += `?lt=${encodeURIComponent(t.token)}`;
+      }
+
       await sendSignInLinkToEmail(await firebaseAuth(), addr, {
-        url: `${window.location.origin}${window.location.pathname}`,
+        url: back,
         handleCodeInApp: true,
       });
       window.localStorage.setItem(KEY, addr);

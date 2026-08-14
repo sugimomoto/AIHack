@@ -99,8 +99,12 @@ export default function Page() {
 
         {/* ★お名前もご連絡先も要らない。状況もうかがわない */}
         <StartButton />
-        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--text-sub-2)", marginTop: 8, textAlign: "center" }}>
-          お名前もご連絡先も要りません。ご関係の状態も、うかがいません。
+        {/* ★★「ご連絡先も要りません」と書いていた。**サインアップ必須にしたので撤回する。**
+               できないことを書かないのと同じで、**しなくなったことも書かない。** */}
+        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--text-sub-2)", marginTop: 10, textAlign: "center" }}>
+          お名前は要りません。ご関係の状態も、うかがいません。
+          <br />
+          メールアドレスは、<strong>次にお戻りいただくためだけ</strong>に使います。
         </p>
 
         <div className="mt-6 flex flex-col gap-2.5">

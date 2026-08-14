@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { InvitationPublicView } from "@/domain/invitation/publicView";
+import { EmailLinkForm } from "@/components/auth/EmailLinkForm";
 
 /**
  * A-3｜招待を受け取った側の最初の画面
@@ -26,6 +27,8 @@ const ASSURANCES = [
 export function InviteLanding({ view, token }: { view: InvitationPublicView; token: string }) {
   const [busy, setBusy] = useState(false);
   const [declined, setDeclined] = useState(false);
+  // ★参加には本人確認が要る（招待した側と同じ扱い）
+  const [needsAuth, setNeedsAuth] = useState(false);
 
   if (view.state !== "OPEN") return <Unavailable />;
   if (declined) return <Declined />;
@@ -34,22 +37,51 @@ export function InviteLanding({ view, token }: { view: InvitationPublicView; tok
     if (busy) return;
     setBusy(true);
     try {
+      // ★★ 参加するには、メールアドレスのご確認が要る。
+      //   招待した側と同じ扱いにする。**片側だけ辿れない状態を残さない。**
+      //   ★辞退には要らない。**断るのに、アカウントを作らせない。**
+      if (action === "ACCEPT") {
+        setNeedsAuth(true);
+        return;
+      }
       const res = await fetch(`/api/invite/${token}/accept`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ action }),
       });
       if (!res.ok) return;
-      // ★受諾でセッションが発行される。
-      //   うかがうのは、お子さんの確認 1枚だけ。年収はここで聞かない。
-      //   「参加しない選択もできます」と伝えた直後に最も抵抗の大きい質問を置くと、
-      //   **あの一文が入口の作法だったことになる。**
-      if (action === "ACCEPT") window.location.href = "/onboarding/confirm-children";
-      else setDeclined(true);
+      setDeclined(true);
     } finally {
       setBusy(false);
     }
   };
+
+  // ★メールのリンクから戻ってきたら、ここで受諾が成立する
+  if (needsAuth) {
+    return (
+      <div className="flex h-full flex-col overflow-y-auto px-5 pb-8 pt-8">
+        <h1 style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.75 }}>
+          ご参加の前に、メールアドレスをうかがいます
+        </h1>
+        <p style={{ fontSize: 13, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}>
+          次にお戻りいただくために使います。<strong>お相手には知られません。</strong>
+          <br />
+          お名前は要りません。
+        </p>
+        <div className="mt-5">
+          <EmailLinkForm mode="accept" acceptToken={token} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setNeedsAuth(false)}
+          className="mt-4"
+          style={{ fontSize: 13, color: "var(--text-sub)", minHeight: 44 }}
+        >
+          戻る
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col overflow-y-auto px-5 pb-6 pt-8">

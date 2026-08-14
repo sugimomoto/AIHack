@@ -85,15 +85,30 @@ async function main() {
   console.log(`E2E: ${BASE}`);
 
   // ─────────────────────────────────────────────
-  section("① オンボーディング（I-1 → I-2 → I-3 → I-4）");
-  const start = await call("/api/cases", {
+  section("① ★サインアップ（ケースは本人確認が済んでから作る）");
+
+  // ★匿名でケースを作る経路は閉じた
+  const anon = await call("/api/cases", { method: "POST", body: {} });
+  ok("★匿名ではケースを作れない", anon.status === 410);
+
+  const start = await call("/api/auth/signup", {
     method: "POST",
-    body: { situation: "DIVORCED_NO_TERMS" },
+    body: { idToken: await idTokenFor(EMAIL_A) },
   });
   ok("ケースが作られる", start.status === 200);
   ok("セッションが発行される", Boolean(start.cookie));
   const cA = start.cookie!;
-  const caseId = start.body.caseId as string;
+
+  // ★同じアドレスで押し直しても、ケースを増やさない
+  const resumed = await call("/api/auth/signup", {
+    method: "POST",
+    body: { idToken: await idTokenFor(EMAIL_A) },
+  });
+  ok("★押し直してもケースが増えない", resumed.body.resumed === true);
+
+  const me = await call("/api/session", { cookie: cA });
+  const caseId = me.body.caseId as string;
+  ok("★はじめから識別子が紐づいている", Boolean(caseId));
 
   // ★I-2 同居。役割はここでだけ決まる
   const livingBad = await call(`/api/cases/${caseId}/living`, {
@@ -158,10 +173,18 @@ async function main() {
   ok("★内部の識別子が漏れない", !JSON.stringify(pub.body).includes(caseId));
 
   // ─────────────────────────────────────────────
-  section("③ 相手が受諾する");
-  const accept = await call(`/api/invite/${token}/accept`, {
+  section("③ 相手が受諾する（★本人確認が要る）");
+
+  // ★受諾にも本人確認が要る。片側だけ辿れない状態を残さない
+  const acceptNoAuth = await call(`/api/invite/${token}/accept`, {
     method: "POST",
     body: { action: "ACCEPT" },
+  });
+  ok("★確認なしでは参加できない", acceptNoAuth.status === 401);
+
+  const accept = await call(`/api/invite/${token}/accept`, {
+    method: "POST",
+    body: { action: "ACCEPT", idToken: await idTokenFor(EMAIL_B) },
   });
   ok("受諾できる", accept.status === 200);
   ok("セッションが発行される", Boolean(accept.cookie));
@@ -207,9 +230,7 @@ async function main() {
   ok("★AIに渡すものにも原文が無い", !JSON.stringify(ctx.body).includes("必死"));
 
   // ─────────────────────────────────────────────
-  section("⑤ ★メールリンクで登録し、別の端末から戻る");
-  const linkNoAuth = await call("/api/auth/link", { method: "POST", body: { idToken: "forged" } });
-  ok("★セッション無しでは結びつけられない", linkNoAuth.status === 401);
+  section("⑤ ★別の端末から戻る");
 
   const forged = await call("/api/auth/link", {
     method: "POST",
@@ -217,10 +238,6 @@ async function main() {
     body: { idToken: "forged.token" },
   });
   ok("★偽のトークンは通らない", forged.status === 401);
-
-  const tokenA = await idTokenFor(EMAIL_A);
-  const link = await call("/api/auth/link", { method: "POST", cookie: cA, body: { idToken: tokenA } });
-  ok("メールアドレスを登録できる", link.status === 200);
 
   const unknown = await idTokenFor(`e2e-unknown-${stamp}@example.test`);
   const bad = await call("/api/auth/signin", { method: "POST", body: { idToken: unknown } });

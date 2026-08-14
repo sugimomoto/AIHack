@@ -1044,11 +1044,17 @@ export async function discardOwnDrafts(
   return targets.length;
 }
 
-/** ★ケース全体の調整。スレッドごとに揃ったかを判定する側で使う */
+/**
+ * ケース全体の調整（相談の帰結）
+ *
+ * ★`kind == "ADJUSTMENT"` だけ。**お知らせ（NOTIFICATION）は控えを作らない。**
+ * ★スレッドごとに揃ったかを判定するため、`threadId` を返す。
+ */
 export async function listAdjustments(
   caseId: CaseId,
 ): Promise<
   {
+    id: string;
     threadId: string | null;
     topic: string;
     byPartyId: string;
@@ -1060,6 +1066,7 @@ export async function listAdjustments(
   const snap = await caseRef(caseId).collection("adjustments").where("kind", "==", "ADJUSTMENT").get();
   return snap.docs
     .map((d) => ({
+      id: d.id,
       threadId: (d.get("threadId") ?? null) as string | null,
       topic: (d.get("topic") ?? "OTHER") as string,
       byPartyId: (d.get("byPartyId") ?? "") as string,

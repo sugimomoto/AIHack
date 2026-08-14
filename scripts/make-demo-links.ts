@@ -12,6 +12,7 @@
 import { writeFileSync } from "node:fs";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 import { signDemoLink } from "../src/domain/session/demoLink";
 
 const BASE = process.env.BASE_URL ?? "https://aida-4n47tjpp2a-an.a.run.app";
@@ -41,10 +42,39 @@ async function main() {
   if (!KEY) throw new Error("DEMO_LINK_SECRET が設定されていません");
   console.log(`対象: ${BASE}\n`);
 
-  const start = await call("/api/cases", { method: "POST", body: {} });
+  // ★★ サインアップ必須になった。確認用でも、本人確認を通す。
+  //   Admin SDK でリンクを作り、そこから idToken を取る（メールは送らない）。
+  const stamp = Date.now();
+  const idTokenFor = async (email: string) => {
+    if (!getApps().length) {
+      initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || "aida-505206" });
+    }
+    const link = await getAuth().generateSignInWithEmailLink(email, {
+      url: `${BASE}/signin`,
+      handleCodeInApp: true,
+    });
+    const oobCode = new URL(link).searchParams.get("oobCode")!;
+    const apiKey = (await (await fetch(`${BASE}/api/auth/config`)).json()).apiKey as string;
+    const r = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithEmailLink?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, oobCode }),
+      },
+    );
+    const d = (await r.json()) as { idToken?: string };
+    if (!d.idToken) throw new Error("確認用のトークンを作れませんでした");
+    return d.idToken;
+  };
+
+  const start = await call("/api/auth/signup", {
+    method: "POST",
+    body: { idToken: await idTokenFor(`demo-a-${stamp}@example.test`) },
+  });
   if (start.status !== 200) throw new Error(`ケース作成に失敗: ${start.status}`);
-  const caseId = start.body.caseId as string;
   const cookieA = start.cookie!;
+  const caseId = (await call("/api/session", { cookie: cookieA })).body.caseId as string;
 
   // ★オンボーディングを通す。
   //   これが無いと算定表に届かず、確認する側が「目安が出ない」ところで止まる。
@@ -73,7 +103,8 @@ async function main() {
   const token = String(inv.body.url).split("/invite/")[1];
   const accepted = await call(`/api/invite/${token}/accept`, {
     method: "POST",
-    body: { action: "ACCEPT" },
+    // ★受諾にも本人確認が要る
+    body: { action: "ACCEPT", idToken: await idTokenFor(`demo-b-${stamp}@example.test`) },
   });
 
   // ★受諾した側の年収は、オンボーディングでは聞かない（H-2）。

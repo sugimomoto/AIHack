@@ -9,13 +9,15 @@ import {
 import { firebaseAuth } from "@/lib/firebaseClient";
 
 /**
- * メールリンクでのサインイン
+ * メールリンクでのサインイン／サインアップ
  *
  * ★パスワードを一切預かりません。
  *   このアプリは住所・年収・子の情報を持ちます。
  *   **漏れて困るものを、そもそも預からない。**
  *
- * @param mode "link"  … いまの当事者にアカウントを結びつける
+ * @param mode "signup" … ★はじめる。**本人確認が済んでからケースを作る**
+ * @param mode "accept" … ★招待を受ける。**確認が済んでから参加が成立する**
+ * @param mode "link"   … いまの当事者にアカウントを結びつける
  * @param mode "signin" … 別の端末から戻る
  */
 const KEY = "aida_signin_email";
@@ -29,7 +31,14 @@ const EXPLAIN: Record<string, string> = {
   "auth/user-disabled": "このアカウントはご利用いただけません。",
 };
 
-export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
+export function EmailLinkForm({
+  mode,
+  acceptToken,
+}: {
+  mode: "signup" | "accept" | "link" | "signin";
+  /** ★accept のときの招待トークン */
+  acceptToken?: string;
+}) {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sent" | "working" | "done" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
@@ -63,20 +72,32 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
         const idToken = await cred.user.getIdToken();
         // ★リンクに載せたトークン。Cookie が無いときの拠り所になる
         const linkToken = new URLSearchParams(window.location.search).get("lt");
-        const res = await fetch(`/api/auth/${mode}`, {
+
+        // ★招待の受諾は、招待の API へ送る（本人確認つき）
+        const at = acceptToken ?? new URLSearchParams(window.location.search).get("at");
+        const url =
+          mode === "accept" && at ? `/api/invite/${at}/accept` : `/api/auth/${mode}`;
+        const body =
+          mode === "accept"
+            ? { action: "ACCEPT", idToken }
+            : { idToken, ...(linkToken ? { linkToken } : {}) };
+
+        const res = await fetch(url, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ idToken, ...(linkToken ? { linkToken } : {}) }),
+          body: JSON.stringify(body),
         });
         window.localStorage.removeItem(KEY);
         if (res.ok) {
           setState("done");
+          // ★受諾後もアプリへ。お子さんの確認は、必要になった時点で伺う（A-3）。
+          //   受諾直後がいちばん抵抗の大きい瞬間である
           window.location.href = "/app";
         } else if (res.status === 404) {
           // ★本人確認は通ったが、当方に紐づく当事者がいない。
           //   「登録してから戻る」という順序を、ここで初めて知る人がいる。
           setMessage(
-            "このメールアドレスに紐づくご利用が見つかりませんでした。はじめてお使いの場合は、まず「はじめる」からお進みください。",
+            "このメールアドレスでのご利用が見つかりませんでした。はじめてお使いの場合は、トップの「はじめる」からお進みください。",
           );
           setState("error");
         } else {
@@ -95,7 +116,7 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
     return () => {
       alive = false;
     };
-  }, [mode]);
+  }, [mode, acceptToken]);
 
   const send = async () => {
     const addr = email.trim();
@@ -107,6 +128,8 @@ export function EmailLinkForm({ mode }: { mode: "link" | "signin" }) {
       //   Cookie が無くても「誰の当事者か」が分かるようにしておく。
       //   ★トークン単体では何もできない。oobCode と揃って初めて結びつく。
       let back = `${window.location.origin}${window.location.pathname}`;
+      // ★受諾のときは、戻り先に招待トークンを載せる（別のブラウザで開かれても続く）
+      if (mode === "accept" && acceptToken) back += `?at=${encodeURIComponent(acceptToken)}`;
       if (mode === "link") {
         const t = await fetch("/api/auth/link-token", { method: "POST" })
           .then((r) => (r.ok ? (r.json() as Promise<{ token: string }>) : null))

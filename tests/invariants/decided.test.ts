@@ -108,3 +108,34 @@ describe("★タブ", () => {
     expect(agreement.slice(0, 400)).not.toMatch(/l1\.8 1\.8/); // 中のチェックを外した
   });
 });
+
+/**
+ * ★「今回だけ」の読む先を直した
+ *
+ * 以前は listExceptions（adjustments を effect==ONE_TIME で引く）を見ていた。
+ * だが**そこに書き込む経路が無くなっていた**（対話から取り決めを動かすのをやめたため）。
+ * 一方、相談の帰結は kind=="ADJUSTMENT" 側に入っており、**読まれていなかった。**
+ *
+ * ★「今回だけ」の実体は、いまや**相談の帰結**である。
+ */
+describe("★読む先が、書く先と合っている", () => {
+  const load = service.slice(service.indexOf("export async function loadSchedule"));
+
+  it("★相談の帰結（kind=ADJUSTMENT）を読む", () => {
+    expect(load).toContain("listAdjustments");
+  });
+
+  it("★到達しない listExceptions を読まない", () => {
+    expect(load).not.toContain("listExceptions");
+  });
+
+  it("★揃ったものだけを出す（片方の書き込みを決まったことにしない）", () => {
+    // ★取り決めでも House Rule でも避けてきた誤りと同じ
+    expect(load).toContain("adjustmentStateOf");
+    expect(load).toMatch(/!==\s*"AGREED"/);
+  });
+
+  it("★スレッドごとに揃いを見る", () => {
+    expect(load).toContain("byThread");
+  });
+});

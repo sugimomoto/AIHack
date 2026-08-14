@@ -89,16 +89,6 @@ export default async function Page({
               メールアドレスをご登録いただくと、端末を変えてもお戻りいただけます。
             </p>
             <EmailLinkForm mode="link" />
-
-            {/* ★飛ばせる。登録しないと戻れないことは上に書いてある。
-                   書いたうえで、飛ばす道を同じ画面に残す */}
-            <a
-              href="/onboarding/invite"
-              className="mt-4 grid place-items-center"
-              style={{ fontSize: 13.5, color: "var(--text-sub)", minHeight: 44 }}
-            >
-              あとで登録する
-            </a>
           </>
         )}
       </div>

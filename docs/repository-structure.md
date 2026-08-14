@@ -3,6 +3,7 @@
 | 項目 | 内容 |
 | --- | --- |
 | 作成日 | 2026-08-11 |
+| 最終更新 | **2026-08-14**（実際のファイル構成に合わせて更新） |
 | 位置づけ | フォルダ・ファイル構成と配置ルールを定義する恒久ドキュメント |
 | 前提 | [architecture.md](architecture.md) / [functional-design.md](functional-design.md) |
 
@@ -73,30 +74,49 @@ src/
 │   └── layout.tsx
 │
 ├── domain/                       # ★ドメインロジック（フレームワーク非依存）
-│   ├── agreement/                # L1：合意
-│   │   ├── topics.ts             # AgreementTopic enum（コード固定）
-│   │   ├── stateMachine.ts       # 状態遷移
-│   │   └── revision.ts           # 履歴の追記
+│   ├── agreement/                # L1：取り決め ★本人が入力して作る
+│   │   ├── topics.ts             # AgreementTopic（8つ固定・実装は4つ）
+│   │   ├── fields.ts             # ★論点ごとの入力項目。フォームと再掲で同じ定義
+│   │   ├── sharing.ts            # ★仮案の共有（下書き／お渡し／取り下げ）
+│   │   ├── screen.ts             # ★論点画面の6状態
+│   │   ├── consent.ts            # 合意の成立（双方の承諾＋内容の一致）
+│   │   ├── moment.ts             # N-1 合意が成立した瞬間
+│   │   ├── outcome.ts            # この相談で決まること
+│   │   └── stateMachine.ts       # 状態遷移
 │   ├── adjustment/               # L2：調整
-│   │   └── effect.ts             # ONE_TIME / PERMANENT の分岐
-│   ├── notification/             # L3：連絡
-│   ├── mediation/                # 調停パイプライン
-│   │   ├── engine.ts
+│   │   ├── effect.ts             # ONE_TIME / PERMANENT
+│   │   ├── flow.ts               # ★お知らせ（かつては「今回だけ？」の問い）
+│   │   ├── record.ts             # 調整の状態
+│   │   └── revision.ts           # K-6 変更の申し出
+│   ├── consultation/             # 相談
+│   │   ├── thread.ts             # 件ごとのスレッド
+│   │   ├── state.ts              # 一覧の状態
+│   │   └── negotiable.ts         # ★kind による帰結の分岐
+│   ├── dialogue/                 # 受け止め（S4）
 │   │   ├── intent.ts             # 意図分類
-│   │   ├── extract.ts            # 事情の抽出（ホワイトリスト）
-│   │   └── relay.ts              # 相手への取次ぎ
-│   ├── context/                  # ★C1の実装本体
-│   │   ├── buildContext.ts
-│   │   ├── buildRelayContext.ts  # partyId を引数に取らない
-│   │   └── buildMediationContext.ts
-│   ├── security/
-│   │   ├── guard.ts              # 入力検知
-│   │   └── piiFilter.ts          # 出力フィルタ
-│   ├── support-table/            # 算定表（LLM不使用）
-│   │   ├── lookup.ts
-│   │   └── data/                 # 算定表のデータ
-│   └── document/                 # 公正証書原案（LLM不使用）
-│       └── builder.ts            # ひな形置換
+│   │   ├── prompts.ts
+│   │   ├── choices.ts
+│   │   └── vocabulary.ts         # 語彙の後始末
+│   ├── relay/                    # ★取次ぎ（C1 の本体）
+│   │   ├── guard.ts              # INV-4a 逐語の検出・ホワイトリスト・伝聞形
+│   │   ├── payload.ts            # ★事実の断片。**逐語でなければ捨てる**＋金額の解釈
+│   │   ├── summary.ts
+│   │   ├── schema.ts
+│   │   └── prompts.ts
+│   ├── context/                  # ★C1の実装本体（許可リスト方式）
+│   │   ├── builders.ts           # partyId を引数に取らない経路を含む
+│   │   └── snapshot.ts
+│   ├── obligation/               # 🚫 予定・履行・逸脱（**呼ばない。**Issue #7 の土台）
+│   │   ├── arrangement.ts        # ★約束（これは使う）
+│   │   ├── schedule.ts / deviation.ts / reminder.ts / visitation.ts
+│   ├── security/                 # 入力検知・PIIフィルタ
+│   ├── safety/                   # 危険の検知（DV・児童虐待）
+│   ├── support/                  # 算定表（LLM不使用）
+│   │   ├── table.ts              # 決定的な参照
+│   │   └── mediation.ts          # 🚫 調停案の検査（**呼ばない**）
+│   ├── document/                 # 公正証書原案（LLM不使用）
+│   │   └── builder.ts            # ひな形置換・★condition の評価
+│   ├── income/ case/ invitation/ session/ topic/ knowledge/ preparation/ llm/ ui/
 │
 ├── infra-adapters/               # 外部との境界
 │   ├── llm/
@@ -113,8 +133,20 @@ src/
 │   │   ├── OwnMessage.tsx        # ①自分の発言
 │   │   ├── AiMessage.tsx         # ②AI自身の発言
 │   │   └── RelayMessage.tsx      # ③AIによる取次ぎ ★描き分けの要
-│   ├── agreement/
-│   └── ui/                       # 汎用
+│   ├── agreement/                # ★取り決め（第4弾で作り直し）
+│   │   ├── TopicList.tsx         # A-1 一覧
+│   │   ├── TopicScreen.tsx       # A-2 論点ごと（6状態）
+│   │   ├── TopicForm.tsx         # 入力＋内容の再掲
+│   │   ├── TopicIntro.tsx        # 財産分与・年金分割の前置き
+│   │   ├── ConfirmSheet.tsx      # ★S-1b/S-3b 渡す前・了承前
+│   │   ├── Divergence.tsx        # ★S-4 別の案（左右に並べない）
+│   │   ├── RangeBar.tsx          # ★算定表の帯
+│   │   └── NeedsIntake.tsx       # A-3 途中で伺う
+│   ├── schedule/
+│   │   ├── DecidedPanel.tsx      # ★決まったこと（引き算だけ）
+│   │   └── SchedulePanel.tsx     # 🚫 旧「これから」。**呼ばない**
+│   ├── consult/ onboarding/ invitation/ safety/ document/ topic/
+│   └── ui/                       # 汎用（TabBar ほか）
 │
 ├── lib/                          # 横断ユーティリティ
 └── types/                        # 共有型定義

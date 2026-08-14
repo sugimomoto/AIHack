@@ -10,7 +10,7 @@ import {
 } from "@/services/scenarioTitle";
 import { OutcomeCard } from "@/components/consult/OutcomeCard";
 import { AdjustmentPanel } from "@/components/consult/AdjustmentPanel";
-import { NOT_NEGOTIABLE_NOTE, canNegotiateAgreement } from "@/domain/consultation/negotiable";
+import { canNegotiateAgreement } from "@/domain/consultation/negotiable";
 import Link from "next/link";
 import { parseThreadId } from "@/domain/consultation/thread";
 
@@ -41,40 +41,16 @@ export default async function Page({
       {/* ★何が決まるのか分からないまま書かせない */}
       <OutcomeCard outcomes={outcomes} />
 
-      {/* ★★ この文言は、書かれていたのに一度も表示されていなかった。
-             このご相談で取り決めが変わらないことを、**書く前に**言う。
-             そして「では、どこで変えるのか」の行き先を、同じ場所に置く。
-             片方だけだと、行き止まりになる。 */}
-      {!negotiable && (
-        <div
-          className="shrink-0 px-4 pt-3"
-        >
-          <div
-            style={{
-              border: "1px dashed var(--border-dashed)",
-              borderRadius: "var(--r-md)",
-              padding: "11px 13px",
-            }}
-          >
-            <p style={{ fontSize: 12, lineHeight: 1.9, color: "var(--text-sub-2)" }}>
-              {NOT_NEGOTIABLE_NOTE}
-            </p>
-            <Link
-              href="/app/agreements"
-              style={{
-                fontSize: 12.5,
-                color: "var(--text-sub)",
-                textDecoration: "underline",
-                display: "inline-block",
-                marginTop: 6,
-                minHeight: 32,
-              }}
-            >
-              取り決めの画面へ
-            </Link>
-          </div>
-        </div>
-      )}
+      {/* ★★ 「このご相談では、いまの取り決めは変わりません」を外した（2026-08-14）。
+             `FORMAL` が 0 になり、**トピックを選んだ相談すべてに出るようになった。**
+             ★どれにも出る注意書きは、区別をしない。区別しないものは、注意にならない。
+
+             しかも書く前に、画面のいちばん上に出ていた。
+             **まだ誰も尋ねていないことへの答え**が、最初に来ていた。
+
+             ★同じことは、下の「お話し合いの内容」が言う。
+             そちらは**控えが実際にできたときだけ**出るので、
+             「これは取り決めになるのか」という問いが立つ場面と一致する。 */}
       <div className="flex min-h-0 flex-1 flex-col">
         <CaseChat
           caseId={session.caseId}

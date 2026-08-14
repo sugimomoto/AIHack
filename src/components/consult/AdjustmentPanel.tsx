@@ -51,6 +51,12 @@ export function AdjustmentPanel({
   const shown = v.agreedChange ?? v.ownChange;
   const rows = describeChange({}, shown).changed;
 
+  // ★★ 中身が無いなら、枠ごと出さない（2026-08-14）。
+  //   控えはあるのに読める項目が無いと、**見出しと注意書きだけが残った。**
+  //   何を待っているのか分からないまま「おふたりのご意向を待っています」と出る。
+  //   ★言えることが無いときは、黙る。
+  if (rows.length === 0) return null;
+
   return (
     <div
       className="shrink-0 px-4 py-3"

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import scenarios from "../../firestore/seeds/scenarios.json";
 import categories from "../../firestore/seeds/topicCategories.json";
-import { NOT_NEGOTIABLE_NOTE } from "@/domain/consultation/negotiable";
+import { ADJUSTMENT_NOTE } from "@/domain/adjustment/record";
 
 /**
  * ★実データを受けた、シナリオとカテゴリの作り直し
@@ -36,13 +36,35 @@ describe("★「決める」と題しながら決まらないものを置かな�
     expect(nc).toContain("取り決めを決める・変える");
   });
 
-  it("★このご相談では取り決めが変わらないことを、書く前に言う", () => {
-    // ★文言は書かれていたのに、一度も表示されていなかった
+  /**
+   * ★★ 「書く前に言う」をやめた（2026-08-14）。
+   *
+   *   `FORMAL` が 0 になり、**トピックを選んだ相談すべてに出るようになった。**
+   *   どれにも出る注意書きは区別をしない。区別しないものは、注意にならない。
+   *   しかも書く前に、画面のいちばん上に出ていた。
+   *   **まだ誰も尋ねていないことへの答え**が、最初に来ていた。
+   *
+   * ★守りたいのは「言う場所」ではなく、**言われていること**である。
+   *   控えができたとき——つまり「これは取り決めになるのか」という問いが
+   *   実際に立つ場面——に出る。
+   */
+  it("★取り決めが変わらないことを、控えの場で言う", () => {
+    expect(ADJUSTMENT_NOTE).toContain("公正証書の原案には入りません");
+    expect(ADJUSTMENT_NOTE).toContain("取り決めも変わりません");
+    const panel = readFileSync("src/components/consult/AdjustmentPanel.tsx", "utf8");
+    expect(panel).toContain("ADJUSTMENT_NOTE");
+  });
+
+  // ★同じことを、1つの画面で二度言わない
+  it("★相談の画面に、同じ注意書きを重ねない", () => {
     const talk = readFileSync("src/app/app/consult/talk/page.tsx", "utf8");
-    expect(talk).toContain("NOT_NEGOTIABLE_NOTE");
-    expect(NOT_NEGOTIABLE_NOTE).toContain("取り決めの画面");
-    // ★行き先も同じ場所に置く。片方だけだと行き止まりになる
-    expect(talk).toContain("/app/agreements");
+    expect(talk).not.toContain("NOT_NEGOTIABLE_NOTE");
+  });
+
+  // ★中身が無いのに、見出しと注意書きだけを残さない
+  it("★控えに読める項目が無ければ、枠ごと出さない", () => {
+    const panel = readFileSync("src/components/consult/AdjustmentPanel.tsx", "utf8");
+    expect(panel).toContain("if (rows.length === 0) return null;");
   });
 });
 

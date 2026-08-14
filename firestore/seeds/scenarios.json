@@ -1,5 +1,21 @@
 [
   {
+    "id": "sc_001",
+    "categoryId": "tc_money",
+    "title": "養育費のことを相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "CHILD_SUPPORT",
+    "requiresConsent": true,
+    "promptHint": "養育費についてのご相談です。取り決めそのものは変わりません。金額や条項は、こちらからは作りません。",
+    "isSystem": true,
+    "sortOrder": 1,
+    "opening": "養育費のことですね。いまのご事情や、お考えになっていることをお書きください。",
+    "examples": [
+      "月に◯万円くらいでお願いしたいです",
+      "毎月末日に受け取れると助かります"
+    ]
+  },
+  {
     "id": "sc_002",
     "categoryId": "tc_money",
     "title": "塾・習い事の費用を相談する",
@@ -61,6 +77,22 @@
     "examples": [
       "治療費◯円がかかりました。半分ずつにできませんか",
       "通院が続きそうで、費用を相談したいです"
+    ]
+  },
+  {
+    "id": "sc_006",
+    "categoryId": "tc_meeting",
+    "title": "面会のルールを相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": "VISITATION",
+    "requiresConsent": true,
+    "promptHint": "お会いになる約束についてのご相談です。取り決めそのものは変わりません。",
+    "isSystem": true,
+    "sortOrder": 6,
+    "opening": "お会いになる約束のことですね。ご希望や、難しいと感じておられるところをお書きください。",
+    "examples": [
+      "月1回、第2土曜の10時から17時にしたいです",
+      "受け渡しは◯◯駅でお願いしたいです"
     ]
   },
   {

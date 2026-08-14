@@ -191,7 +191,7 @@ export const TOPIC_CATEGORIES = [
     id: "money",
     label: "お金のこと",
     scenarios: [
-      "養育費を決める",
+      "養育費のことを相談する",
       "塾・習い事の費用を相談する",
       "進学費用の分担を相談する",
       "今月の支払いを待ってほしい",
@@ -202,7 +202,7 @@ export const TOPIC_CATEGORIES = [
     id: "meeting",
     label: "子どもと会うこと",
     scenarios: [
-      "面会のルールを決める",
+      "面会のルールを相談する",
       "今回の日程を変更したい",
       "学校行事に参加したい",
       "長期休暇の過ごし方を相談する",

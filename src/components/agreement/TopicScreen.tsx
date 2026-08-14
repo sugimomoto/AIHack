@@ -383,7 +383,7 @@ export function TopicScreen({
             <p
               style={{ fontSize: 11.5, lineHeight: 1.95, color: "var(--text-sub-2)", marginTop: 10 }}
             >
-              ご希望が違うときは、ご相談ください。お書きになった言葉は、そのままお相手には届きません。
+              ご希望が違うときは、ご相談ください。お書きになった言葉は、そのままでは届きません。整えてお伝えします。
             </p>
           </>
         )}

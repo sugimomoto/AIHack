@@ -24,7 +24,11 @@ export function LiveChat({ consultationId }: { consultationId: string }) {
   const [turns, setTurns] = useState<Turn[]>([
     {
       kind: "ai",
-      lines: ["こんにちは。", "思っていることを、そのまま書いてください。", "ここに書いたことは、お相手には届きません。"],
+      lines: [
+        "こんにちは。",
+        "思っていることを、そのまま書いてください。",
+        "そのままは届きません。整えてお伝えします。",
+      ],
       choices: [],
     },
   ]);

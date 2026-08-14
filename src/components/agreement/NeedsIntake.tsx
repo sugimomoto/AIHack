@@ -379,8 +379,11 @@ function Income({ busy, setBusy, onDone }: Sub) {
             {raw === "" ? "—" : `${yen.toLocaleString("ja-JP")}円`}
           </span>
         </div>
+        {/* ★★ 相談の言葉とは、約束の種類が違う（2026-08-14）。
+               相談は「整えて伝える」。**年収は、そもそも渡らない**（INV-2a）。
+               ★同じ「届きません」でまとめると、どちらかが嘘になる。 */}
         <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
-          ここに書いたことは、お相手には届きません
+          この金額は、お相手には知られません
         </p>
         <div
           className="mt-2 flex items-baseline justify-between"

@@ -59,9 +59,9 @@ export default function Page() {
             立つためのサービスです。
           </h1>
           <p style={{ fontSize: 13, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 12 }}>
-            書いた言葉は、お相手には届きません。
+            書いた言葉そのままでは届きません。
             <br />
-            合意できた事項だけが共有されます。
+            <strong>整えたうえで、お伝えします。</strong>
           </p>
         </div>
 

@@ -86,7 +86,7 @@ export const SCENES: Scene[] = [
     suggest: "NON_CUSTODIAL",
     upto: 2,
     agreements: 0,
-    note: "「ここに書いたことは、お相手には届きません」を信じられるか",
+    note: "「そのままは届きません。整えてお伝えします」を信じられるか",
   },
   {
     no: 4,

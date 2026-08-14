@@ -72,7 +72,7 @@ export function IncomeInput({
       >
         <Row
           label="入力した金額"
-          note="ここに書いたことは、お相手には届きません"
+          note="この金額は、お相手には知られません"
           value={raw === "" ? "—" : `${yen.toLocaleString()}円`}
           muted
         />

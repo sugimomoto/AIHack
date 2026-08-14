@@ -32,8 +32,15 @@ describe("★受け止めのプロンプトが拒否を指示していない", (
     expect(RECEPTION_SYSTEM_PROMPT).toMatch(/受け止め|否定しない/);
   });
 
-  it("★相手に渡らないことがプロンプトに書かれている", () => {
-    expect(RECEPTION_SYSTEM_PROMPT).toMatch(/届きません|渡りません|共有されません/);
+  /**
+   * ★★ 対で書く（2026-08-14）。
+   *   「渡りません」だけだと、**このアプリの価値がまるごと消える。**
+   *   渡らないのは**そのままの言葉**であって、
+   *   **必要な内容は、整えて伝えている。**
+   */
+  it("★そのままは渡らないこと、整えて伝えることの両方が書かれている", () => {
+    expect(RECEPTION_SYSTEM_PROMPT).toMatch(/そのまま.*渡ることはありません|届きません|渡りません/);
+    expect(RECEPTION_SYSTEM_PROMPT).toContain("整えて");
   });
 
   /**

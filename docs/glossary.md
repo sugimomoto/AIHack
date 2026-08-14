@@ -265,7 +265,7 @@
 | 概念 | 値 |
 | --- | --- |
 | 親権形態 | `SOLE` / `JOINT` / `UNDECIDED` |
-| シナリオ種別 | `FORMAL`（取り決めを決める相談・★**0件**） / `ADJUSTMENT`（個別の相談） / `NOTIFICATION`（お知らせ） |
+| シナリオ種別 | ~~`FORMAL`~~（★**0件**。2026-08-14 に残り2件を `ADJUSTMENT` へ寄せた） / `ADJUSTMENT`（個別の相談・**21件**） / `NOTIFICATION`（お知らせ・**8件**） |
 | 仮案の共有 | `NONE` / `DRAFT` / `SHARED` / `WITHDRAWN` |
 | 調整の効果 | `ONE_TIME` / `PERMANENT` |
 | 当事者の役割 | `CUSTODIAL` / `NON_CUSTODIAL` |

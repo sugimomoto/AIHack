@@ -109,8 +109,41 @@ export function NewConsult() {
         })}
       </div>
 
+      {/* ★★ 「養育費を決める」「面会のルールを決める」を、ここから外した。
+             対話から取り決めを作らないと決めた以上、**題が「決める」なのに決まらない。**
+             果たせない約束になっていた。
+
+             ★外すだけにしない。決める場所への行き先を、跡に置く。
+             消すだけだと、入口が消えて、決める場所には行けなくなる。 */}
       <div
         className="mt-6"
+        style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: 18 }}
+      >
+        <Link
+          href="/app/agreements"
+          className="flex items-center justify-between"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-md)",
+            padding: "14px 16px",
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 14.5 }}>取り決めを決める・変える</p>
+            <p style={{ fontSize: 12, color: "var(--text-sub)", marginTop: 3 }}>
+              養育費・面会交流・財産分与・年金分割
+            </p>
+          </div>
+          <span style={{ color: "var(--muted)" }}>›</span>
+        </Link>
+        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 8 }}>
+          公正証書に入るものは、こちらでお決めになります。
+        </p>
+      </div>
+
+      <div
+        className="mt-5"
         style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: 18 }}
       >
         {/* ★選ばずに書き始められる。ここが必須要件 */}

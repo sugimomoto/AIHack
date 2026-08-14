@@ -1,21 +1,5 @@
 [
   {
-    "id": "sc_001",
-    "categoryId": "tc_money",
-    "title": "養育費を決める",
-    "kind": "FORMAL",
-    "linkedTopic": "CHILD_SUPPORT",
-    "requiresConsent": true,
-    "promptHint": "養育費の額・支払日・終期を決める相談です。金額は算定表を参照して範囲を示してください。",
-    "isSystem": true,
-    "sortOrder": 1,
-    "opening": "養育費のことですね。金額・お支払いの日・いつまで続けるか、この3つが決まると書面にできます。",
-    "examples": [
-      "月に◯万円くらいでお願いしたいです",
-      "毎月末日に受け取れると助かります"
-    ]
-  },
-  {
     "id": "sc_002",
     "categoryId": "tc_money",
     "title": "塾・習い事の費用を相談する",
@@ -80,22 +64,6 @@
     ]
   },
   {
-    "id": "sc_006",
-    "categoryId": "tc_meeting",
-    "title": "面会のルールを決める",
-    "kind": "FORMAL",
-    "linkedTopic": "VISITATION",
-    "requiresConsent": true,
-    "promptHint": "面会交流の頻度・時間・場所・受け渡し方法を決める相談です。",
-    "isSystem": true,
-    "sortOrder": 6,
-    "opening": "お会いになる約束のことですね。回数・曜日・時間・受け渡しの場所が決まると、書面にできます。",
-    "examples": [
-      "月1回、第2土曜の10時から17時にしたいです",
-      "受け渡しは◯◯駅でお願いしたいです"
-    ]
-  },
-  {
     "id": "sc_007",
     "categoryId": "tc_meeting",
     "title": "今回の日程を変更したい",
@@ -113,14 +81,14 @@
   },
   {
     "id": "sc_008",
-    "categoryId": "tc_meeting",
+    "categoryId": "tc_school",
     "title": "学校行事に参加したい",
     "kind": "ADJUSTMENT",
     "linkedTopic": "VISITATION",
     "requiresConsent": true,
     "promptHint": "学校行事への参加に関する相談です。",
     "isSystem": false,
-    "sortOrder": 8,
+    "sortOrder": 1,
     "opening": "学校行事のことですね。いつ何があるか、どうしたいかを書いていただけます。",
     "examples": [
       "◯月◯日の運動会に行きたいです",
@@ -257,14 +225,14 @@
   },
   {
     "id": "sc_017",
-    "categoryId": "tc_daily",
+    "categoryId": "tc_school",
     "title": "学校からの連絡を共有する",
     "kind": "NOTIFICATION",
     "linkedTopic": null,
     "requiresConsent": false,
     "promptHint": "学校からの連絡事項の共有です。合意は不要です。",
     "isSystem": false,
-    "sortOrder": 17,
+    "sortOrder": 5,
     "opening": "学校からのお知らせですね。いつ、何があるかを書いていただけます。",
     "examples": [
       "◯月◯日に授業参観があります",
@@ -301,6 +269,166 @@
     "examples": [
       "今月のぶんについて、ご確認をお願いできますか",
       "来月は少し遅れそうなので、ご相談させてください"
+    ]
+  },
+  {
+    "id": "sc_020",
+    "categoryId": "tc_money",
+    "title": "立て替えたお金を精算する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "isSystem": false,
+    "sortOrder": 7,
+    "promptHint": "立て替えた実費の精算です。原文にある品目と金額をそのまま扱ってください。",
+    "opening": "立て替えられた分の精算ですね。何にいくらかかったかを、書かれたとおりにお伝えします。",
+    "examples": [
+      "メガネの作り直しで◯円かかりました",
+      "病院代を立て替えたので、精算をお願いしたいです"
+    ]
+  },
+  {
+    "id": "sc_021",
+    "categoryId": "tc_money",
+    "title": "買うものを相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "isSystem": false,
+    "sortOrder": 8,
+    "promptHint": "購入の可否と費用の相談です。",
+    "opening": "お買いになるものの相談ですね。何を、いくらくらいで、どう分けたいかを書いていただけます。",
+    "examples": [
+      "通学用のカバンを買い替えたいのですが",
+      "スマホの機種変更について相談したいです"
+    ]
+  },
+  {
+    "id": "sc_022",
+    "categoryId": "tc_meeting",
+    "title": "受け渡しのことを相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "isSystem": false,
+    "sortOrder": 6,
+    "promptHint": "受け渡しの時間・場所の相談です。",
+    "opening": "受け渡しのことですね。時間や場所のご希望を書いていただけます。",
+    "examples": [
+      "今回は駅前でお願いできますか",
+      "21時だと難しいので、少し早められませんか"
+    ]
+  },
+  {
+    "id": "sc_023",
+    "categoryId": "tc_school",
+    "title": "面談・懇談の分担を相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "isSystem": false,
+    "sortOrder": 2,
+    "promptHint": "面談・懇談にどちらが出るかの相談です。",
+    "opening": "面談のことですね。日時と、どちらが出られるかを書いていただけます。",
+    "examples": [
+      "三者面談が◯日にあります。出ていただけますか",
+      "今回は私が出ますので、内容は共有します"
+    ]
+  },
+  {
+    "id": "sc_024",
+    "categoryId": "tc_school",
+    "title": "提出書類のことを伝える",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "isSystem": false,
+    "sortOrder": 3,
+    "promptHint": "書類の名称と期限の共有です。合意は不要です。",
+    "opening": "書類のことですね。何の書類が、いつまでに要るかをお伝えします。",
+    "examples": [
+      "在学証明書が◯日までに要るそうです",
+      "保健調査票の記入をお願いできますか"
+    ]
+  },
+  {
+    "id": "sc_025",
+    "categoryId": "tc_school",
+    "title": "持ち物・購入するものを伝える",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "isSystem": false,
+    "sortOrder": 4,
+    "promptHint": "持ち物・購入品の共有です。合意は不要です。",
+    "opening": "持ち物のことですね。何が、いつまでに要るかをお伝えします。",
+    "examples": [
+      "制服の採寸が今週末までです",
+      "体操服に名前の記入が要るそうです"
+    ]
+  },
+  {
+    "id": "sc_026",
+    "categoryId": "tc_school",
+    "title": "学校でのできごとを伝える",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "isSystem": false,
+    "sortOrder": 6,
+    "promptHint": "学校でのできごとの共有です。★原因を誰かに求める表現は取り次がないでください。",
+    "opening": "学校でのことですね。何があったか、いまどうなっているかを書いていただけます。書かれたまま届くことはありません。",
+    "examples": [
+      "学校から連絡があり、友だちとのことで指導を受けたそうです",
+      "持ち物のことで注意を受けました。家でも話してみます"
+    ]
+  },
+  {
+    "id": "sc_027",
+    "categoryId": "tc_life",
+    "title": "特性やご様子を共有する",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "isSystem": false,
+    "sortOrder": 4,
+    "promptHint": "お子さんの特性・様子の共有です。合意は不要です。",
+    "opening": "お子さんのご様子ですね。検査や通級のことも、そのまま書いていただけます。",
+    "examples": [
+      "発達検査の結果が出たので共有します",
+      "学校で通級を勧められました"
+    ]
+  },
+  {
+    "id": "sc_028",
+    "categoryId": "tc_life",
+    "title": "生活のルールをすり合わせる",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "isSystem": false,
+    "sortOrder": 5,
+    "promptHint": "ご家庭でのルールを揃える相談です。",
+    "opening": "ご家庭でのお約束のことですね。おふたりで揃えておきたいことを書いていただけます。",
+    "examples": [
+      "お小遣いは月◯円で揃えられませんか",
+      "ゲームの時間について、同じお約束にしたいです"
+    ]
+  },
+  {
+    "id": "sc_029",
+    "categoryId": "tc_daily",
+    "title": "荷物・忘れ物の受け渡しを伝える",
+    "kind": "NOTIFICATION",
+    "linkedTopic": null,
+    "requiresConsent": false,
+    "isSystem": false,
+    "sortOrder": 5,
+    "promptHint": "荷物・忘れ物の受け渡しの共有です。合意は不要です。",
+    "opening": "お荷物のことですね。何を、どこで受け渡すかをお伝えします。",
+    "examples": [
+      "保険証を宅配ボックスに入れておきます",
+      "水筒を忘れているので、明日お渡しします"
     ]
   }
 ]

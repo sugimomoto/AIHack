@@ -16,19 +16,30 @@ export const metadata = {
 };
 
 /**
- * ★「はじめる」はここには置かない（StartButton が担う）。
- *   以下は、はじめる前でも見られるもの。
+ * ★★ どう進むか。**これが無いと、何をするアプリか分からない。**
+ *
+ *   以前は「転送しない」だけを言っていた。**しないことしか言っていなかった。**
+ *   何が起きるのかが無いので、**話したあとどうなるのかが見えない。**
  */
-const ROUTES = [
-  {
-    href: "/context",
-    label: "AIに渡しているもの",
-    note: "相手の言葉を持っていないことを、そのまま表示します。★はじめたあとにご覧いただけます。",
-  },
-  { href: "/metrics", label: "原価", note: "CT-1〜CT-4。ルーティングなしとの比較を実測値で出します。" },
-  { href: "/knowledge", label: "取り決めについて知る", note: "制度の一般的な説明。個別の助言はしません。" },
-  { href: "/mock", label: "体験モック", note: "デザイン確認用。両当事者の視点を切り替えられます。" },
-  { href: "/signin", label: "お戻りになる", note: "ご登録済みのメールアドレスにリンクをお送りします。" },
+const STEPS = [
+  { n: "1", label: "おひとりで、AIに話す", note: "書いた言葉は、お相手に届きません。" },
+  { n: "2", label: "決めたいことを、書いて渡す", note: "金額と条項は、ご自身で書きます。AIは作りません。" },
+  { n: "3", label: "記録が同じになったら、合意", note: "片方だけでは成立しません。" },
+];
+
+/**
+ * ★★ 審査・確認のための入口を、**当事者の導線から分ける。**
+ *
+ *   以前は「お戻りになる」と同じ列に、5枚並べていた。
+ *   ★「CT-1〜CT-4」「体験モック」は、**当事者には何のことか分からない。**
+ *   一方でこれらは、主張の裏付けとして**審査員には必ず見ていただく**必要がある。
+ *
+ *   → 隠さない。**宛先を書いて分ける。**
+ */
+const REVIEW = [
+  { href: "/context", label: "AIに渡しているもの", note: "相手の言葉を持っていないことを、そのまま表示します（はじめたあと）" },
+  { href: "/metrics", label: "原価", note: "CT-1〜CT-4。ルーティングなしとの比較を実測値で" },
+  { href: "/mock", label: "体験モック", note: "両当事者の視点を切り替えられます" },
 ];
 
 export default async function Page({
@@ -153,6 +164,45 @@ export default async function Page({
           </div>
         </section>
 
+        {/* ★★ どう進むか。「転送しない」だけでは、**しないことしか言っていない** */}
+        <section className="mt-5">
+          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-sub)" }}>どう進むか</p>
+          <div className="mt-2.5 flex flex-col gap-2">
+            {STEPS.map((s) => (
+              <div
+                key={s.n}
+                className="flex items-start gap-3"
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--r-md)",
+                  padding: "13px 15px",
+                }}
+              >
+                <span
+                  className="grid shrink-0 place-items-center"
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 11,
+                    background: "var(--bubble-ai)",
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
+                >
+                  {s.n}
+                </span>
+                <div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.7 }}>{s.label}</p>
+                  <p style={{ fontSize: 12, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 2 }}>
+                    {s.note}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* ★お名前もご連絡先も要らない。状況もうかがわない */}
         <StartButton />
         {/* ★★「ご連絡先も要りません」と書いていた。**サインアップ必須にしたので撤回する。**
@@ -163,33 +213,65 @@ export default async function Page({
           メールアドレスは、<strong>次にお戻りいただくためだけ</strong>に使います。
         </p>
 
-        <div className="mt-6 flex flex-col gap-2.5">
-          {ROUTES.map((r) => (
-            <Link
-              key={r.href}
-              href={r.href}
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--r-lg)",
-                padding: 16,
-              }}
-            >
-              <p
+        {/* ★★ お戻りは、**同じ欄**である。
+               以前は雑多な5枚の5番目に「お戻りになる」を置いていた。**埋もれていた。**
+               ★入口を2つに分けない。分けると、どちらか選ばせることになる。
+               すでに登録があれば「おかえりなさい」と出る（EmailLinkForm）。
+               ★選ばせずに、**こちらが見分ける。** */}
+        <p
+          className="mt-4"
+          style={{
+            background: "var(--muted-bg)",
+            borderRadius: "var(--r-sm)",
+            padding: "11px 13px",
+            fontSize: 12.5,
+            lineHeight: 1.95,
+            color: "var(--text-sub)",
+            textAlign: "center",
+          }}
+        >
+          <strong>以前ご登録の方も、同じ欄からお戻りいただけます。</strong>
+          <br />
+          入力されたアドレスで、こちらがお見分けします。
+        </p>
+
+        <p className="mt-5" style={{ textAlign: "center" }}>
+          <Link
+            href="/knowledge"
+            style={{ fontSize: 12.5, color: "var(--text-sub)", textDecoration: "underline" }}
+          >
+            取り決めについて知る
+          </Link>
+          <span style={{ fontSize: 12, color: "var(--muted)" }}>
+            （はじめる前でもご覧いただけます）
+          </span>
+        </p>
+
+        {/* ★★ 宛先を書いて分ける。当事者の導線に、審査用の言葉を混ぜない */}
+        <section className="mt-8" style={{ borderTop: "1px dashed var(--border-dashed)", paddingTop: 16 }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-sub-2)" }}>
+            審査・確認用（AI HACK 2026）
+          </p>
+          <div className="mt-2 flex flex-col gap-1.5">
+            {REVIEW.map((r) => (
+              <Link
+                key={r.href}
+                href={r.href}
                 style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "var(--text)",
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--r-md)",
+                  padding: "11px 14px",
                 }}
               >
-                {r.label}
-              </p>
-              <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 4 }}>
-                {r.note}
-              </p>
-            </Link>
-          ))}
-        </div>
+                <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{r.label}</p>
+                <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub)", marginTop: 2 }}>
+                  {r.note}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 20, textAlign: "center" }}>
           AI HACK 2026 提出作品。実在の人物の情報は含まれません。

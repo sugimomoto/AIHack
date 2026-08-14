@@ -13,7 +13,12 @@ import { DiscardDrafts } from "./DiscardDrafts";
  *
  * ★通知に本文を出すのは既定 OFF。DV・つきまといの文脈がある。
  */
-type Settings = { partnerAlias: string | null; notifyBody: boolean };
+type Settings = {
+  partnerAlias: string | null;
+  notifyBody: boolean;
+  /** ★お相手が参加しているか。★状態だけで、識別子は返らない */
+  partnerJoined?: boolean;
+};
 
 export function SettingsView({ caseId, partyId }: { caseId: string; partyId: string }) {
   const [s, setS] = useState<Settings | null>(null);
@@ -210,6 +215,46 @@ export function SettingsView({ caseId, partyId }: { caseId: string; partyId: str
           </Link>
         ))}
       </div>
+
+      {/* ★★ お相手とつながっているか。
+             「つながっているのか分からない」という状態を残さない。
+             ★状態だけ。お相手のアドレスも識別子も出さない（C1）。 */}
+      {s && (
+        <div
+          className="mt-3"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-md)",
+            padding: "13px 15px",
+          }}
+        >
+          <p style={{ fontSize: 11.5, color: "var(--text-sub-2)" }}>お相手のご参加</p>
+          <p
+            style={{
+              fontSize: 14.5,
+              marginTop: 4,
+              color: s.partnerJoined ? "var(--agree-text)" : "var(--text)",
+            }}
+          >
+            {s.partnerJoined ? "つながっています" : "まだご参加いただいていません"}
+          </p>
+          <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 6 }}>
+            {s.partnerJoined
+              ? "お相手にお渡しになった内容だけが、届いています。"
+              : "ご案内をお渡しになるまで、お相手には何も届きません。急かすご連絡はしません。"}
+          </p>
+          {!s.partnerJoined && (
+            <Link
+              href="/onboarding/invite"
+              className="mt-2 inline-block"
+              style={{ fontSize: 12.5, color: "var(--text-sub)", textDecoration: "underline" }}
+            >
+              ご案内を用意する
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* ★★ いま入っているアドレス。打ち間違いは、ここでも気づける */}
       {email && (

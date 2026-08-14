@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   isSignInWithEmailLink,
   sendSignInLinkToEmail,
@@ -41,7 +41,9 @@ export function EmailLinkForm({
   acceptToken?: string;
 }) {
   const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "sent" | "working" | "done" | "error">("idle");
+  const [state, setState] = useState<
+    "idle" | "sent" | "working" | "needEmail" | "done" | "error"
+  >("idle");
   const [message, setMessage] = useState<string | null>(null);
   /**
    * ★★ 入ったアドレスを、必ず見せる。
@@ -52,40 +54,32 @@ export function EmailLinkForm({
    */
   const [entered, setEntered] = useState<{ email: string; resumed: boolean } | null>(null);
 
-  // ★メール内のリンクから戻ってきた場合の処理
-  useEffect(() => {
-    let alive = true;
-    void (async () => {
+  /**
+   * リンクを完了させる。
+   *
+   * ★★ Firebase の仕様上、**アドレスの照合は省けない。**
+   *   リンクを拾った人が、宛先を知らないまま入れてしまうのを防ぐ仕組みである。
+   *
+   * ★だが以前は `window.prompt` で聞いていた。**素のダイアログは、この場に合わない。**
+   *   そして**間違えたときにやり直せなかった**（prompt は一度きり）。
+   *   → 画面の中で聞き、**違っていたら同じ場所で直せる**ようにした。
+   */
+  const complete = useCallback(
+    async (addr: string) => {
       const auth = await firebaseAuth().catch(() => null);
-      if (!auth || !alive) return;
-      if (!isSignInWithEmailLink(auth, window.location.href)) return;
-
-      // ★リンクを別のブラウザで開くと、送信時に保存したアドレスが無い。
-      //   その場合は入力していただく（Firebase の仕様上、照合に必要）。
-      // ★確認用リンクは e2eEmail を載せている。手動確認のたびに入力させない
-      const fromQuery = new URLSearchParams(window.location.search).get("e2eEmail");
-      const saved =
-        fromQuery ||
-        window.localStorage.getItem(KEY) ||
-        window.prompt("確認のため、リンクをお送りしたメールアドレスをご入力ください") ||
-        "";
-      if (!saved) {
-        setMessage("メールアドレスが確認できませんでした。もう一度お試しください。");
-        setState("error");
-        return;
-      }
+      if (!auth) return;
 
       setState("working");
+      setMessage(null);
       try {
-        const cred = await signInWithEmailLink(auth, saved, window.location.href);
+        const cred = await signInWithEmailLink(auth, addr, window.location.href);
         const idToken = await cred.user.getIdToken();
         // ★リンクに載せたトークン。Cookie が無いときの拠り所になる
         const linkToken = new URLSearchParams(window.location.search).get("lt");
 
         // ★招待の受諾は、招待の API へ送る（本人確認つき）
         const at = acceptToken ?? new URLSearchParams(window.location.search).get("at");
-        const url =
-          mode === "accept" && at ? `/api/invite/${at}/accept` : `/api/auth/${mode}`;
+        const url = mode === "accept" && at ? `/api/invite/${at}/accept` : `/api/auth/${mode}`;
         const body =
           mode === "accept"
             ? { action: "ACCEPT", idToken }
@@ -97,43 +91,69 @@ export function EmailLinkForm({
           body: JSON.stringify(body),
         });
         window.localStorage.removeItem(KEY);
+
         if (res.ok) {
           setState("done");
           const d = (await res.json().catch(() => ({}))) as { resumed?: boolean };
-
           // ★★ はじめる／参加のときは、**入ったアドレスを見せてから進む。**
           //   黙って進むと、打ち間違いに気づけない
           if (mode === "signup" || mode === "accept") {
-            setEntered({ email: cred.user.email ?? saved, resumed: Boolean(d.resumed) });
+            setEntered({ email: cred.user.email ?? addr, resumed: Boolean(d.resumed) });
             return;
           }
-          // ★受諾後もアプリへ。お子さんの確認は、必要になった時点で伺う（A-3）。
-          //   受諾直後がいちばん抵抗の大きい瞬間である
           window.location.href = "/app";
-        } else if (res.status === 404) {
-          // ★本人確認は通ったが、当方に紐づく当事者がいない。
-          //   「登録してから戻る」という順序を、ここで初めて知る人がいる。
+          return;
+        }
+
+        if (res.status === 404) {
+          // ★本人確認は通ったが、当方に紐づく当事者がいない
           setMessage(
             "このメールアドレスでのご利用が見つかりませんでした。はじめてお使いの場合は、トップの「はじめる」からお進みください。",
           );
           setState("error");
-        } else {
-          const d = (await res.json()) as { error?: string };
-          setMessage(d.error ?? "うまくいきませんでした");
-          setState("error");
+          return;
         }
+        const d = (await res.json()) as { error?: string };
+        setMessage(d.error ?? "うまくいきませんでした");
+        setState("error");
       } catch (e) {
-        // ★原因が分からないと直せない。Firebase のエラーコードを出す。
-        //   コード自体に個人情報は含まれない。
         const code = (e as { code?: string })?.code ?? "";
+        // ★★ アドレス違いは、やり直せる誤りである。**行き止まりにしない**
+        if (code === "auth/invalid-email") {
+          setMessage("リンクをお送りしたアドレスと一致しません。もう一度ご入力ください。");
+          setState("needEmail");
+          return;
+        }
+        // ★原因が分からないと直せない。Firebase のエラーコードを出す
         setMessage(EXPLAIN[code] ?? `うまくいきませんでした（${code || "原因不明"}）`);
         setState("error");
       }
+    },
+    [mode, acceptToken],
+  );
+
+  // ★メール内のリンクから戻ってきた場合の処理
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      const auth = await firebaseAuth().catch(() => null);
+      if (!auth || !alive) return;
+      if (!isSignInWithEmailLink(auth, window.location.href)) return;
+
+      // ★リンクを別のブラウザで開くと、送信時に保存したアドレスが無い。
+      //   ★確認用リンクは e2eEmail を載せている。手動確認のたびに入力させない
+      const known =
+        new URLSearchParams(window.location.search).get("e2eEmail") ||
+        window.localStorage.getItem(KEY);
+
+      // ★分かっていれば、そのまま進む。無ければ**画面の中で伺う**
+      if (known) void complete(known);
+      else if (alive) setState("needEmail");
     })();
     return () => {
       alive = false;
     };
-  }, [mode, acceptToken]);
+  }, [complete]);
 
   const send = async () => {
     const addr = email.trim();
@@ -237,6 +257,75 @@ export function EmailLinkForm({
             別のアドレスで入り直す
           </Link>
         )}
+      </div>
+    );
+  }
+
+  /**
+   * ★リンクをお送りしたアドレスの確認
+   *
+   *   Firebase の仕様上、照合は省けない。
+   *   **リンクを拾った人が、宛先を知らないまま入れるのを防ぐ仕組み**である。
+   *   ★だから「なぜ聞くのか」を、その場に書く。
+   */
+  if (state === "needEmail") {
+    return (
+      <div>
+        <p style={{ fontSize: 14.5, lineHeight: 1.85, fontWeight: 600 }}>
+          リンクをお送りしたアドレスを、ご入力ください
+        </p>
+        <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 8 }}>
+          リンクを開いた画面が、お送りになった画面と違うためです。
+          <br />
+          ★ほかの方がリンクを開いても入れないように、確かめています。
+        </p>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="メールアドレス"
+          className="mt-4 w-full"
+          style={{
+            background: "var(--surface-2)",
+            borderRadius: "var(--r-md)",
+            padding: "13px 15px",
+            minHeight: 48,
+            fontSize: 15,
+          }}
+        />
+        {/* ★間違えても行き止まりにしない。同じ場所で直せる */}
+        {message && (
+          <p
+            style={{
+              fontSize: 12.5,
+              lineHeight: 1.9,
+              color: "var(--attention-text)",
+              marginTop: 10,
+            }}
+          >
+            {message}
+          </p>
+        )}
+        <button
+          type="button"
+          disabled={!email.trim()}
+          onClick={() => void complete(email.trim())}
+          className="mt-4 w-full disabled:opacity-45"
+          style={{
+            background: "var(--agree-bg)",
+            border: "1px solid var(--agree)",
+            borderRadius: "var(--r-full)",
+            minHeight: 48,
+            fontSize: 15,
+            fontWeight: 600,
+            color: "var(--agree-text)",
+          }}
+        >
+          確かめる
+        </button>
+        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 10 }}>
+          何度でもお試しいただけます。このリンクは、まだ使えます。
+        </p>
       </div>
     );
   }

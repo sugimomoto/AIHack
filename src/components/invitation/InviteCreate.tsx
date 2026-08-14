@@ -53,7 +53,6 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
     }
   };
 
-  const [email, setEmail] = useState("");
   const [preview, setPreview] = useState(false);
   const [reveal, setReveal] = useState(true); // 既定 ON
   const [copied, setCopied] = useState(false);
@@ -87,9 +86,9 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
               lineHeight: 1.85,
             }}
           >
-            お渡しの方法を、選んでください。
+            ご案内のリンクをお作りします。
             <div style={{ fontSize: 12.5, color: "var(--text-sub)", marginTop: 2 }}>
-              どちらでも、あとから変えられます。
+              いつ、どの方法でお渡しになるかは、ご自身で決められます。
             </div>
           </div>
         </div>
@@ -109,7 +108,7 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
           />
         </div>
 
-        {/* ★2枚は同じ寸法・同じ枠線。主従を作らない */}
+        {/* ★お渡しの方法は1つだけ。**作れていない機能を並べない** */}
         <div className="mt-4 flex flex-col gap-3">
           <section style={CARD}>
             <h2 style={{ fontSize: 15, fontWeight: 600 }}>リンクをコピーして、自分で渡す</h2>
@@ -139,38 +138,12 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
             </div>
           </section>
 
-          <section style={CARD}>
-            <h2 style={{ fontSize: 15, fontWeight: 600 }}>メールで送る</h2>
-            <p style={{ fontSize: 13, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 6 }}>
-              アプリが送信します。文面は決まっていて、書き換えられません。送る前に、そのままお見せします。
-            </p>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="メールアドレス"
-              className="mt-3 w-full"
-              style={{
-                background: "var(--surface-2)",
-                borderRadius: "var(--r-md)",
-                padding: "12px 14px",
-                minHeight: 44,
-                fontSize: 14,
-              }}
-            />
-            <button
-              type="button"
-              onClick={async () => {
-                if (!url) await issue("EMAIL", email || undefined);
-                setPreview(true);
-              }}
-              className="mt-3"
-              style={{ fontSize: 13, color: "var(--agree-text)", fontWeight: 600 }}
-            >
-              送られる文面を見る ▸
-            </button>
-          </section>
         </div>
+
+        {/* ★★ 「メールで送る」を外した（2026-08-14）。
+               送信基盤が無く、ボタンは無効のままだった。
+               **作れていない機能を、選択肢として並べておかない。**
+               お渡しの方法は、ご自身で選んでいただく。 */}
 
         {/* ★安全性の情報は選択肢の外側。末尾の一文で判断を本人に戻す */}
         <div
@@ -184,7 +157,8 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
             color: "var(--text-sub-2)",
           }}
         >
-          リンクをご自身で渡すほうが、お相手が急に連絡を受け取ることにはなりません。ただ、どちらが良いかは事情によります。
+          ★アプリからお相手に連絡することはありません。お渡しになるまで、お相手には何も届きません。
+          お渡しの方法（メッセージ・口頭など）と時期は、ご自身でお選びいただけます。
         </div>
 
         <div className="mt-5 text-center">

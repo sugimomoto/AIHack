@@ -28,7 +28,17 @@ export function InviteLanding({ view, token }: { view: InvitationPublicView; tok
   const [busy, setBusy] = useState(false);
   const [declined, setDeclined] = useState(false);
   // ★参加には本人確認が要る（招待した側と同じ扱い）
-  const [needsAuth, setNeedsAuth] = useState(false);
+  //
+  // ★★ メールのリンクから戻ってきたときは、**最初からこの画面**にする。
+  //
+  //   以前は false 固定だった。戻ってくると通常の選択画面が描かれ、
+  //   **リンクを処理する画面が出ないまま止まっていた**（実機で発生）。
+  //   押した本人にとっては「リンクを踏んだのに何も起きない」形になる。
+  const [needsAuth, setNeedsAuth] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const q = new URLSearchParams(window.location.search);
+    return q.get("mode") === "signIn" && Boolean(q.get("oobCode"));
+  });
 
   if (view.state !== "OPEN") return <Unavailable />;
   if (declined) return <Declined />;

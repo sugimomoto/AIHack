@@ -22,7 +22,15 @@ export async function GET(req: Request, ctx: { params: Promise<{ caseId: string 
     const partyId = await resolveParty(req);
     const snap = await loadForLlm(asCaseId(caseId));
     assertOwnParty(snap, partyId);
-    return NextResponse.json(await loadViewerSettings(asCaseId(caseId), partyId));
+    // ★★ お相手が参加しているかを返す。
+    //
+    //   「つながっているのか分からない」という状態を残さない。
+    //   ★状態だけ。**お相手のアドレスも識別子も返さない**（C1）。
+    const other = snap.parties.find((p) => p.id !== partyId);
+    return NextResponse.json({
+      ...(await loadViewerSettings(asCaseId(caseId), partyId)),
+      partnerJoined: other?.state === "ACTIVE",
+    });
   } catch (e) {
     return errorResponse(e);
   }
@@ -47,7 +55,15 @@ export async function POST(req: Request, ctx: { params: Promise<{ caseId: string
       ...(alias === undefined ? {} : { partnerAlias: alias }),
       ...(typeof body.notifyBody === "boolean" ? { notifyBody: body.notifyBody } : {}),
     });
-    return NextResponse.json(await loadViewerSettings(asCaseId(caseId), partyId));
+    // ★★ お相手が参加しているかを返す。
+    //
+    //   「つながっているのか分からない」という状態を残さない。
+    //   ★状態だけ。**お相手のアドレスも識別子も返さない**（C1）。
+    const other = snap.parties.find((p) => p.id !== partyId);
+    return NextResponse.json({
+      ...(await loadViewerSettings(asCaseId(caseId), partyId)),
+      partnerJoined: other?.state === "ACTIVE",
+    });
   } catch (e) {
     return errorResponse(e);
   }

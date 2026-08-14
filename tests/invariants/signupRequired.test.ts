@@ -131,3 +131,60 @@ describe("★入っているアドレスが見える", () => {
     expect(settings).toContain("お相手には知られません");
   });
 });
+
+describe("★招待はリンクだけ。作れていない機能を並べない", () => {
+  const invite = strip(readFileSync("src/components/invitation/InviteCreate.tsx", "utf8"));
+
+  it("★「メールで送る」を外した（送信基盤が無く、ボタンは無効のままだった）", () => {
+    expect(invite).not.toContain("メールで送る");
+    expect(invite).not.toContain("送られる文面を見る");
+  });
+
+  it("リンクをお渡しする道は残る", () => {
+    expect(invite).toContain("リンクをコピーして、自分で渡す");
+  });
+
+  it("★アプリから連絡しないことを、その場に書く", () => {
+    expect(invite).toContain("お渡しになるまで、お相手には何も届きません");
+  });
+});
+
+describe("★リンクを別の画面で開いても、行き止まりにしない", () => {
+  const form = strip(readFileSync("src/components/auth/EmailLinkForm.tsx", "utf8"));
+  const landing = strip(readFileSync("src/components/invitation/InviteLanding.tsx", "utf8"));
+
+  it("★ブラウザのダイアログで聞かない", () => {
+    // ★素のダイアログは、この場に合わない
+    expect(form).not.toContain("window.prompt");
+  });
+
+  it("★アドレス違いは、やり直せる（行き止まりにしない）", () => {
+    expect(form).toContain('"needEmail"');
+    expect(form).toContain("何度でもお試しいただけます");
+  });
+
+  it("★なぜ聞くのかを、その場に書く", () => {
+    expect(form).toContain("ほかの方がリンクを開いても入れないように");
+  });
+
+  it("★招待から戻ったとき、確認の画面が最初から出る", () => {
+    // ★以前は false 固定で、戻ってきても何も起きなかった
+    expect(landing).toMatch(/useState\(\(\) => \{/);
+    expect(landing).toContain("oobCode");
+  });
+});
+
+describe("★つながっているかが分かる", () => {
+  const settings = strip(readFileSync("src/components/settings/SettingsView.tsx", "utf8"));
+  const route = readFileSync("src/app/api/cases/[caseId]/settings/route.ts", "utf8");
+
+  it("設定で確かめられる", () => {
+    expect(settings).toContain("お相手のご参加");
+    expect(settings).toContain("つながっています");
+  });
+
+  it("★状態だけ。お相手の識別子もアドレスも返さない（C1）", () => {
+    expect(route).toContain("partnerJoined");
+    expect(route).not.toMatch(/other\?\.id|other\.authUid/);
+  });
+});

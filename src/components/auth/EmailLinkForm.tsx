@@ -6,6 +6,7 @@ import {
   sendSignInLinkToEmail,
   signInWithEmailLink,
 } from "firebase/auth";
+import Link from "next/link";
 import { firebaseAuth } from "@/lib/firebaseClient";
 
 /**
@@ -42,6 +43,14 @@ export function EmailLinkForm({
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sent" | "working" | "done" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
+  /**
+   * ★★ 入ったアドレスを、必ず見せる。
+   *
+   *   打ち間違えると、**新しい空のケースが作られる。**
+   *   「データが消えた」ように見えるが、実際は**別人として入っている。**
+   *   ★見せないと、本人にも気づけない。
+   */
+  const [entered, setEntered] = useState<{ email: string; resumed: boolean } | null>(null);
 
   // ★メール内のリンクから戻ってきた場合の処理
   useEffect(() => {
@@ -90,6 +99,14 @@ export function EmailLinkForm({
         window.localStorage.removeItem(KEY);
         if (res.ok) {
           setState("done");
+          const d = (await res.json().catch(() => ({}))) as { resumed?: boolean };
+
+          // ★★ はじめる／参加のときは、**入ったアドレスを見せてから進む。**
+          //   黙って進むと、打ち間違いに気づけない
+          if (mode === "signup" || mode === "accept") {
+            setEntered({ email: cred.user.email ?? saved, resumed: Boolean(d.resumed) });
+            return;
+          }
           // ★受諾後もアプリへ。お子さんの確認は、必要になった時点で伺う（A-3）。
           //   受諾直後がいちばん抵抗の大きい瞬間である
           window.location.href = "/app";
@@ -148,6 +165,76 @@ export function EmailLinkForm({
       setState("error");
     }
   };
+
+  // ★★ 入ったアドレスを見せる。**打ち間違いに、ここで気づける**
+  if (entered) {
+    return (
+      <div>
+        <p style={{ fontSize: 15, lineHeight: 1.85, fontWeight: 600 }}>
+          {entered.resumed ? "おかえりなさい。" : "はじめまして。"}
+        </p>
+        <div
+          className="mt-3"
+          style={{
+            background: "var(--surface-2)",
+            borderRadius: "var(--r-md)",
+            padding: "13px 15px",
+          }}
+        >
+          <p style={{ fontSize: 11.5, color: "var(--text-sub-2)" }}>お入りになったアドレス</p>
+          <p style={{ fontSize: 15, marginTop: 4, wordBreak: "break-all" }}>{entered.email}</p>
+        </div>
+
+        {/* ★新規のときだけ言う。**打ち間違いは、ここでしか気づけない** */}
+        {!entered.resumed && (
+          <p
+            style={{
+              fontSize: 12,
+              lineHeight: 1.95,
+              color: "var(--text-sub-2)",
+              marginTop: 10,
+              borderTop: "1px dashed var(--border-dashed)",
+              paddingTop: 10,
+            }}
+          >
+            このアドレスで、新しくはじめます。
+            <br />
+            <strong>以前お使いのアドレスと違う場合は、そちらでお入りください。</strong>
+            前のご利用は、そのまま残っています。
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            window.location.href = "/app";
+          }}
+          className="mt-4 w-full"
+          style={{
+            background: "var(--agree-bg)",
+            border: "1px solid var(--agree)",
+            borderRadius: "var(--r-full)",
+            minHeight: 48,
+            fontSize: 15,
+            fontWeight: 600,
+            color: "var(--agree-text)",
+          }}
+        >
+          続ける
+        </button>
+
+        {!entered.resumed && (
+          <Link
+            href="/"
+            className="mt-2 grid place-items-center"
+            style={{ fontSize: 13, color: "var(--text-sub)", minHeight: 44 }}
+          >
+            別のアドレスで入り直す
+          </Link>
+        )}
+      </div>
+    );
+  }
 
   if (state === "sent") {
     return (

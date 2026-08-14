@@ -81,3 +81,53 @@ describe("★書いた約束を、実態に合わせる", () => {
     expect(account).not.toContain("あとで登録する");
   });
 });
+
+/**
+ * ★どのアドレスで入っているかを、見せる
+ *
+ * ★サインアップ必須にしたことで、**打ち間違いが新しい空のケースを作る。**
+ *   「データが消えた」ように見えるが、実際は**別人として入っている。**
+ *   見せないと、本人にも気づけない。
+ */
+describe("★入っているアドレスが見える", () => {
+  const sessionRoute = readFileSync("src/app/api/session/route.ts", "utf8");
+  const form = strip(readFileSync("src/components/auth/EmailLinkForm.tsx", "utf8"));
+  const settings = strip(readFileSync("src/components/settings/SettingsView.tsx", "utf8"));
+
+  it("★セッションがアドレスを返す", () => {
+    expect(sessionRoute).toContain("email");
+  });
+
+  it("★ただし保存はしない。その都度 Auth から引く", () => {
+    // ★「漏れて困るものを、そもそも預からない」を崩さない
+    expect(sessionRoute).toContain("getUser");
+    expect(sessionRoute).not.toContain("saveOwnContactInfo");
+  });
+
+  it("★引けなくても、動作は変えない（表示できないだけ）", () => {
+    expect(sessionRoute).toMatch(/catch[\s\S]{0,40}return null/);
+  });
+
+  it("★はじめた直後に、入ったアドレスを見せる", () => {
+    expect(form).toContain("お入りになったアドレス");
+  });
+
+  it("★新規か復帰かを言い分ける", () => {
+    // ★戻ったつもりで「はじめまして」が出れば、打ち間違いに気づける
+    expect(form).toContain("おかえりなさい");
+    expect(form).toContain("はじめまして");
+  });
+
+  it("★新規のときは、入り直す道を置く", () => {
+    expect(form).toContain("別のアドレスで入り直す");
+    expect(form).toContain("前のご利用は、そのまま残っています");
+  });
+
+  it("★設定でも、いつでも確かめられる", () => {
+    expect(settings).toContain("お入りのアドレス");
+  });
+
+  it("★お相手には知られないことを、その場に書く", () => {
+    expect(settings).toContain("お相手には知られません");
+  });
+});

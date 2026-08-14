@@ -13,7 +13,8 @@ export const dynamic = "force-dynamic";
  *   「送迎をお願いしたい」を先週やって、今週また頼む。
  *   これは**別の件**であって、続きではない。
  *
- * ★ただし「養育費を決める」は続き。kind がその区別を持っている。
+ * ★★ 例外は無くした（2026-08-14）。以前は「養育費を決める」だけが続きだった。
+ *   対話から取り決めへ行く経路を断った以上、相談は都度のものである。
  */
 export default async function Page({ searchParams }: { searchParams: Promise<{ s?: string }> }) {
   const session = await readSession();
@@ -24,9 +25,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
 
   const threadId = threadIdFor({
     scenarioId: sc?.id ?? null,
-    kind: sc?.kind ?? null,
-    // ★件ごとに新しくする鍵。続く相談（FORMAL）では使われない。
-    //   トピックを選ばずに始めた相談にも渡す（既定のスレッドに入れない）。
+    // ★件ごとに新しくする鍵。トピックを選ばずに始めた相談にも渡す
     token: randomBytes(6).toString("hex"),
   });
 

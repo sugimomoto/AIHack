@@ -7,13 +7,22 @@
  *   これは**別の件**であって、続きではない。
  *   先週の日付や事情が残っていると、今日の話が読めなくなる。
  *
- * ★ただし「養育費を決める」は違う。
- *   ひとつの話し合いが続いているので、**続きでなければ意味がない。**
+ * ★★ 例外を無くした（2026-08-14）。**どのトピックでも、毎回新しく立てる。**
  *
- *   その区別は kind に既にある。
- *     FORMAL       … 取り決めそのものを決める（続く）
- *     ADJUSTMENT   … 個別の相談（都度別）
- *     NOTIFICATION … お知らせ（都度別）
+ *   以前は「養育費を決める」だけを続きにしていた（kind が FORMAL）。
+ *   ひとつの話し合いが続いていく、という想定だった。
+ *
+ *   ★その想定は、もう成り立たない。
+ *   **対話から取り決めへ行く経路を断った（T1）**ため、
+ *   取り決めは取り決めの画面で書く。相談は相談であって、
+ *   **合意形成の本体ではない。**だとすれば、都度の相談である。
+ *
+ *   実害も出ていた。**先月の事情が残ったまま今月の話が始まる。**
+ *   ADJUSTMENT で避けていたことが、FORMAL でだけ起きていた。
+ *
+ * ★過去のスレッドは、そのまま開ける。
+ *   一覧は保存済みの threadId を辿るので、`th_sc_001` は残る。
+ *   **新しく立てるようになるだけで、過去は失われない。**
  *
  * ★スレッドIDは**双方で同じ**。
  *   取次ぎを相手側の同じスレッドに並べるための鍵になる。
@@ -21,31 +30,29 @@
 
 export const DEFAULT_THREAD_ID = "th_default";
 
-/** ★続きにするのは、取り決めそのものを決める相談だけ */
-export function isContinuing(kind: string | null | undefined): boolean {
-  return kind === "FORMAL";
-}
-
 export function threadIdFor(input: {
   scenarioId: string | null | undefined;
-  kind: string | null | undefined;
-  /** ★都度別の相談で使う。呼び出し側が生成する（同じ値なら同じスレッド） */
-  token?: string | null;
+  /**
+   * ★件ごとに新しくする鍵。**必須にしてある。**
+   *
+   *   以前は省略でき、省略すると `th_{scenarioId}` になった。
+   *   それは「続き」のIDそのものであり、**渡し忘れが黙って
+   *   前の会話につながる**形だった。型で塞ぐ。
+   */
+  token: string;
 }): string {
+  const t = input.token.trim();
+  const ok = /^[A-Za-z0-9]{4,24}$/.test(t);
   const s = (input.scenarioId ?? "").trim();
+
   if (!s || !/^[A-Za-z0-9_-]{1,40}$/.test(s)) {
     // ★トピックを選ばずに始めた相談も、**毎回新しく立てる。**
     //   既定のスレッドに入れると、前回の会話がそのまま続いてしまう。
-    const free = (input.token ?? "").trim();
-    return /^[A-Za-z0-9]{4,24}$/.test(free) ? `th_free_${free}` : DEFAULT_THREAD_ID;
+    return ok ? `th_free_${t}` : DEFAULT_THREAD_ID;
   }
 
-  if (isContinuing(input.kind)) return `th_${s}`;
-
-  const t = (input.token ?? "").trim();
-  // ★token が無ければ続きになってしまう。無い場合は既定に落とさず、
-  //   呼び出し側の誤りとして分かるように scenario だけのIDにはしない。
-  if (!t || !/^[A-Za-z0-9]{4,24}$/.test(t)) return `th_${s}`;
+  // ★鍵が無ければ既定に落とす。**`th_{s}` には決して落とさない**（それは続きになる）
+  if (!ok) return DEFAULT_THREAD_ID;
   return `th_${s}_${t}`;
 }
 

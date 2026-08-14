@@ -2,6 +2,39 @@
 
 - 出典：`firestore/seeds/topicCategories.json` / `firestore/seeds/scenarios.json`
 - **このファイルは現状の記録である。**変更の提案は `.steering/20260814-real-data-findings/design.md`
+- ★コード値には**日本語を併記**している。判別しやすくするため
+
+---
+
+## 0. ★ 用語の対応表
+
+### `kind` — 帰結を決める軸
+
+| コード値 | 日本語 | 意味 |
+| --- | --- | --- |
+| `FORMAL` | **取り決めを決める相談** | 公正証書に載る内容を決める。★いまは経路が断たれており、決まらない |
+| `ADJUSTMENT` | **個別の相談** | 取り決めは動かさない。「決まったこと」に控えが残る |
+| `NOTIFICATION` | **お知らせ** | 合意を求めない。取り次ぐだけ |
+
+### `linkedTopic` — 対応する取り決めの論点
+
+| コード値 | 日本語 | 今回扱うか |
+| --- | --- | --- |
+| `CHILD_SUPPORT` | **養育費** | ○ |
+| `VISITATION` | **面会交流** | ○ |
+| `PROPERTY_DIVISION` | **財産分与** | ○ |
+| `PENSION_SPLIT` | **年金分割** | ○ |
+| `DIVORCE_CONSENT` | **離婚への同意** | × （扱えない／対象外） |
+| `PARENTAL_AUTHORITY` | **親権者** | × （扱えない／対象外） |
+| `CONSOLATION_MONEY` | **慰謝料** | × （扱えない／対象外） |
+| `MARITAL_EXPENSES` | **婚姻費用** | × （扱えない／対象外） |
+
+### `requiresConsent` — 合意を要するか
+
+| コード値 | 日本語 |
+| --- | --- |
+| `true` | **合意が要る** |
+| `false` | **合意を求めない** |
 
 ---
 
@@ -25,19 +58,19 @@
 
 ## 2. シナリオが持つ項目
 
-| 項目 | 何に効くか | 当事者に見えるか |
-| --- | --- | --- |
-| `id` | 識別子 | — |
-| `categoryId` | どのカテゴリに並ぶか | 見える（カテゴリ名） |
-| `title` | 一覧に出る題 | **見える** |
-| `kind` | **帰結を決める軸**（§3） | 見えない |
-| `linkedTopic` | 対応する取り決めの論点 | 見えない |
-| `requiresConsent` | 合意を要するか（表示・分類の補助） | 見えない |
-| `promptHint` | **LLM への指示** | ★**見せない**（API が返さない） |
-| `isSystem` | 既定で用意したものか | 見えない |
-| `sortOrder` | 並び順 | — |
-| `opening` | 書き出しの案内（AI の第一声） | **見える** |
-| `examples` | 書き方の例 | **見える** |
+| 項目 | 日本語 | 何に効くか | 当事者に見えるか |
+| --- | --- | --- | --- |
+| `id` | 識別子 | — | — |
+| `categoryId` | カテゴリ | どのカテゴリに並ぶか | 見える（カテゴリ名） |
+| `title` | 題 | 一覧に出る | **見える** |
+| `kind` | **種別** | **帰結を決める軸**（§3） | 見えない |
+| `linkedTopic` | 対応する論点 | 取り決めとの結びつき | 見えない |
+| `requiresConsent` | 合意の要否 | 表示・分類の補助 | 見えない |
+| `promptHint` | **LLMへの指示** | 抽出の方針 | ★**見せない**（API が返さない） |
+| `isSystem` | 既定のものか | — | 見えない |
+| `sortOrder` | 並び順 | — | — |
+| `opening` | **書き出しの案内** | AI の第一声 | **見える** |
+| `examples` | **書き方の例** | 最初の一文を助ける | **見える** |
 
 > ★ `promptHint` と `opening` を混ぜない。
 > **`promptHint` は LLM への指示、`opening` は当事者への案内**である。
@@ -45,32 +78,32 @@
 
 ---
 
-## 3. ★ `kind` — 帰結を決める軸
+## 3. ★ `kind`（種別）が実際に効くところ
 
-| kind | 取次ぎ | 取り決め（公正証書） | Adjustment（決まったこと） |
+| 種別 | 取次ぎ | 取り決め（公正証書） | 「決まったこと」への控え |
 | --- | --- | --- | --- |
-| **FORMAL** | する | ~~作る~~ **→ 作らない**（2026-08-13 の方針転換） | する |
-| **ADJUSTMENT** | する | 作らない | する |
-| **NOTIFICATION** | する | 作らない | ★**しないはずが、している**（既知の欠陥） |
+| `FORMAL`（取り決めを決める相談） | する | ~~作る~~ **→ 作らない**（2026-08-13 の方針転換） | する |
+| `ADJUSTMENT`（個別の相談） | する | 作らない | する |
+| `NOTIFICATION`（お知らせ） | する | 作らない | ★**しないはずが、している**（既知の欠陥） |
 
 ### 3.1 いまの実装との差
 
-- **FORMAL から取り決めは作られない。**対話から取り決めへ行く経路を断った（T1）
-  - → **`kind` が FORMAL であることの意味は、ほぼ失われている**
-- **NOTIFICATION も Adjustment を作ってしまう。**T1 で分岐を落としすぎた（要修正）
+- **`FORMAL` から取り決めは作られない。**対話から取り決めへ行く経路を断った（T1）
+  - → **`FORMAL` であることの意味は、ほぼ失われている**
+- **`NOTIFICATION` も控えを作ってしまう。**T1 で分岐を落としすぎた（要修正）
 
 ### 3.2 `kind` がまだ効いている箇所
 
 | | |
 | --- | --- |
 | `canNegotiateAgreement(kind)` | `flexible`（柔軟なスキーマで抽出するか）の判定に使う |
-| `consultations` API | `kind === "FORMAL" && linkedTopic` のときだけ論点を結びつける |
+| `consultations` API | `FORMAL` かつ `linkedTopic` があるときだけ論点を結びつける |
 
 ---
 
 ## 4. カテゴリ（4つ）
 
-| # | id | 名前 | シナリオ数 |
+| # | コード値 | 名前 | シナリオ数 |
 | --- | --- | --- | --- |
 | 1 | `tc_money` | **お金のこと** | 6 |
 | 2 | `tc_meeting` | **子どもと会うこと** | 6 |
@@ -81,7 +114,7 @@
 
 ## 5. シナリオ一覧（19件）
 
-**内訳：FORMAL 2 ／ ADJUSTMENT 14 ／ NOTIFICATION 3**
+**内訳：`FORMAL`（取り決めを決める相談）2 ／ `ADJUSTMENT`（個別の相談）14 ／ `NOTIFICATION`（お知らせ）3**
 
 ### お金のこと（`tc_money`）
 
@@ -89,10 +122,10 @@
 
 | | |
 | --- | --- |
-| kind | **FORMAL** |
-| linkedTopic | `CHILD_SUPPORT` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 養育費の額・支払日・終期を決める相談です。金額は算定表を参照して範囲を示してください。 |
+| 種別（kind） | `FORMAL`（**取り決めを決める相談**） |
+| 対応する論点（linkedTopic） | `CHILD_SUPPORT`（**養育費**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 養育費の額・支払日・終期を決める相談です。金額は算定表を参照して範囲を示してください。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -107,10 +140,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `CHILD_SUPPORT` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 特別費用の分担に関する相談です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `CHILD_SUPPORT`（**養育費**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 特別費用の分担に関する相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -125,10 +158,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `CHILD_SUPPORT` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 進学に伴う費用の分担に関する相談です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `CHILD_SUPPORT`（**養育費**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 進学に伴う費用の分担に関する相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -143,10 +176,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `CHILD_SUPPORT` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 支払時期の一時的な変更に関する相談です。事情を丁寧に受け止めてください。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `CHILD_SUPPORT`（**養育費**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 支払時期の一時的な変更に関する相談です。事情を丁寧に受け止めてください。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -161,10 +194,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `CHILD_SUPPORT` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 医療費の分担に関する相談です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `CHILD_SUPPORT`（**養育費**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 医療費の分担に関する相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -179,10 +212,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | — （持たない） |
-| requiresConsent | true |
-| promptHint（LLMへ） | お支払いについてのご相談です。取り決めそのものは変わりません。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | お支払いについてのご相談です。取り決めそのものは変わりません。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -201,10 +234,10 @@
 
 | | |
 | --- | --- |
-| kind | **FORMAL** |
-| linkedTopic | `VISITATION` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 面会交流の頻度・時間・場所・受け渡し方法を決める相談です。 |
+| 種別（kind） | `FORMAL`（**取り決めを決める相談**） |
+| 対応する論点（linkedTopic） | `VISITATION`（**面会交流**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 面会交流の頻度・時間・場所・受け渡し方法を決める相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -219,10 +252,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `VISITATION` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 面会日程の変更に関する相談です。★今回だけか今後もかを必ず確認してください。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `VISITATION`（**面会交流**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 面会日程の変更に関する相談です。★今回だけか今後もかを必ず確認してください。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -237,10 +270,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `VISITATION` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 学校行事への参加に関する相談です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `VISITATION`（**面会交流**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 学校行事への参加に関する相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -255,10 +288,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `VISITATION` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 長期休暇中の面会に関する相談です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `VISITATION`（**面会交流**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 長期休暇中の面会に関する相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -273,10 +306,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | `VISITATION` |
-| requiresConsent | true |
-| promptHint（LLMへ） | 宿泊や遠方への外出に関する相談です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | `VISITATION`（**面会交流**） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 宿泊や遠方への外出に関する相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -291,10 +324,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | — （持たない） |
-| requiresConsent | true |
-| promptHint（LLMへ） | 予定どおりにお会いになれなかったあとのご相談です。責める言葉は取り次ぎません。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 予定どおりにお会いになれなかったあとのご相談です。責める言葉は取り次ぎません。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -313,10 +346,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | — （持たない） |
-| requiresConsent | None |
-| promptHint（LLMへ） | 進学に関する相談です。共同親権の場合は双方の合意が必要です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `none`（合意を求めない） |
+| LLMへの指示（promptHint） | 進学に関する相談です。共同親権の場合は双方の合意が必要です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -331,10 +364,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | — （持たない） |
-| requiresConsent | None |
-| promptHint（LLMへ） | 医療に関する相談です。急迫の事情がある場合は単独で判断できます。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `none`（合意を求めない） |
+| LLMへの指示（promptHint） | 医療に関する相談です。急迫の事情がある場合は単独で判断できます。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -349,10 +382,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | — （持たない） |
-| requiresConsent | None |
-| promptHint（LLMへ） | 転居や転校に関する相談です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `none`（合意を求めない） |
+| LLMへの指示（promptHint） | 転居や転校に関する相談です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -371,10 +404,10 @@
 
 | | |
 | --- | --- |
-| kind | **ADJUSTMENT** |
-| linkedTopic | — （持たない） |
-| requiresConsent | true |
-| promptHint（LLMへ） | 送迎の依頼です。合意が必要ですが軽微な調整です。 |
+| 種別（kind） | `ADJUSTMENT`（**個別の相談**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `true`（合意が要る） |
+| LLMへの指示（promptHint） | 送迎の依頼です。合意が必要ですが軽微な調整です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -389,10 +422,10 @@
 
 | | |
 | --- | --- |
-| kind | **NOTIFICATION** |
-| linkedTopic | — （持たない） |
-| requiresConsent | false |
-| promptHint（LLMへ） | 体調に関する連絡です。合意は不要で、伝達のみを行います。 |
+| 種別（kind） | `NOTIFICATION`（**お知らせ**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `false`（合意を求めない） |
+| LLMへの指示（promptHint） | 体調に関する連絡です。合意は不要で、伝達のみを行います。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -407,10 +440,10 @@
 
 | | |
 | --- | --- |
-| kind | **NOTIFICATION** |
-| linkedTopic | — （持たない） |
-| requiresConsent | false |
-| promptHint（LLMへ） | 子どもの様子の共有です。合意は不要です。 |
+| 種別（kind） | `NOTIFICATION`（**お知らせ**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `false`（合意を求めない） |
+| LLMへの指示（promptHint） | 子どもの様子の共有です。合意は不要です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -425,10 +458,10 @@
 
 | | |
 | --- | --- |
-| kind | **NOTIFICATION** |
-| linkedTopic | — （持たない） |
-| requiresConsent | false |
-| promptHint（LLMへ） | 学校からの連絡事項の共有です。合意は不要です。 |
+| 種別（kind） | `NOTIFICATION`（**お知らせ**） |
+| 対応する論点（linkedTopic） | — （持たない） |
+| 合意の要否（requiresConsent） | `false`（合意を求めない） |
+| LLMへの指示（promptHint） | 学校からの連絡事項の共有です。合意は不要です。 |
 
 **書き出しの案内**（当事者に見える）
 
@@ -441,32 +474,31 @@
 
 ---
 
----
-
 ## 6. ★ この一覧を作って分かったこと
 
-現状を機械的に書き出したことで、**設計と実装のずれが3つ見えた。**
+現状を機械的に書き出したことで、**設計と実装のずれが3つ**見えた。
 
 ### 6.1 「決める」と題したシナリオが、決められない
 
-`sc_001 養育費を決める` / `sc_006 面会のルールを決める` は `kind: FORMAL` である。
+`sc_001 養育費を決める` / `sc_006 面会のルールを決める` は
+種別が `FORMAL`（取り決めを決める相談）である。
 
 **2026-08-13 に、対話から取り決めを作る経路を断った。**
 このシナリオを選んでも、**取り決めにはならない。**
 
 > 題が「決める」なのに、決まらない。**果たせない約束になっている。**
 
-### 6.2 NOTIFICATION が、控えを残してしまう
+### 6.2 `NOTIFICATION`（お知らせ）が、控えを残してしまう
 
-設計では「NOTIFICATION は取次ぎのみ」だが、実装は
-`payload` があれば種別を問わず Adjustment を作る。
+設計では「お知らせは取次ぎのみ」だが、実装は
+`payload` があれば種別を問わず控え（Adjustment）を作る。
 
 実測：運動会の写真を共有すると、`{"subject":"入学金"}` が控えとして残った。
 
-### 6.3 `linkedTopic` を、NOTIFICATION も持っている
+### 6.3 `linkedTopic`（対応する論点）を、個別の相談も持っている
 
-`sc_015`〜`sc_017` は `linkedTopic` を持たない（正しい）。
-一方 `sc_002` などの ADJUSTMENT は `CHILD_SUPPORT` を持つ。
+`sc_015`〜`sc_017`（お知らせ）は持たない（正しい）。
+一方 `sc_002` など `ADJUSTMENT`（個別の相談）は `CHILD_SUPPORT`（養育費）を持つ。
 
 `canNegotiateAgreement` の注記にあるとおり、これが
 **「進学費用の相談が養育費の枠で決められる」**の発生源だった。
@@ -482,7 +514,6 @@
 要点：
 
 - カテゴリを **4つ → 5つ**（★**学校のこと**を新設）
-- シナリオを **19件 → 26件**（★10の大項目すべてに入口を作る）
-- **FORMAL を 0 件に**（取り決め画面への導線に置き換える）
+- シナリオを **19件 → 26件**（★実データの10大項目すべてに入口を作る）
+- **`FORMAL`（取り決めを決める相談）を 0 件に**（取り決め画面への導線に置き換える）
 - **緊急はシナリオにしない。**扱えないと言い、出口を示す
-

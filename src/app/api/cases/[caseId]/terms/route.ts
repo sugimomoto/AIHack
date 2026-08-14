@@ -143,6 +143,24 @@ async function share(
     return NextResponse.json({ error: "お渡しできる案がありません" }, { status: 400 });
   }
 
+  // ★★ 先に渡した人が、その論点の筆を持つ。
+  //
+  //   お相手から案が届いているときに、こちらからも渡せてしまうと、
+  //   **二つの案が並ぶ状態**になる。並べた時点で交渉の卓になる。
+  //   了承しないときは、**相談を通す。**
+  //
+  //   ★画面だけで止めない。ここで止める。
+  const all = await listProposalsByTopic(caseId, topic);
+  const theirsShared = all.some(
+    (p) => p.byPartyId !== partyId && isVisibleTo(p, partyId) && p.payload,
+  );
+  if (theirsShared) {
+    return NextResponse.json(
+      { error: "お相手から案が届いています。ご了承いただくか、ご相談ください" },
+      { status: 409 },
+    );
+  }
+
   // ★一度取り下げたものを、そのまま出し直さない。
   //   同じ行の sharedAt を書き換えると、**取り下げた記録が消える。**
   //   複製して新しい仮案として出す。履歴は残る。

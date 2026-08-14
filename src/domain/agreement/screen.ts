@@ -17,10 +17,8 @@ export type ScreenState =
   | "DRAFT"
   /** 渡してある。お相手のご返事待ち */
   | "SHARED"
-  /** お相手から案が来ている。了承するか、別の案を出す */
+  /** お相手から案が来ている。了承するか、相談する */
   | "INCOMING"
-  /** お相手から別の案（自分も出している） */
-  | "DIVERGED"
   /** 合意済 */
   | "AGREED"
   /** 取り下げた。★地は下書きに戻るが、帯の文言が違う */
@@ -40,6 +38,9 @@ export type ScreenInput = {
  *   2. 取り下げは、下書きと見分けがつかなくならないように先に見る
  *   3. 相手の案は、自分の下書きより優先して知らせる
  *      （相手は返事を待っている。こちらの下書きは誰も待っていない）
+ *
+ * ★かつて DIVERGED（お相手から別の案）という状態があった。**やめた。**
+ *   受け取った側が対案をフォームで返す経路そのものを外し、相談に寄せた。
  */
 export function screenStateOf(i: ScreenInput): ScreenState {
   if (i.agreed) return "AGREED";
@@ -48,12 +49,18 @@ export function screenStateOf(i: ScreenInput): ScreenState {
   const hasOther = i.otherPayload !== null;
   const hasOwn = i.ownPayload !== null;
 
-  // ★双方に案があり、**内容が違う**とき。一方が了承しなかった経路。**例外的**
-  //   内容が同じなら、了承が済んで確定を待っているだけである。
-  //   ここを内容で見ないと、了承した直後に「別の案」と表示される（実機で検出）。
+  // ★内容が同じなら、了承が済んで確定を待っているだけである。
+  //   ここを内容で見ないと、了承した直後に別の状態へ落ちる（実機で検出）。
   if (hasOther && hasOwn && i.sharing === "SHARED") {
-    return payloadsAgree([i.ownPayload, i.otherPayload]) ? "SHARED" : "DIVERGED";
+    if (payloadsAgree([i.ownPayload, i.otherPayload])) return "SHARED";
   }
+
+  // ★★ お相手の案があれば、それが最優先。**「別の案を出す」経路はやめた。**
+  //
+  //   受け取った側にできるのは「了承する」か「このことを相談する」の2つ。
+  //   対立は、フォーム上の対案の応酬ではなく、**必ず仲介を通す。**
+  //   それがこのアプリの主張そのものであり、
+  //   ★二つの金額を左右に並べる画面（いちばん危うい画面）に到達しなくなる。
   if (hasOther) return "INCOMING";
 
   if (i.sharing === "SHARED") return "SHARED";
@@ -72,7 +79,6 @@ export const LIST_LABEL: Record<ScreenState, string> = {
   DRAFT: "下書きです（お相手には見えていません）",
   SHARED: "お相手のご返事をお待ちしています",
   INCOMING: "お相手から案が届いています",
-  DIVERGED: "お相手から別の案が届いています",
   AGREED: "合意できています",
   WITHDRAWN: "取り下げました（下書きに戻っています）",
 };

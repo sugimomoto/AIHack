@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Recap, TopicForm } from "./TopicForm";
 import { ConfirmSheet } from "./ConfirmSheet";
-import { Divergence } from "./Divergence";
 import { RangeBar } from "./RangeBar";
 import { TopicIntro } from "./TopicIntro";
 import { AgreementMoment } from "./AgreementMoment";
@@ -54,7 +53,6 @@ export function TopicScreen({
   const [busy, setBusy] = useState(false);
   const [sheet, setSheet] = useState<"SHARE" | "APPROVE" | null>(null);
   const [editing, setEditing] = useState(false);
-  const [counter, setCounter] = useState(false);
   const [asking, setAsking] = useState(false);
 
   const fetchView = useCallback(async (): Promise<View | null> => {
@@ -92,7 +90,6 @@ export function TopicScreen({
       if (!res.ok) console.error("[terms]", await res.text());
       setSheet(null);
       setEditing(false);
-      setCounter(false);
       await load();
     } finally {
       setBusy(false);
@@ -146,7 +143,7 @@ export function TopicScreen({
 
       <div className="px-4 pb-10">
         {/* ------------------------------------------------ 未入力／書き直し */}
-        {(state === "EMPTY" || editing || counter) && (
+        {(state === "EMPTY" || editing) && (
           <>
             {/* ★A-3：目安に要る情報が無ければ、その場で伺える入口を置く。
                    ★入れないと決められない、とは書かない。実質的な強制になる */}
@@ -190,7 +187,7 @@ export function TopicScreen({
             )}
             <TopicForm
             topic={topic}
-            initial={counter ? v.otherPayload : v.ownPayload}
+            initial={v.ownPayload}
             busy={busy}
             intro={<TopicIntro topic={topic} />}
             onSave={(payload) => void act({ action: "SAVE", payload })}
@@ -301,7 +298,7 @@ export function TopicScreen({
         )}
 
         {/* ------------------------------------------------ お相手の案（S-3） */}
-        {state === "INCOMING" && !counter && v.otherPayload && (
+        {state === "INCOMING" && v.otherPayload && (
           <>
             <IncomingCard
               topic={topic}
@@ -348,42 +345,29 @@ export function TopicScreen({
               いま決めなくてかまいません。ご返事があるまで、この案は残ります。
             </p>
 
-            {/* ★枠線・面積・文字サイズをすべて同一にする。了承を強調しない */}
+            {/* ★★ 「別の案を出す」を外した。
+                   対案をフォームで返すと、二つの金額が並ぶ画面になる。
+                   **並べた時点で交渉の卓になる。**
+                   了承しないときは、**必ず仲介を通す。**それがこのアプリの主張である。
+
+                   ★枠線・面積・文字サイズを同一にする。了承を強調しない */}
             <div className="mt-4 flex flex-col gap-2">
               <SecondaryButton onClick={() => setSheet("APPROVE")} disabled={busy} full>
                 この内容で了承する
               </SecondaryButton>
-              <SecondaryButton onClick={() => setCounter(true)} disabled={busy} full>
-                別の案を出す
-              </SecondaryButton>
-              <Link
-                href={`/app/consult/new?topic=${topic}`}
-                className="w-full text-center"
-                style={{ fontSize: 13, color: "var(--text-sub)", minHeight: 44, paddingTop: 12 }}
-              >
-                このことを相談する
-              </Link>
+              <ConsultLink topic={topic} full />
             </div>
+            <p
+              style={{ fontSize: 11.5, lineHeight: 1.95, color: "var(--text-sub-2)", marginTop: 10 }}
+            >
+              ご希望が違うときは、ご相談ください。お書きになった言葉は、そのままお相手には届きません。
+            </p>
           </>
         )}
 
-        {/* ------------------------------------------------ 別の案（S-4） */}
-        {state === "DIVERGED" && v.ownPayload && v.otherPayload && (
-          <>
-            <Divergence
-              topic={topic}
-              mine={v.ownPayload}
-              theirs={v.otherPayload}
-              range={v.range}
-            />
-            <div className="mt-4 flex flex-col gap-2">
-              <SecondaryButton onClick={() => setSheet("APPROVE")} disabled={busy} full>
-                お相手の案で了承する
-              </SecondaryButton>
-              <ConsultLink topic={topic} full />
-            </div>
-          </>
-        )}
+        {/* ★S-4（お相手から別の案）はやめた。
+               Divergence / RangeBar のコードは残してある。呼ばないだけ。
+               → .steering/20260814-real-data-findings/design.md */}
 
         {/* ------------------------------------------------ 合意済（N-1 / K-6） */}
         {state === "AGREED" && v.agreement && (

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { DiscardDrafts } from "./DiscardDrafts";
 
 /**
  * 設定
@@ -198,6 +199,9 @@ export function SettingsView({ caseId, partyId }: { caseId: string; partyId: str
           </Link>
         ))}
       </div>
+
+      {/* ★消せるのは、渡していない自分の下書きだけ */}
+      <DiscardDrafts caseId={caseId} partyId={partyId} />
 
       <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 18 }}>
         アプリ名・アイコン・通知文のいずれからも、内容が推測されないようにしています。

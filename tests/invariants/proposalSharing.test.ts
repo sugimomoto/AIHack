@@ -232,7 +232,10 @@ describe("★了承した直後に「別の案」と出さない", () => {
     ).toBe("SHARED");
   });
 
-  it("内容が違えば DIVERGED", async () => {
+  it("★内容が違っても、二つの案を並べる状態を作らない", async () => {
+    // ★かつては DIVERGED（お相手から別の案）にしていた。**やめた。**
+    //   二つの金額を左右に並べた時点で、交渉の卓になる。
+    //   了承しないときは、必ず仲介（相談）を通す。
     const { screenStateOf } = await import("@/domain/agreement/screen");
     expect(
       screenStateOf({
@@ -241,7 +244,7 @@ describe("★了承した直後に「別の案」と出さない", () => {
         otherPayload: { monthlyAmount: 30000 },
         sharing: "SHARED",
       }),
-    ).toBe("DIVERGED");
+    ).toBe("INCOMING");
   });
 
   it("★合意済は、何よりも先に見える", async () => {
@@ -254,5 +257,62 @@ describe("★了承した直後に「別の案」と出さない", () => {
         sharing: "SHARED",
       }),
     ).toBe("AGREED");
+  });
+});
+
+/**
+ * ★「別の案を出す」をやめた
+ *
+ * 受け取った側にできるのは「了承する」か「このことを相談する」の2つ。
+ * 対立は、フォーム上の対案の応酬ではなく、**必ず仲介を通す。**
+ *
+ * ★実装は壊れてもいた。別の案を保存しても画面が INCOMING に戻り、
+ *   下書きが見えず、渡す手段も無かった（実機で検出）。
+ */
+describe("★対案はフォームで返さない。相談を通す", () => {
+  // ★コメントは数えない。「やめた」と書いた説明自体が引っかかる
+  const strip = (x: string) =>
+    x.replace(/\{\/\*[\s\S]*?\*\/\}/g, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
+  const screen = strip(readFileSync("src/components/agreement/TopicScreen.tsx", "utf8"));
+  const route = readFileSync("src/app/api/cases/[caseId]/terms/route.ts", "utf8");
+
+  it("★画面に「別の案を出す」が無い", () => {
+    expect(screen).not.toContain("別の案を出す");
+  });
+
+  it("★受け取った側の行き先が、相談になっている", () => {
+    const incoming = screen.slice(screen.indexOf('state === "INCOMING"'));
+    expect(incoming.slice(0, 3000)).toContain("ConsultLink");
+  });
+
+  it("★二つの案を並べる画面を呼ばない", () => {
+    // ★Divergence / RangeBar のコードは残す。呼ばないだけ
+    expect(screen).not.toMatch(/<Divergence/);
+  });
+
+  it("★先に渡した人が筆を持つ。API で止める", () => {
+    // ★画面だけで止めない。API を直接叩けば渡せてしまう
+    const share = route.slice(route.indexOf("async function share"), route.indexOf("async function withdraw"));
+    expect(share).toContain("theirsShared");
+    expect(share).toMatch(/409/);
+  });
+});
+
+describe("★下書きを消せるのは、自分の渡していないものだけ", () => {
+  const repo = readFileSync("src/infra-adapters/firestore/repositories/caseRepository.ts", "utf8");
+  const fn = repo.slice(repo.indexOf("export async function discardOwnDrafts"));
+
+  it("★自分のものだけ", () => {
+    expect(fn.slice(0, 900)).toContain('where("byPartyId", "==", partyId)');
+  });
+
+  it("★渡したものは消さない（相手が見ている）", () => {
+    expect(fn.slice(0, 900)).toMatch(/sharedAt.*=== null/);
+  });
+
+  it("★合意済みには触れない（片方が消せてはいけない）", () => {
+    // proposals しか触らない。agreementItems を消していない
+    expect(fn.slice(0, 900)).toContain('collection("proposals")');
+    expect(fn.slice(0, 900)).not.toContain("agreementItems");
   });
 });

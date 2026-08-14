@@ -1013,3 +1013,33 @@ export async function listRules(
     }))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
+
+/**
+ * ★ご自身の下書きを消す。
+ *
+ *   消せるのは**渡していない自分の仮案だけ。**
+ *
+ *   ・お渡ししたもの      … 消さない。相手が見ている
+ *   ・合意済みのもの      … 消さない。**双方が合意したものを、片方が消せてはいけない**
+ *                          （変えるときは K-6 の変更の申し出を通る）
+ *   ・お相手の仮案        … 触れない
+ */
+export async function discardOwnDrafts(
+  caseId: CaseId,
+  partyId: PartyId,
+): Promise<number> {
+  const snap = await caseRef(caseId)
+    .collection("proposals")
+    .where("byPartyId", "==", partyId)
+    .get();
+
+  const targets = snap.docs.filter(
+    (d) => (d.get("sharedAt") ?? null) === null && (d.get("withdrawnAt") ?? null) === null,
+  );
+  if (targets.length === 0) return 0;
+
+  const batch = getDb().batch();
+  for (const d of targets) batch.delete(d.ref);
+  await batch.commit();
+  return targets.length;
+}

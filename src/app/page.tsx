@@ -41,8 +41,13 @@ export default async function Page({
   //   この人は、もう説明を読んで押した人である。
   //   もう一度読ませたうえ、確認の欄が**説明の下に埋もれる**のは筋が悪い。
   //   ★用があるのは1つだけなので、それだけを出す。
+  //
+  // ★★ 判定を、クライアント側（Firebase の isSignInWithEmailLink）と揃える。
+  //   apiKey を見ないと、条件がずれる。
+  //   ずれると、**確認だけの画面に「リンクを送る」フォームが出る**（実機で発生）。
   const q = await searchParams;
-  const fromEmailLink = q.mode === "signIn" && typeof q.oobCode === "string";
+  const fromEmailLink =
+    q.mode === "signIn" && typeof q.oobCode === "string" && typeof q.apiKey === "string";
 
   if (fromEmailLink) {
     return (

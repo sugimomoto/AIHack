@@ -52,7 +52,11 @@ export function TopicIntro({ topic }: { topic: string }) {
           </p>
         </Card>
 
-        {/* ★恒久的な枠。外す前提にしない */}
+        {/* ★恒久的な枠。外す前提にしない。
+               ★一次資料（日本年金機構・2026-08-14 確認）に基づく。
+                 「上限は2分の1」とは書かれていない。
+                 **定められる範囲は「情報通知書」で分かる**とされている。
+                 書かれていないことを、アプリが断定しない。 */}
         <div
           className="mt-3"
           style={{
@@ -62,7 +66,18 @@ export function TopicIntro({ topic }: { topic: string }) {
           }}
         >
           <p style={{ fontSize: 12, lineHeight: 1.95, color: "var(--text-sub-2)" }}>
-            お手続きは年金事務所でご確認ください。期限や必要な書類があるとされています。
+            分ける割合を決められる範囲は、年金事務所が出す「情報通知書」で分かります。
+            お手続きの前に、年金事務所でご確認ください。
+          </p>
+          <p
+            style={{
+              fontSize: 12,
+              lineHeight: 1.95,
+              color: "var(--text-sub-2)",
+              marginTop: 6,
+            }}
+          >
+            ご請求には期限があります（原則、離婚の翌日から5年以内）。
             ここでの記録は、おふたりの合意を残すためのものです。
           </p>
         </div>

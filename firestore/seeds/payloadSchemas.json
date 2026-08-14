@@ -211,22 +211,22 @@
         "subject": {
           "type": "string",
           "title": "できごと",
-          "description": "何があるか。例: 父母会 / 発熱 / 運動会"
+          "description": "原文にある語をそのまま"
         },
         "date": {
           "type": "string",
           "title": "日付",
-          "description": "書かれたとおりに。例: 9月20日 / 今朝。年は書かれていなければ入れない"
+          "description": "原文にある表記をそのまま。無い年を補わない"
         },
         "time": {
           "type": "string",
           "title": "時刻",
-          "description": "書かれたとおりに。例: 14時"
+          "description": "原文にある表記をそのまま"
         },
         "place": {
           "type": "string",
           "title": "場所",
-          "description": "例: 小学校の体育館"
+          "description": "原文にある語をそのまま"
         }
       }
     }
@@ -245,21 +245,22 @@
         "subject": {
           "type": "string",
           "title": "できごと",
-          "description": "何の予定か。例: 送迎 / 受け渡し"
+          "description": "原文にある語をそのまま"
         },
         "date": {
           "type": "string",
           "title": "日付",
-          "description": "書かれたとおりに。例: 8月22日。年は書かれていなければ入れない"
+          "description": "原文にある表記をそのまま。無い年を補わない"
         },
         "time": {
           "type": "string",
           "title": "時刻",
-          "description": "例: 14時"
+          "description": "原文にある表記をそのまま"
         },
         "place": {
           "type": "string",
-          "title": "場所"
+          "title": "場所",
+          "description": "原文にある語をそのまま"
         }
       }
     }
@@ -278,23 +279,22 @@
         "subject": {
           "type": "string",
           "title": "何について",
-          "description": "例: 入学金 / 塾の費用 / 医療費 / 今月の支払い"
-        },
-        "amountYen": {
-          "type": "integer",
-          "minimum": 0,
-          "title": "金額",
-          "description": "円。単位を含めない"
+          "description": "原文にある語をそのまま。言い換えない"
         },
         "shareText": {
           "type": "string",
           "title": "分担",
-          "description": "書かれたとおりに。例: 半分ずつ / 6対4"
+          "description": "原文にある表記をそのまま。言い換えない"
         },
         "date": {
           "type": "string",
           "title": "日付",
-          "description": "書かれたとおりに。年は書かれていなければ入れない"
+          "description": "原文にある表記をそのまま。無い年を補わない"
+        },
+        "amountText": {
+          "type": "string",
+          "title": "金額",
+          "description": "原文にある表記をそのまま。単位の換算はしない"
         }
       }
     }

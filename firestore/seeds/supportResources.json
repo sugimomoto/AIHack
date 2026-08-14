@@ -10,6 +10,16 @@
   "operator": "こども家庭庁"
  },
  {
+  "id": "sr_8000",
+  "name": "子ども医療電話相談",
+  "contact": "#8000",
+  "scope": "CHILD",
+  "note": "急な体調のとき、看護師などに相談できます。★受付時間は、お住まいの都道府県によって違います。",
+  "url": "https://www.mhlw.go.jp/topics/2006/10/tp1010-3.html",
+  "verified": true,
+  "operator": "厚生労働省"
+ },
+ {
   "id": "sr_dv_plus",
   "name": "DV相談＋（プラス）",
   "contact": "0120-279-889",

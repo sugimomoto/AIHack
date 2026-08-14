@@ -7,7 +7,12 @@ import { summaryFromPayload } from "@/domain/relay/summary";
 import { EXTRACTION_SCHEMA } from "@/domain/relay/schema";
 import { EXTRACTION_SYSTEM_PROMPT, buildRelayText } from "@/domain/relay/prompts";
 import { hasVerbatimRun, verifyRelay, type ContextCategory } from "@/domain/relay/guard";
-import { stripUnstated, toProposalSchema } from "@/domain/relay/payload";
+import {
+  resolveAmount,
+  stripUnstated,
+  stripUnstatedFrom,
+  toProposalSchema,
+} from "@/domain/relay/payload";
 import { findPublishedPayloadSchema } from "@/infra-adapters/firestore/repositories/masterRepository";
 
 /**
@@ -153,7 +158,12 @@ async function structurePayload(input: {
       system: [
         "入力に書かれている項目だけを取り出してください。",
         "★書かれていない項目は含めないでください。推測して埋めないでください。",
-        "金額は数値で、単位を含めずに返してください（「月3万」→ 30000）。",
+        // ★★ 単位の換算をさせない。算術は LLM の仕事ではない（P3）。
+        //   実測：原文「6万円」が 5000 / 50000 / 50000 になり、一度も合わなかった。
+        "★金額は、原文にある表記をそのまま返してください（「6万円」なら 6万円）。換算しないでください。",
+        // ★★ スキーマの title と description が、そのまま値として出力されていた。
+        //   実測：{\"subject\":\"何について\"}（title）、{\"shareText\":\"例: 半分ずつ / 6対4\"}（description）
+        "★項目の説明文そのものを、値として返さないでください。",
       ].join("\n"),
       user: input.raw,
       caseId: input.caseId,
@@ -166,7 +176,15 @@ async function structurePayload(input: {
     });
     await saveCallLog(res.log);
 
-    const payload = stripUnstated(res.content);
+    // ★★ 3段で絞る。**捏造を落とし、算術はコードで行う。**
+    //
+    //   1. stripUnstated      … null・空を落とす（既存）
+    //   2. stripUnstatedFrom  … ★原文に無い値を落とす。これが本体
+    //   3. resolveAmount      … ★金額の文字列を、コードで数値にする
+    //
+    //   > 言葉は渡さない。事実は、原文のまま。
+    const stated = stripUnstatedFrom(input.raw, stripUnstated(res.content));
+    const payload = resolveAmount(stated);
     return Object.keys(payload).length > 0 ? payload : null;
   } catch (e) {
     // ★構造化に失敗しても取次ぎは成立する。文章は既に検査を通っている

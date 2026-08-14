@@ -18,7 +18,7 @@ import { consultationIdOf, parseThreadId } from "@/domain/consultation/thread";
 import { arrangementFrom } from "@/domain/obligation/arrangement";
 // ★assertNegotiable は使わなくなった（対話から取り決めへ行く経路が消えたため）。
 //   関数そのものは残してある。二重の歯止めとして無害で、消すと戻せない。
-import { canNegotiateAgreement } from "@/domain/consultation/negotiable";
+import { canNegotiateAgreement, isAdjustment } from "@/domain/consultation/negotiable";
 import { listScenarios } from "@/infra-adapters/firestore/repositories/masterRepository";
 import { todayJst } from "@/lib/today";
 import { requiresAgreement } from "@/domain/topic/level";
@@ -203,13 +203,19 @@ async function relayIfNeeded(input: {
     //     ・抽出が品目を言い換え、「スマホ代」が「コピー代」に化けた
     //     ・はっきり書いた人ほど、逐語一致の検査で伝わる中身が減っていた
     //
-    //   kind による歯止めは入れられる。だが**歯止めが要ること自体が構造の問題**だった。
     //   取り決めは「取り決め」画面の入力だけで作る（仮案 → 了承）。
-    //   これで P3（数字と条項を LLM に作らせない）が例外なく守られる。
     //
-    // ★相談の帰結は Adjustment だけ。公正証書には載らない。
+    // ★★ ただし、ADJUSTMENT と NOTIFICATION の区別まで一緒に落としてはいけない。
+    //
+    //   一度落としてしまい、**お知らせが「決まったこと」に控えを残した。**
+    //   実測：運動会の写真を共有すると `{"subject":"入学金"}` が控えになった。
+    //
+    //     FORMAL       → 取次ぎのみ（★取り決めは作らない。今回の方針）
+    //     ADJUSTMENT   → 取次ぎ ＋ 控え（Adjustment）
+    //     NOTIFICATION → 取次ぎのみ。**合意を求めない連絡に、控えは要らない**
+    //
     // ★payload が無ければ、記録する内容が無い。
-    if (relay.payload && input.threadId) {
+    if (isAdjustment(input.scenarioKind) && relay.payload && input.threadId) {
       await appendAdjustment(input.caseId, {
         threadId: input.threadId,
         scenarioId: input.scenarioId ?? null,

@@ -47,3 +47,23 @@ export class NotNegotiableError extends Error {
 export function assertNegotiable(kind: string | null | undefined): void {
   if (!canNegotiateAgreement(kind)) throw new NotNegotiableError(String(kind));
 }
+
+/**
+ * その相談は、「決まったこと」に控えを残すか
+ *
+ * ★★ お知らせ（NOTIFICATION）には、控えを残さない。
+ *
+ *   合意を求めない連絡である。運動会の写真も、学校からのお知らせも、
+ *   **決まったことではない。**控えに並べる意味が無い。
+ *
+ *   一度この区別を落としたことがある（対話から取り決めを作る経路を断つとき、
+ *   3分岐をまとめて1つにしてしまった）。
+ *   実測で、写真の共有が `{"subject":"入学金"}` という控えを残した。
+ *
+ * ★トピックを選ばずに書いた相談（kind が無い）は、控えを残す側に倒す。
+ *   何の相談か分からない以上、**残しておくほうが失われない。**
+ */
+export function isAdjustment(kind: string | null | undefined): boolean {
+  if (!kind) return true;
+  return kind === "ADJUSTMENT";
+}

@@ -52,6 +52,21 @@ describe("★1枚目：アプリの説明", () => {
   });
 });
 
+describe("★オンボーディングは3枚のまま", () => {
+  const form = stripComments(readFileSync("src/components/auth/EmailLinkForm.tsx", "utf8"));
+
+  it("★はじめた人は、3枚目（招待するか）へ進む", () => {
+    // ★サインアップを1枚目に統合したとき、ここの接続が切れていた（退行）。
+    //   ホームのカードでは、第4弾で決めた3つの歯止めを持てない
+    //   （関係の状態を聞かない／2択を同じ重さで／約束を選択肢より先に置く）
+    expect(form).toContain("/onboarding/invite");
+  });
+
+  it("★受諾した人は、招待する相手がいない。そのままアプリへ", () => {
+    expect(form).toMatch(/mode === "accept" \? "\/app"/);
+  });
+});
+
 describe("★2枚目：登録の確認", () => {
   it("★飛ばす道は無い（サインアップ必須にしたため）", () => {
     expect(account).not.toContain("あとで登録する");

@@ -207,7 +207,12 @@ export function EmailLinkForm({
         <button
           type="button"
           onClick={() => {
-            window.location.href = "/app";
+            // ★★ はじめた人は、3枚目（お相手を招待しますか）へ。
+            //   第4弾の設計はオンボーディング3枚である。
+            //   サインアップを1枚目に統合したとき、ここの接続が切れていた。
+            //
+            // ★受諾した人は、招待する相手がいない。そのままアプリへ。
+            window.location.href = mode === "accept" ? "/app" : "/onboarding/invite";
           }}
           className="mt-4 w-full"
           style={{

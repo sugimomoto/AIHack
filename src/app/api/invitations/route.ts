@@ -33,7 +33,15 @@ export async function POST(req: Request) {
     if (!caseId) throw new UnauthenticatedError();
     const snap = await loadForLlm(asCaseId(caseId));
     assertOwnParty(snap, partyId);
-    senderName = snap.parties.find((p) => p.id === partyId)?.displayNameForOther ?? "ご関係の方";
+    // ★★ 既定を `displayNameForOther` から外した（2026-08-14）。
+    //
+    //   これは「お相手にどう表示するか」の欄で、**既定値が「お相手」**である。
+    //   そのため名前を空欄にすると、招待を開いた画面に
+    //   **「お相手さまからのご依頼です。」**と出ていた。意味をなさない。
+    //
+    //   ★画面は「空欄なら『ご関係の方』となります」と約束している。
+    //   **書いてあるとおりにする。**
+    senderName = "ご関係の方";
   } catch (e) {
     if (e instanceof UnauthenticatedError) return NextResponse.json({ error: e.message }, { status: 401 });
     if (e instanceof ScopeViolationError) return NextResponse.json({ error: e.message }, { status: 403 });

@@ -2,20 +2,17 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { buildInvitationMail } from "@/domain/invitation/mail";
-
 /**
- * A-1｜招待の作成 ＋ A-2｜送信前のプレビュー
+ * A-1｜招待の作成
  *
- * ★2つの選択肢に主従を作らない。
- *   面積・枠線・角丸をそろえ、どちらも強調ボタンにしない。
- *   安全性の情報は選択肢の「外側」に置く。中に入れると推奨になる。
+ * ★★ 送信前のプレビュー（A-2）を消した（2026-08-14）。
+ *   メール送信をやめたのに画面だけが残り、**`setPreview(true)` が
+ *   どこからも呼ばれていなかった。**開くことのできない画面である。
+ *   その中に「お名前を出す」の切り替えが閉じ込められていた。
  *
- * ★プレビューは buildInvitationMail をそのまま呼ぶ。
- *   APIが送る文面と同じ関数を使うため、「見せた文面」と「送る文面」が
- *   構造上ずれない。別々に書くと、いずれ乖離する。
+ * ★安全性の情報は選択肢の「外側」に置く。中に入れると推奨になる。
  *
- * @see design/README-v2.md A-1 / A-2
+ * @see design/README-v2.md A-1
  */
 
 const CARD: React.CSSProperties = {
@@ -42,7 +39,11 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
       const res = await fetch("/api/invitations", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ method, recipientEmail, revealSenderName: reveal, senderName }),
+        // ★★ `revealSenderName` の切り替えを外した（2026-08-14）。
+        //   チェックボックスは MailPreview の中にあり、**どこからも開けなかった。**
+        //   そもそも欄と役割が重なる。**空欄にすれば名乗らない**のだから、
+        //   同じことを決める操作を2つ置かない。
+        body: JSON.stringify({ method, recipientEmail, revealSenderName: true, senderName }),
       });
       if (!res.ok) return null;
       const d = (await res.json()) as { url: string };
@@ -53,21 +54,7 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
     }
   };
 
-  const [preview, setPreview] = useState(false);
-  const [reveal, setReveal] = useState(true); // 既定 ON
   const [copied, setCopied] = useState(false);
-
-  if (preview) {
-    return (
-      <MailPreview
-        senderName={senderName || "ご関係の方"}
-        url={url ?? ""}
-        reveal={reveal}
-        onReveal={setReveal}
-        onBack={() => setPreview(false)}
-      />
-    );
-  }
 
   return (
     <div className="flex h-full flex-col">
@@ -95,8 +82,15 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
 
         {/* ★名乗りは任意。実名でなくてよい */}
         <div className="mt-4" style={CARD}>
+          {/* ★★ 何のための欄かが分からなくなっていた（2026-08-14）。
+                 メールをやめたので、**文面に入る名前ではなくなった。**
+                 いまは**お相手がリンクを開いた画面**に出る。
+                 ★どこに出るかを書かないと、要否を判断できない。 */}
           <h2 style={{ fontSize: 15, fontWeight: 600 }}>お相手に伝えるお名前</h2>
           <p style={{ fontSize: 13, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 6 }}>
+            お相手がリンクを開いたときに、
+            <strong>「◯◯さまからのご依頼です」</strong>と表示されます。
+            <br />
             実名でなくても構いません。空欄なら「ご関係の方」となります。
           </p>
           <input
@@ -161,137 +155,27 @@ export function InviteCreate({ senderName: initialName }: { senderName?: string 
           お渡しの方法（メッセージ・口頭など）と時期は、ご自身でお選びいただけます。
         </div>
 
+        {/* ★★ リンクを作ったあとに「あとにする」と出ていた（2026-08-14）。
+               ★**渡した人にとっては、後回しではなく、済ませたことである。**
+               やることをやった人に「あとにする」と言わせるのは筋が通らない。
+
+               ★ただし「渡しました」とも書かない。
+               コピーしたことは分かるが、**渡したかどうかは分からない。**
+               分からないことを、こちらが決めつけない。 */}
         <div className="mt-5 text-center">
           <button
             type="button"
             onClick={() => (window.location.href = "/app")}
             style={{ fontSize: 13.5, color: "var(--text-sub)" }}
           >
-            あとにする
+            {url ? "次へ進む" : "あとにする"}
           </button>
           <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--muted)", marginTop: 6 }}>
-            お相手を待つあいだも、ひとりで進められます。
+            {url
+              ? "お渡しになるのは、いつでも構いません。お相手を待つあいだも、ひとりで進められます。"
+              : "お相手を待つあいだも、ひとりで進められます。"}
           </p>
         </div>
-      </div>
-    </div>
-  );
-}
-
-/** A-2｜送信前のプレビュー */
-function MailPreview({
-  senderName,
-  url,
-  reveal,
-  onReveal,
-  onBack,
-}: {
-  senderName: string;
-  url: string;
-  reveal: boolean;
-  onReveal: (v: boolean) => void;
-  onBack: () => void;
-}) {
-  // ★APIが送るのと同じ関数。見せた文面と送る文面がずれない
-  const mail = buildInvitationMail({ url, senderName, revealSenderName: reveal });
-
-  return (
-    <div className="flex h-full flex-col">
-      <Header title="送られる文面" onBack={onBack} />
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-        <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub-2)", paddingTop: 14 }}>
-          この文面がそのまま送られます。書き換えることはできません。
-        </p>
-
-        <div
-          className="mt-3"
-          style={{
-            background: "var(--surface)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--r-lg)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              background: "var(--envelope-head)",
-              borderBottom: "1px dashed var(--border-dashed)",
-              padding: "7px 14px",
-              fontSize: 11.5,
-              color: "var(--text-sub)",
-            }}
-          >
-            件名
-          </div>
-          <div style={{ padding: "12px 14px", fontSize: 15 }}>{mail.subject}</div>
-          <div
-            style={{
-              background: "var(--envelope-head)",
-              borderTop: "1px dashed var(--border-dashed)",
-              borderBottom: "1px dashed var(--border-dashed)",
-              padding: "7px 14px",
-              fontSize: 11.5,
-              color: "var(--text-sub)",
-            }}
-          >
-            本文
-          </div>
-          <div style={{ padding: "14px", fontSize: 13.5, lineHeight: 1.95, whiteSpace: "pre-wrap" }}>
-            {mail.body}
-          </div>
-        </div>
-
-        {/* ★書けることは、実際に書かれていることだけにする。
-             本文は「お子さまに関する取り決め」に触れているため、
-             「お子さんの件だと分からない」とは書けない。 */}
-        <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub-2)", marginTop: 14 }}>
-          件名から用途は分かりません。離婚・養育費・調停といった語も使いません。自由に書き足せる欄もありません。
-        </p>
-      </div>
-
-      <div className="shrink-0 px-4 pb-5 pt-3" style={{ borderTop: "1px solid var(--border-subtle)" }}>
-        <label
-          className="flex items-center gap-3"
-          style={{
-            background: "var(--surface)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--r-md)",
-            padding: "12px 14px",
-          }}
-        >
-          <input type="checkbox" checked={reveal} onChange={(e) => onReveal(e.target.checked)} />
-          <span className="min-w-0 flex-1">
-            <span style={{ fontSize: 14 }}>お名前を出す</span>
-            <span style={{ display: "block", fontSize: 12, color: "var(--text-sub)", lineHeight: 1.8 }}>
-              出さない場合は「ご関係の方からのご依頼で」となります。
-            </span>
-          </span>
-        </label>
-
-        {/* ★送信基盤は未接続（C-02）。作れていない機能を、動くように見せない */}
-        <button
-          type="button"
-          disabled
-          className="mt-3 w-full disabled:opacity-45"
-          style={{
-            background: "var(--agree-bg)",
-            border: "1px solid var(--agree)",
-            borderRadius: "var(--r-full)",
-            minHeight: 50,
-            fontSize: 15,
-            fontWeight: 600,
-            color: "var(--agree-text)",
-          }}
-        >
-          この内容で送る
-        </button>
-        <p style={{ fontSize: 11.5, lineHeight: 1.85, color: "var(--text-sub-2)", marginTop: 6, textAlign: "center" }}>
-          メールの送信はまだご利用いただけません。上のリンクをご自身でお渡しください。
-        </p>
-        <button type="button" onClick={onBack} className="mt-2 w-full" style={{ fontSize: 13.5, color: "var(--text-sub)", minHeight: 40 }}>
-          戻る
-        </button>
       </div>
     </div>
   );

@@ -59,3 +59,50 @@ describe("★書き出しの案内", () => {
     }
   });
 });
+
+/**
+ * ★うまくいかなかったあとの相談
+ *
+ *   予定どおりに進んでいるあいだ、当事者はアプリを必要としない。
+ *   **困るのは、予定どおりにならなかったとき。**
+ *   そこは直接連絡したくない相手と話さなければならない場面であり、
+ *   **仲介の価値がいちばん高い。**
+ *
+ * @see .steering/20260812-feedback-pivot/design-upcoming.md §2.5
+ */
+describe("★うまくいかなかったときの入口がある", () => {
+  const all = scenarios as {
+    id: string;
+    title: string;
+    kind: string;
+    opening?: string;
+    examples?: string[];
+  }[];
+
+  const rough = ["会えなかった", "お支払いのことで"];
+
+  it("★会えなかったとき・お支払いのことを相談できる", () => {
+    for (const t of rough) {
+      expect(all.some((s) => s.title.includes(t)), `入口が無い: ${t}`).toBe(true);
+    }
+  });
+
+  it("★取り決めを動かさない（ADJUSTMENT）", () => {
+    for (const s of all.filter((x) => rough.some((t) => x.title.includes(t)))) {
+      expect(s.kind).toBe("ADJUSTMENT");
+    }
+  });
+
+  it("★責める言い方を、例に置かない", () => {
+    // ★書き出しの例は、その人の最初の一文になる。
+    //   責める形を置けば、責めるところから始まる。
+    const BLAMING = ["なぜ", "どうして", "約束したのに", "守って", "ひどい", "いい加減"];
+    for (const s of all.filter((x) => rough.some((t) => x.title.includes(t)))) {
+      for (const e of s.examples ?? []) {
+        for (const b of BLAMING) {
+          expect(e.includes(b), `責める例: ${s.id} ${e}`).toBe(false);
+        }
+      }
+    }
+  });
+});

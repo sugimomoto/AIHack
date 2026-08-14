@@ -270,5 +270,37 @@
       "◯月◯日に授業参観があります",
       "提出物の期限の連絡がありました"
     ]
+  },
+  {
+    "id": "sc_018",
+    "categoryId": "tc_meeting",
+    "title": "会えなかったことを相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "promptHint": "予定どおりにお会いになれなかったあとのご相談です。責める言葉は取り次ぎません。",
+    "isSystem": false,
+    "sortOrder": 11,
+    "opening": "お会いになれなかったのですね。これからのことを、ご一緒に考えます。振替をご希望でしたら、いくつか日をお書きください。",
+    "examples": [
+      "先月お会いできなかったので、振替をご相談したいです",
+      "今月は難しかったので、来月に2回お願いできませんか"
+    ]
+  },
+  {
+    "id": "sc_019",
+    "categoryId": "tc_money",
+    "title": "お支払いのことで相談する",
+    "kind": "ADJUSTMENT",
+    "linkedTopic": null,
+    "requiresConsent": true,
+    "promptHint": "お支払いについてのご相談です。取り決めそのものは変わりません。",
+    "isSystem": false,
+    "sortOrder": 6,
+    "opening": "お支払いのことですね。いつのぶんについて、どうなさりたいかをお書きください。",
+    "examples": [
+      "今月のぶんについて、ご確認をお願いできますか",
+      "来月は少し遅れそうなので、ご相談させてください"
+    ]
   }
 ]

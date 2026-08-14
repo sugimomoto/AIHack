@@ -9,11 +9,12 @@ import {
 } from "@/domain/obligation/schedule";
 import { remindersFor } from "@/domain/obligation/reminder";
 import { assessEnforceability, detectDeviations } from "@/domain/obligation/deviation";
+import { adjustmentStateOf } from "@/domain/adjustment/record";
 import {
   listAgreementItems,
   loadForLlm,
   listArrangements,
-  listExceptions,
+  listAdjustments,
   loadFulfillments,
   reportFulfillment,
 } from "@/infra-adapters/firestore/repositories/caseRepository";
@@ -103,16 +104,49 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
 
-  const [exceptions, arrangements] = await Promise.all([
-    listExceptions(caseId).catch(() => []),
+  const [adjustments, arrangements] = await Promise.all([
+    listAdjustments(caseId).catch(() => []),
     listArrangements(caseId).catch(() => []),
   ]);
+
+  const parties = snap.parties.map((p) => p.id as string);
+
+  // ★★ 読む先を直した。
+  //
+  //   以前は `exceptions` を読んでいたが、**そこには何も入らない。**
+  //   `appendException` は applyAdjustment(ONE_TIME) からしか呼ばれず、
+  //   取り決めの入力が作る提案は必ず PERMANENT だからである。
+  //   → 「今回だけ」の枠は、一度も表示されていなかった（実機で検出）。
+  //
+  //   相談の帰結は `adjustments` に入っている。**こちらを読む。**
+  //
+  // ★★ ただし、揃ったものだけ。
+  //   片方が出しただけのものを「決まったこと」に並べてはいけない。
+  //   合意・ルールと同じ規律である。
+  const byThread = new Map<string, typeof adjustments>();
+  for (const a of adjustments) {
+    const key = a.threadId ?? "_";
+    byThread.set(key, [...(byThread.get(key) ?? []), a]);
+  }
+
+  const decided: {
+    id: string;
+    topic: string;
+    change: Record<string, unknown>;
+    effect: "ONE_TIME" | "PERMANENT" | null;
+  }[] = [];
+  for (const [key, entries] of byThread) {
+    if (adjustmentStateOf(entries, parties) !== "AGREED") continue;
+    // ★当事者ごとの最新は一致している（揃っている）ので、どれを出しても同じ
+    const last = entries[entries.length - 1];
+    decided.push({ id: key, topic: last.topic, change: last.change, effect: last.effect });
+  }
 
   return {
     // ★取り決めではない軽い約束（L2）。公正証書には載らない
     arrangements: arrangements.filter((a) => a.date >= monthsBefore(input.today, 1)),
-    // ★「今回だけ」の変更。取り決めそのものは変わっていない
-    exceptions: exceptions.map((e) => ({ id: e.id, topic: e.topic, change: e.change })),
+    // ★揃った調整。取り決めそのものは変わっていない
+    decided,
   };
 }
 

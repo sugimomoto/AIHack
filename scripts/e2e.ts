@@ -332,6 +332,72 @@ async function main() {
   ok("★断っても、いまの取り決めを失わない", after.body.agreement !== null);
 
   // ─────────────────────────────────────────────
+  section("⑦b ★先に渡した人が筆を持つ／下書きは自分のもの");
+
+  // ★お相手から案が届いている側は、こちらから渡せない
+  await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cB,
+    body: { topic: "VISITATION", action: "SAVE", payload: { frequency: "MONTHLY_1", timeRange: "10:00-17:00", handoverPlace: "駅前" } },
+  });
+  await call(`/api/cases/${caseId}/terms`, { method: "POST", cookie: cB, body: { topic: "VISITATION", action: "SHARE" } });
+  const race = await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cA2,
+    body: { topic: "VISITATION", action: "SAVE", payload: { frequency: "MONTHLY_2", timeRange: "10:00-17:00", handoverPlace: "駅前" } },
+  });
+  ok("相手の案が届いていても、下書きは作れる", race.status === 200);
+  const blocked = await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cA2,
+    body: { topic: "VISITATION", action: "SHARE" },
+  });
+  ok("★お相手から案が届いていたら、こちらからは渡せない", blocked.status === 409);
+
+  // ★下書きを消しても、渡したものと合意済みは消えない
+  const discarded = await call(`/api/cases/${caseId}/drafts`, { method: "DELETE", cookie: cA2 });
+  ok("ご自身の下書きを消せる", discarded.status === 200 && discarded.body.removed >= 1);
+  const kept = await call(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, { cookie: cA2 });
+  ok("★下書きを消しても、合意済みは残る", kept.body.agreement !== null);
+  const stillShared = await call(`/api/cases/${caseId}/agreement?topic=VISITATION`, { cookie: cA2 });
+  ok("★下書きを消しても、お相手が渡した案は残る", stillShared.body.otherPayload !== null);
+
+  // ─────────────────────────────────────────────
+  section("⑦c ★おふたりで決めたこと（公正証書には入らない）");
+
+  const r1 = await call(`/api/cases/${caseId}/rules`, {
+    method: "POST",
+    cookie: cA2,
+    body: { kind: "SPECIAL_EXPENSE", thresholdYen: 10000, share: "HALF" },
+  });
+  ok("片方が選べる", r1.status === 200);
+  ok("★片方だけでは決まらない", r1.body.state === "WAITING");
+
+  const seenByB = await call(`/api/cases/${caseId}/rules`, { cookie: cB });
+  const ruleB = (seenByB.body.items as { ownValue: unknown }[])[0];
+  ok("★揃うまで、お相手の値は見えない", ruleB.ownValue === null);
+
+  const r2 = await call(`/api/cases/${caseId}/rules`, {
+    method: "POST",
+    cookie: cB,
+    body: { kind: "SPECIAL_EXPENSE", thresholdYen: 10000, share: "HALF" },
+  });
+  ok("★同じ内容を選ぶと揃う", r2.body.state === "AGREED");
+
+  const badRule = await call(`/api/cases/${caseId}/rules`, {
+    method: "POST",
+    cookie: cA2,
+    body: { kind: "SPECIAL_EXPENSE", thresholdYen: 7777, share: "HALF" },
+  });
+  ok("★選択肢に無い値は受け付けない", badRule.status === 400);
+
+  const doc2 = await call(`/api/cases/${caseId}/document`, { cookie: cA2 });
+  ok(
+    "★おふたりで決めたことは、公正証書の原案に入らない",
+    !JSON.stringify(doc2.body).includes("10,000") && !JSON.stringify(doc2.body).includes("thresholdYen"),
+  );
+
+  // ─────────────────────────────────────────────
   section("⑧ 安全・運用");
   const metricsNoAuth = await call("/api/metrics");
   ok("★原価は未認証で見られない", metricsNoAuth.status === 401);

@@ -47,9 +47,16 @@ describe("★返す内容そのものを絞る（画面で隠さない）", () =
     expect(load).not.toMatch(/enforceability/);
   });
 
-  it("約束と、今回だけの変更は返す", () => {
+  it("約束と、揃った調整は返す", () => {
     expect(load).toMatch(/arrangements/);
-    expect(load).toMatch(/exceptions/);
+    expect(load).toMatch(/decided/);
+  });
+
+  it("★片方が出しただけの調整は返さない（揃ったものだけ）", () => {
+    // ★以前は exceptions を読んでいたが、そこには何も入らなかった。
+    //   相談の帰結は adjustments に入る。ただし揃ったものだけを出す。
+    expect(load).toContain("adjustmentStateOf");
+    expect(load).toMatch(/!== "AGREED"/);
   });
 });
 

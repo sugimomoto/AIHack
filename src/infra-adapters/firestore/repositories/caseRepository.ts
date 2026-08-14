@@ -1043,3 +1043,29 @@ export async function discardOwnDrafts(
   await batch.commit();
   return targets.length;
 }
+
+/** ★ケース全体の調整。スレッドごとに揃ったかを判定する側で使う */
+export async function listAdjustments(
+  caseId: CaseId,
+): Promise<
+  {
+    threadId: string | null;
+    topic: string;
+    byPartyId: string;
+    change: Record<string, unknown>;
+    effect: "ONE_TIME" | "PERMANENT" | null;
+    createdAt: string;
+  }[]
+> {
+  const snap = await caseRef(caseId).collection("adjustments").where("kind", "==", "ADJUSTMENT").get();
+  return snap.docs
+    .map((d) => ({
+      threadId: (d.get("threadId") ?? null) as string | null,
+      topic: (d.get("topic") ?? "OTHER") as string,
+      byPartyId: (d.get("byPartyId") ?? "") as string,
+      change: (d.get("change") ?? {}) as Record<string, unknown>,
+      effect: (d.get("effect") ?? null) as "ONE_TIME" | "PERMANENT" | null,
+      createdAt: (d.get("createdAt") ?? "") as string,
+    }))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}

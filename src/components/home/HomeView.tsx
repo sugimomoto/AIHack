@@ -81,7 +81,7 @@ export function HomeView({
         <div className="flex items-baseline justify-between">
           <span style={{ fontSize: "17px", fontWeight: 500 }}>取り決め</span>
           <span style={{ fontSize: "13px", color: "var(--text-sub)" }}>
-            8つのうち{decided}つ
+            {decided > 0 ? "決まったものがあります" : "話し合うことがある項目"}
           </span>
         </div>
         <div className="mt-2.5 flex gap-1.5" aria-hidden>
@@ -134,7 +134,8 @@ export function HomeView({
       </div>
 
       <p className="mt-5" style={{ fontSize: "12.5px", color: "var(--text-sub)" }}>
-        直近の予定は「これから」にまとめてあります。
+        {/* ★予定は持たない。タブ名も「決まったこと」に変わった */}
+        お話し合いで決まったことは「決まったこと」にまとめてあります。
       </p>
     </div>
   );

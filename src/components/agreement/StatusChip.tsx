@@ -16,7 +16,8 @@ const STYLE: Record<
   IN_NEGOTIATION: { label: "係争中", mark: "△", fg: "var(--attention-text)", bg: "var(--attention-bg)", bd: "var(--attention)" },
   NOT_STARTED: { label: "未着手", mark: "○", fg: "var(--text-sub)", bg: "transparent", bd: "var(--muted)", dashed: true },
   REVISION_REQUESTED: { label: "変更申請中", mark: "⇄", fg: "var(--ai-text)", bg: "var(--surface-2)", bd: "var(--ai)" },
-  DEVIATED: { label: "逸脱", mark: "!", fg: "var(--attention-text)", bg: "var(--attention-bg)", bd: "var(--attention)", dashed: true },
+  // ★逸脱の検知はやめた。値は型に残るが、この表示に到達しない
+  DEVIATED: { label: "—", mark: "", fg: "var(--muted)", bg: "var(--surface-2)", bd: "var(--border-subtle)", dashed: true },
   ESCALATED: { label: "調停へ", mark: "→", fg: "var(--text-sub)", bg: "var(--muted-bg)", bd: "var(--muted)" },
   PLANNED: { label: "今後対応", mark: "", fg: "var(--text-sub)", bg: "transparent", bd: "transparent" },
 };

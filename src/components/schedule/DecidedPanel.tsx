@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { changeSummary } from "@/domain/agreement/fields";
+import { describeAdjustment, isOneTime } from "@/domain/adjustment/summary";
 import { EmptyUpcoming } from "@/components/ui/EmptyState";
-import { TOPIC_LABEL } from "@/domain/agreement/topics";
 
 /**
  * 決まったこと（旧「これから」）
@@ -29,8 +28,16 @@ import { TOPIC_LABEL } from "@/domain/agreement/topics";
 type View = {
   /** 了承された個別の約束（L2）。★公正証書には載らない */
   arrangements: { id: string; date: string; label: string }[];
-  /** 今回だけの変更。★取り決めは変わっていない */
-  exceptions: { id: string; topic: string; change: Record<string, unknown> }[];
+  /**
+   * ★揃った調整。**片方が出しただけのものは入らない。**
+   *   以前は exceptions を読んでいたが、そこには何も入らなかった（実機で検出）。
+   */
+  decided: {
+    id: string;
+    topic: string;
+    change: Record<string, unknown>;
+    effect: "ONE_TIME" | "PERMANENT" | null;
+  }[];
 };
 
 const md = (d: string) => `${Number(d.slice(5, 7))}月${Number(d.slice(8, 10))}日`;
@@ -66,7 +73,7 @@ export function DecidedPanel({
 
   if (!v) return null;
 
-  const empty = v.arrangements.length === 0 && v.exceptions.length === 0;
+  const empty = v.arrangements.length === 0 && v.decided.length === 0;
   if (empty) return <EmptyUpcoming />;
 
   return (
@@ -99,35 +106,50 @@ export function DecidedPanel({
         ))}
       </div>
 
-      {v.exceptions.length > 0 && (
+      {v.decided.length > 0 && (
         <div className="mt-4 flex flex-col gap-2">
-          {v.exceptions.map((e) => (
-            <div
-              key={e.id}
-              style={{
-                background: "var(--surface-2)",
-                borderRadius: "var(--r-md)",
-                padding: "13px 15px",
-              }}
-            >
-              <p style={{ fontSize: 14 }}>今回だけ　{changeSummary(e.topic, e.change)}</p>
-              <p style={{ fontSize: 12, color: "var(--text-sub)", marginTop: 3 }}>
-                {TOPIC_LABEL[e.topic as keyof typeof TOPIC_LABEL] ?? e.topic}
-              </p>
-              <p
+          {v.decided.map((e) => {
+            const rows = describeAdjustment(e.change);
+            if (rows.length === 0) return null;
+            return (
+              <div
+                key={e.id}
                 style={{
-                  fontSize: 11.5,
-                  lineHeight: 1.9,
-                  color: "var(--text-sub-2)",
-                  marginTop: 8,
-                  borderTop: "1px dashed var(--border-dashed)",
-                  paddingTop: 8,
+                  background: "var(--surface-2)",
+                  borderRadius: "var(--r-md)",
+                  padding: "13px 15px",
                 }}
               >
-                取り決めそのものは変わっていません。
-              </p>
-            </div>
-          ))}
+                {/* ★「今回だけ」は、そうと分かっているときだけ書く。
+                       分からないものにそう書くと、逆の誤解を生む */}
+                {isOneTime(e.effect) && (
+                  <p style={{ fontSize: 12, color: "var(--text-sub)" }}>今回だけ</p>
+                )}
+                {rows.map((r, i) => (
+                  <div
+                    key={r.label}
+                    className="flex items-baseline justify-between gap-3"
+                    style={{ marginTop: i === 0 ? 4 : 6 }}
+                  >
+                    <span style={{ fontSize: 12, color: "var(--text-sub)" }}>{r.label}</span>
+                    <span style={{ fontSize: i === 0 ? 15 : 13.5 }}>{r.value}</span>
+                  </div>
+                ))}
+                <p
+                  style={{
+                    fontSize: 11.5,
+                    lineHeight: 1.9,
+                    color: "var(--text-sub-2)",
+                    marginTop: 8,
+                    borderTop: "1px dashed var(--border-dashed)",
+                    paddingTop: 8,
+                  }}
+                >
+                  取り決めそのものは変わっていません。
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
 

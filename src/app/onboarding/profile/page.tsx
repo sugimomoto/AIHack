@@ -22,7 +22,7 @@ export default async function Page({
   searchParams: Promise<{ from?: string }>;
 }) {
   const s = await readSession();
-  if (!s) redirect("/start");
+  if (!s) redirect("/");
 
   // ★ホームから開いた人は、ホームに戻す。
   //   状況で分岐するのはオンボーディングを通っている最中だけである。

@@ -129,9 +129,10 @@ export function HomeBoard({ caseId, partyId }: { caseId: string; partyId: string
           <div className="flex items-baseline justify-between">
             <span style={{ fontSize: 15, fontWeight: 600 }}>取り決め</span>
             <span style={{ fontSize: 13, color: "var(--text-sub)" }}>
-              {h.decided > 0
-                ? `${h.topics.length}つのうち${h.decided}つ`
-                : "話し合うことがある項目"}
+              {/* ★★ 進捗の数字を出さない。
+                     「4つのうち2つ」は、開くたびに**残りを突きつける。**
+                     一覧では守っている規律を、ホームで破っていた。 */}
+              {h.decided > 0 ? "決まったものがあります" : "話し合うことがある項目"}
             </span>
           </div>
 
@@ -199,7 +200,8 @@ export function HomeBoard({ caseId, partyId }: { caseId: string; partyId: string
       </Link>
 
       <p style={{ fontSize: 12, lineHeight: 1.9, color: "var(--text-sub)", marginTop: 14 }}>
-        直近の予定は「これから」にまとめてあります。
+        {/* ★予定は持たない。タブ名も「決まったこと」に変わった */}
+        お話し合いで決まったことは「決まったこと」にまとめてあります。
       </p>
     </div>
   );

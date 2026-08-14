@@ -1,5 +1,6 @@
 import { PhoneFrame } from "@/components/ui/PhoneFrame";
 import { EmailLinkForm } from "@/components/auth/EmailLinkForm";
+import Link from "next/link";
 
 /**
  * 別の端末から戻る
@@ -33,13 +34,13 @@ export default function Page() {
             <br />
             はじめての方は「はじめる」からお進みください。アプリの中で、メールアドレスをご登録いただけます。
           </p>
-          <a
-            href="/start"
+          <Link
+            href="/"
             className="mt-3 grid place-items-center"
             style={{ border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", minHeight: 44, fontSize: 14 }}
           >
             はじめる
-          </a>
+          </Link>
         </div>
       </div>
     </PhoneFrame>

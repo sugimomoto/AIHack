@@ -5,6 +5,11 @@ import { IMPLEMENTED_TOPICS, TOPIC_LABEL } from "@/domain/agreement/topics";
 /**
  * L-2 取り決めが空 ← いちばん重要
  *
+ * ★★ いまは呼ばれていない。
+ *   取り決めの一覧は TopicList に置き換わり、空の状態もそちらが持つ。
+ *   **文言（EMPTY_AGREEMENTS）は TopicList が使っている。**
+ *   消さずに残すのは、L-2 の組み方（沈める・チップを付けない）の記録として。
+ *
  * ★進捗バーを出さない。
  *   0/2 のバーは、**開くたびに何も進んでいないことを突きつける。**
  *   1件でも決まった時点から出す。

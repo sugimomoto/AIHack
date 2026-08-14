@@ -23,7 +23,22 @@ export function RelayMessage({
 }) {
   return (
     <div
-      className="anim-msg-in w-full overflow-hidden rounded-[20px]"
+      /**
+       * ★★ `shrink-0` が要る（2026-08-14 実測）。
+       *
+       *   この封書だけが `overflow-hidden` を持っている（角丸で中を切るため）。
+       *   ところが flex の子は、**`overflow` が `visible` でないと
+       *   自動の最小高さが 0 になる。**
+       *   縦に余白が足りないと、**枠線2本ぶんの 2px まで潰れる。**
+       *
+       *   実測：height 2px。届いているのに、**線1本にしか見えなかった。**
+       *   吹き出し（OwnMessage / RelaySent）は `overflow-hidden` を持たないので、
+       *   **自分の発言だけが残り、お相手から届いたものだけが消えていた。**
+       *
+       * ★このアプリでは、これは見た目の崩れでは済まない。
+       *   **届くことが、そもそもの主題**だからである。
+       */
+      className="anim-msg-in w-full shrink-0 overflow-hidden rounded-[20px]"
       style={{
         background: "var(--surface)",
         border: "1px solid var(--border)",

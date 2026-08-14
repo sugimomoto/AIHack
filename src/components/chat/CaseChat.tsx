@@ -72,7 +72,31 @@ export function CaseChat({
   const effectNotice = notice && notice.key === (reloadKey ?? 0) ? notice.text : null;
   const setEffectNotice = (text: string | null) =>
     setNotice(text ? { key: reloadKey ?? 0, text } : null);
-  const endRef = useRef<HTMLDivElement>(null);
+  /**
+   * ★★ 目印ではなく、**入れ物そのものを動かす**（2026-08-14）。
+   *
+   *   以前は末尾に高さ 0 の目印を置き、`scrollIntoView` を呼んでいた。
+   *   **効いていなかった**（実測：呼んでも scrollTop が 0 のまま）。
+   *   高さの無い要素は「すでに見えている」と判定されうる。
+   *
+   *   `scrollTop = scrollHeight` なら、判定に頼らない。
+   */
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  /**
+   * ★★ 動かさずに、いきなり下へ（2026-08-14 実測）。
+   *
+   *   `behavior: "smooth"` は**最後まで走らなかった**（1秒後も scrollTop が 0）。
+   *   途中で流れが変わる（書体の読み込み、再描画）と、止まってしまう。
+   *
+   *   ★このアプリでは、動かさないほうが正しくもある。
+   *   画面が滑ると「何かが起きた」ように見える。
+   *   起きたのは**届いていたものが見えるようになっただけ**である。
+   */
+  const toBottom = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, []);
 
   const headers = useCallback(
     () => ({ "content-type": "application/json", "x-dev-party": partyId }),
@@ -125,12 +149,22 @@ export function CaseChat({
   useEffect(() => {
     const n = view.messages.length + view.inbound.length + (view.outbound?.length ?? 0);
     if (n === seenRef.current) return;
-    const first = seenRef.current === -1;
     seenRef.current = n;
-    requestAnimationFrame(() =>
-      endRef.current?.scrollIntoView(first ? { block: "end" } : { behavior: "smooth", block: "end" }),
-    );
-  }, [view]);
+
+    // ★★ 一度では届かない（2026-08-14 実測）。
+    //   rAF の時点では、書体がまだ読み込まれておらず、**あとから背が伸びる。**
+    //   伸びたぶん取り残され、いちばん新しいものが画面の外に残る。
+    //   ★背が変わりうるあいだ、何度か送る。
+    const go = () => toBottom();
+    requestAnimationFrame(go);
+    const t1 = setTimeout(go, 120);
+    const t2 = setTimeout(go, 400);
+    void document.fonts?.ready.then(go).catch(() => {});
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [view, toBottom]);
 
   const send = async () => {
     const body = text.trim();
@@ -155,7 +189,7 @@ export function CaseChat({
       setEffectNotice(null);
     } finally {
       setBusy(false);
-      requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
+      requestAnimationFrame(() => toBottom());
     }
   };
 
@@ -181,7 +215,10 @@ export function CaseChat({
         )}
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-4 py-4">
+      <div
+        ref={scrollerRef}
+        className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-4 py-4"
+      >
         {/* ★1件目を書くときがいちばん怖い。
                「お相手には届きません」は、書いたあとではなく**書く前**に要る（L-1） */}
         {view.inbound.length === 0 && view.messages.length === 0 && (
@@ -301,7 +338,6 @@ export function CaseChat({
             <span style={{ fontSize: 12.5, color: "var(--text-sub)" }}>考えています…</span>
           </div>
         )}
-        <div ref={endRef} />
       </div>
 
       {/* ★済んだものが残り続けると、対応が要るものが埋もれる。

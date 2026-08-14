@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { canNegotiateAgreement, NOT_NEGOTIABLE_NOTE } from "@/domain/consultation/negotiable";
+import { canNegotiateAgreement } from "@/domain/consultation/negotiable";
+import { ADJUSTMENT_NOTE } from "@/domain/adjustment/record";
 
 /**
  * ★「進学費用の分担を相談する」が、養育費の枠で決められようとしていた。
@@ -34,7 +35,14 @@ describe("★取り決めを動かせる相談", () => {
     expect(canNegotiateAgreement("SOMETHING_NEW")).toBe(false);
   });
 
-  it("★動かさないことを画面に書く文がある", () => {
-    expect(NOT_NEGOTIABLE_NOTE).toContain("変わりません");
+  /**
+   * ★★ 以前は相談画面の上に `NOT_NEGOTIABLE_NOTE` を出していた（2026-08-14 に削除）。
+   *   `FORMAL` が 0 になり、**トピックを選んだ相談すべてに出る**ようになったため、
+   *   区別をしない注意書きになっていた。
+   *
+   * ★言われていること自体は、**控えの場に残す。**
+   */
+  it("★動かさないことを書く文が、控えの場にある", () => {
+    expect(ADJUSTMENT_NOTE).toContain("変わりません");
   });
 });

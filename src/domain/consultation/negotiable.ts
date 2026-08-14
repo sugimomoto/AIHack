@@ -27,9 +27,19 @@ export function canNegotiateAgreement(kind: string | null | undefined): boolean 
   return kind === "FORMAL";
 }
 
-/** ★取り決めを動かさない相談で、そのことを画面に書く */
-export const NOT_NEGOTIABLE_NOTE =
-  "このご相談では、いまの取り決めは変わりません。取り決めを変えるときは、取り決めの画面から申し出ます。";
+/**
+ * ★★ `NOT_NEGOTIABLE_NOTE` を消した（2026-08-14）。
+ *
+ *   相談画面のいちばん上に、書く前から出していた。
+ *   `FORMAL` が 0 になった結果、**トピックを選んだ相談すべてに出る**ようになり、
+ *   区別をしない注意書きになっていた。
+ *
+ *   ★同じことは、控えの枠（`ADJUSTMENT_NOTE`）が言う。
+ *   そちらは**控えが実際にできたときだけ**出るので、
+ *   「これは取り決めになるのか」という問いが立つ場面と一致する。
+ *
+ *   ★使われなくなった定数を残さない。**残すと、次に誰かが貼り直す。**
+ */
 
 export class NotNegotiableError extends Error {
   constructor(readonly kind: string) {

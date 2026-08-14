@@ -31,6 +31,8 @@ type View = {
   ownPayload: Record<string, unknown> | null;
   otherPayload: Record<string, unknown> | null;
   otherSharedOn: string | null;
+  /** ★お相手がご参加済みか。渡したつもりにさせないために要る */
+  partnerJoined?: boolean;
   ownSharedOn: string | null;
   sharing: "NONE" | "DRAFT" | "SHARED" | "WITHDRAWN";
   agreement: { payload: Record<string, unknown>; agreedAt: string } | null;
@@ -257,7 +259,14 @@ export function TopicScreen({
                 padding: "13px 15px",
               }}
             >
-              <p style={{ fontSize: 13, lineHeight: 1.9 }}>お相手のご返事をお待ちしています</p>
+              {/* ★★ お相手がまだご参加でないなら、**待たせない。**
+                     「ご返事をお待ちしています」は、**いる人にしか使えない言葉**である。
+                     ★取り下げる必要は無い。ご参加の時点でお届けする */}
+              <p style={{ fontSize: 13, lineHeight: 1.9 }}>
+                {v.partnerJoined !== false
+                  ? "お相手のご返事をお待ちしています"
+                  : "お相手は、まだご参加いただいていません"}
+              </p>
               {/* ★既読を持たない。持てないことを、そのまま書く */}
               <p
                 style={{
@@ -267,8 +276,22 @@ export function TopicScreen({
                   marginTop: 6,
                 }}
               >
-                ご覧になったかどうかは、こちらでは分かりません。お急ぎいただくご連絡はしません。期限もありません。
+                {v.partnerJoined !== false
+                  ? "ご覧になったかどうかは、こちらでは分かりません。お急ぎいただくご連絡はしません。期限もありません。"
+                  : "お渡しになったものは、そのままお預かりしています。ご参加になった時点でお届けしますので、取り下げていただく必要はありません。"}
               </p>
+              {/* ★★ 既定は「ご参加済み」側に倒す。
+                     取りこぼしで **いる相手を「いない」と言うほうが害が大きい。**
+                     はっきり false のときだけ、言い方を変える */}
+              {v.partnerJoined === false && (
+                <Link
+                  href="/onboarding/invite"
+                  className="mt-2 inline-block"
+                  style={{ fontSize: 12.5, color: "var(--text-sub)", textDecoration: "underline" }}
+                >
+                  ご案内を用意する
+                </Link>
+              )}
             </div>
 
             <p

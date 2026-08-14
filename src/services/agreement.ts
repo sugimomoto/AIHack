@@ -258,6 +258,18 @@ export async function loadAgreementView(input: {
     ownPayload: mine?.payload ?? null,
     /** ★お相手の案。渡されていなければ null */
     otherPayload: theirs?.payload ?? null,
+    /**
+     * ★★ お相手が、まだご参加でないこと。
+     *
+     *   これが無いと、**渡したつもりになる。**
+     *   お相手が受諾していなくても「お渡ししました／ご返事をお待ちしています」と
+     *   出てしまい、**いない人の返事を待つことになる。**
+     *
+     *   ★設定にしか出していなかった（`partnerJoined`）。
+     *   ★待たせている画面にこそ、要る。
+     */
+    partnerJoined:
+      (snap.parties.find((p) => p.id !== input.partyId)?.state ?? "PREPARING") === "ACTIVE",
     otherSharedOn: (theirs?.sharedAt ?? "").slice(0, 10) || null,
     ownSharedOn: (mine?.sharedAt ?? "").slice(0, 10) || null,
     /** ★ご自身のぶんで、算定表に要る情報が足りていないか（A-3 の入口） */

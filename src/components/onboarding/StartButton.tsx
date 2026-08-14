@@ -24,8 +24,10 @@ export function StartButton() {
       <p style={{ fontSize: 13.5, lineHeight: 1.95 }}>
         メールアドレスに、お入りいただくリンクをお送りします。
       </p>
+      {/* ★「パスワードは設けません」は EmailLinkForm 側が言う。ここでは重ねない。
+             ★ここでしか言えないのは「お相手には知られない」ほうである */}
       <p style={{ fontSize: 12, lineHeight: 1.95, color: "var(--text-sub)", marginTop: 6 }}>
-        パスワードは設けません。<strong>お相手には知られません。</strong>
+        <strong>お相手には知られません。</strong>
       </p>
       <div className="mt-4">
         <EmailLinkForm mode="signup" />

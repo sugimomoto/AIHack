@@ -41,10 +41,7 @@ async function main() {
   if (!KEY) throw new Error("DEMO_LINK_SECRET が設定されていません");
   console.log(`対象: ${BASE}\n`);
 
-  const start = await call("/api/cases", {
-    method: "POST",
-    body: { situation: "DIVORCED_NO_TERMS" },
-  });
+  const start = await call("/api/cases", { method: "POST", body: {} });
   if (start.status !== 200) throw new Error(`ケース作成に失敗: ${start.status}`);
   const caseId = start.body.caseId as string;
   const cookieA = start.cookie!;
@@ -88,6 +85,59 @@ async function main() {
       body: { annualIncomeYen: 2_100_000 },
     });
   }
+
+  // ─────────────────────────────────────────────
+  // ★取り決めを、確認しやすい状態にしておく。
+  //
+  //   4つの論点が「全部同じ状態」だと、この画面の要点が伝わらない。
+  //   **状態ごとに1つずつ**置いておく。
+  //
+  //     面会交流   … 合意済       → 公正証書の原案に条項が出る
+  //     養育費     … 渡してある   → 受け取った側は「了承する」画面から始まる
+  //     財産分与   … 未入力       → ご自身でウィザードを試せる
+  //     年金分割   … 未入力       → 同上
+  const cookieB = accepted.cookie;
+
+  const VISITATION = {
+    frequency: "MONTHLY_1",
+    dayOfWeek: "SAT",
+    weekOfMonth: 2,
+    timeRange: "10:00-17:00",
+    handoverPlace: "駅前",
+  };
+  await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cookieA,
+    body: { topic: "VISITATION", action: "SAVE", payload: VISITATION },
+  });
+  await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cookieA,
+    body: { topic: "VISITATION", action: "SHARE" },
+  });
+  if (cookieB) {
+    await call(`/api/cases/${caseId}/terms`, {
+      method: "POST",
+      cookie: cookieB,
+      body: { topic: "VISITATION", action: "APPROVE" },
+    });
+  }
+
+  // ★養育費は、渡したところで止めておく。**了承する側の画面が見える**
+  await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cookieA,
+    body: {
+      topic: "CHILD_SUPPORT",
+      action: "SAVE",
+      payload: { monthlyAmount: 50000, payDay: "DAY_25", until: "AGE_20" },
+    },
+  });
+  await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cookieA,
+    body: { topic: "CHILD_SUPPORT", action: "SHARE" },
+  });
 
   // ★確認用の印を付ける。これが無いとリンクは効かない
   if (!getApps().length) initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || "aida-505206" });

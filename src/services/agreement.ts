@@ -215,18 +215,25 @@ export async function loadAgreementView(input: {
   //   いまは LLM を呼ばない。算定表を引くだけで、決定的である。
   //   **キャッシュは、正しさを固定する側にしか働かない。**
   //   （実際、鍵の設計を誤って「情報が揃っていません」が恒久的に残る不具合を出した）
-  const draft = ready
-    ? await buildMediationDraft({
-        caseId: input.caseId,
-        topic: input.topic,
-        // ★義務者＝非監護親。C-01 として暫定
-        payerBand: bands[nonCustodial(snap)] ?? null,
-        payeeBand: bands[custodial(snap)] ?? null,
-        childAges: snap.children.map((c) => ageOf(c.birthDate)),
-        // ★閲覧者に依存しない。誰の案かは構造化表示（proposals[].isOwn）が担う
-        proposals: parties.map((id) => ({ payload: byParty.get(id)! })),
-      })
-    : null;
+  //
+  // ★★ そして、双方の提案が揃うのを待たない。
+  //
+  //   以前は ready（双方に提案がある）を条件にしていた。
+  //   LLM に「おふたりの差」を説明させていたので、両方の提案が要ったためである。
+  //
+  //   ★LLM をやめたいま、範囲は**年収帯と子の年齢だけ**で決まる。提案に依存しない。
+  //   そして範囲がいちばん要るのは、**お相手の案を了承するか決めるとき**である。
+  //   揃うまで出さないと、**判断材料が要る場面にだけ出ない。**（実機で検出）
+  const draft = await buildMediationDraft({
+    caseId: input.caseId,
+    topic: input.topic,
+    // ★義務者＝非監護親。C-01 として暫定
+    payerBand: bands[nonCustodial(snap)] ?? null,
+    payeeBand: bands[custodial(snap)] ?? null,
+    childAges: snap.children.map((c) => ageOf(c.birthDate)),
+    // ★もう使わない（説明文を作らなくなったため）。引数の互換のために残す
+    proposals: [],
+  });
 
   const payloads = parties.map((id) => byParty.get(id) ?? null);
 

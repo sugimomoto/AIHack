@@ -93,9 +93,24 @@ export const EXTRACTION_SYSTEM_PROMPT = [
  * ★LLM に文章全体を書かせない。
  *   定型の枠に、検査を通った要素だけをはめる。
  *   自由に書かせると、そこから原文が滲む経路ができる。
+ *
+ * ★★ 見出しが分からないときは、**付けない**（2026-08-14）。
+ *
+ *   以前は `topicLabel` が既定値の「ご相談」に落ちたまま枠にはめていた。
+ *   要約も最小形に落ちると、こうなった。
+ *
+ *     **「ご相談について、ご相談が来ています。」**（実測）
+ *
+ *   ★埋められなかった穴に、既定値を入れて塗りつぶしていた。
+ *   分からないなら、**その部分を書かない。**
  */
-export function buildRelayText(input: { topicLabel: string; summary: string; context: string }): string {
-  const lines = [`${input.topicLabel}について、${input.summary}`];
+export function buildRelayText(input: {
+  topicLabel: string | null;
+  summary: string;
+  context: string;
+}): string {
+  const label = (input.topicLabel ?? "").trim();
+  const lines = [label ? `${label}について、${input.summary}` : input.summary];
   if (input.context.trim()) lines.push(`背景として、${input.context.trim()}`);
   return lines.join("\n");
 }

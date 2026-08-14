@@ -62,7 +62,10 @@ export async function buildRelay(input: {
   // ★感情表現だけでは取次ぎを起こさない。受け止めて終わる
   if (!needsRelay(input.intents)) return null;
 
-  const topicLabel = TOPIC_LABEL[input.topic ?? "OTHER"] ?? "ご相談";
+  // ★★ 分からないときは null にする。**「ご相談」で塗りつぶさない**（2026-08-14）。
+  //   既定値を入れると、要約も最小形に落ちたときに
+  //   「ご相談について、ご相談が来ています。」になる（実測）。
+  const topicLabel: string | null = TOPIC_LABEL[input.topic ?? "OTHER"] ?? null;
 
   let last: { summary: string; context: string; categories: string[] } | null = null;
   let verification: ReturnType<typeof verifyRelay> | null = null;
@@ -71,7 +74,7 @@ export async function buildRelay(input: {
     last = await extract(input, attempt);
     verification = verifyRelay({
       raw: input.raw,
-      topicLabel,
+      topicLabel: topicLabel ?? "",
       context: last.context,
       categories: last.categories,
     });
@@ -112,7 +115,7 @@ export async function buildRelay(input: {
 function safeSummary(
   summary: string,
   raw: string,
-  topicLabel: string,
+  topicLabel: string | null,
   payload: Record<string, unknown> | null,
 ): string {
   const s = summary.trim();

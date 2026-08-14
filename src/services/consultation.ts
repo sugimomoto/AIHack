@@ -139,7 +139,10 @@ export async function postMessage(input: {
 
   // ★種別はサーバ側で引く。画面から渡させると、
   //   個別相談を FORMAL と偽って取り決めを動かせてしまう。
-  const scenarioKind = input.scenarioId ? await kindOf(input.scenarioId) : null;
+  const sc = input.scenarioId
+    ? await scenarioOf(input.scenarioId)
+    : { kind: null, linkedTopic: null };
+  const scenarioKind = sc.kind;
 
   const relayed = await relayIfNeeded({
     caseId,
@@ -147,7 +150,9 @@ export async function postMessage(input: {
     partyId: input.partyId,
     raw: input.text,
     intents: r.intents,
-    topic: r.topic,
+    // ★★ 分類が付かなくても、**入口で選ばれた論点に落とす。**
+    //   これが無いと、見出しが「ご相談について、」になる。
+    topic: r.topic ?? sc.linkedTopic,
     // ★お知らせで「今回だけのご相談として承ります」と伝えている。
     //   記録もそのとおりにする。**言ったことと残るものを食い違わせない。**
     effect: parseEffect(input.effect) ?? (r.effectNotice ? "ONE_TIME" : null),
@@ -307,11 +312,28 @@ export async function loadView(input: {
   };
 }
 
-/** シナリオの種別。★取得できなければ、取り決めに触れない側に倒す */
-async function kindOf(scenarioId: string): Promise<string | null> {
+/**
+ * シナリオの種別と、結びついた論点。
+ *
+ * ★種別は取得できなければ、取り決めに触れない側に倒す。
+ *
+ * ★★ `linkedTopic` を一緒に引く（2026-08-14）。
+ *
+ *   取次ぎの見出しは、**一発言ごとの分類**から決めていた。
+ *   そのため同じスレッドでも、分類が付いた発言は「養育費について、…」、
+ *   付かない発言は **「ご相談について、ご相談が来ています。」**になった。
+ *   （実測：th_sc_001 の1通目は成功、2通目が失敗）
+ *
+ *   ★何の話かは、**その人が入口で選んでいる。**
+ *   一発言ごとに当て直す必要は無い。選ばれたものを既定にする。
+ */
+async function scenarioOf(
+  scenarioId: string,
+): Promise<{ kind: string | null; linkedTopic: string | null }> {
   try {
-    return (await listScenarios()).find((s) => s.id === scenarioId)?.kind ?? "UNKNOWN";
+    const sc = (await listScenarios()).find((s) => s.id === scenarioId);
+    return { kind: sc?.kind ?? "UNKNOWN", linkedTopic: sc?.linkedTopic ?? null };
   } catch {
-    return "UNKNOWN";
+    return { kind: "UNKNOWN", linkedTopic: null };
   }
 }

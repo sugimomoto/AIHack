@@ -37,6 +37,8 @@ type View = {
   agreement: { payload: Record<string, unknown>; agreedAt: string } | null;
   draft: { rangeText: string | null; notice: string | null; unverified: boolean } | null;
   range: { minYen: number; maxYen: number } | null;
+  /** ★ご自身のぶんで、算定表に要る情報が足りていないか */
+  needsIntake: boolean;
 };
 
 export function TopicScreen({
@@ -145,13 +147,55 @@ export function TopicScreen({
       <div className="px-4 pb-10">
         {/* ------------------------------------------------ 未入力／書き直し */}
         {(state === "EMPTY" || editing || counter) && (
-          <TopicForm
+          <>
+            {/* ★A-3：目安に要る情報が無ければ、その場で伺える入口を置く。
+                   ★入れないと決められない、とは書かない。実質的な強制になる */}
+            {topic === "CHILD_SUPPORT" && v.needsIntake && (
+              <Link
+                href={`/app/agreements/${topic.toLowerCase()}/prepare`}
+                className="mb-4 block"
+                style={{
+                  background: "var(--bubble-ai)",
+                  border: "1px dashed #DCC7A6",
+                  borderRadius: "var(--r-md)",
+                  padding: "13px 15px",
+                }}
+              >
+                <p style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.8 }}>
+                  算定表の目安をお出しできます
+                </p>
+                <p
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 1.9,
+                    color: "var(--text-sub)",
+                    marginTop: 4,
+                  }}
+                >
+                  お子さんのことと年収を伺えば、月額の範囲をお示しします。
+                  伺わなくても、月額はお決めになれます。
+                </p>
+              </Link>
+            )}
+
+            {/* ★こちらは伺い終わっている。**同じ入口を出し続けない。**
+                   出せない理由を、そのまま書く */}
+            {topic === "CHILD_SUPPORT" && !v.needsIntake && !v.range && (
+              <p
+                className="mb-4"
+                style={{ fontSize: 12, lineHeight: 1.9, color: "var(--text-sub)" }}
+              >
+                お相手の年収が登録されると、算定表の目安をお示しします。
+              </p>
+            )}
+            <TopicForm
             topic={topic}
             initial={counter ? v.otherPayload : v.ownPayload}
             busy={busy}
             intro={<TopicIntro topic={topic} />}
             onSave={(payload) => void act({ action: "SAVE", payload })}
-          />
+            />
+          </>
         )}
 
         {/* ------------------------------------------------ 下書き／取り下げ */}

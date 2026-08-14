@@ -178,6 +178,21 @@ export function recapOf(
 }
 
 /**
+ * 一部だけの変更を、読める文にする。
+ *
+ * ★「今回だけ」の変更は payload の一部しか持たない。
+ *   recapOf は visibleWhen で絞るため、条件になる項目が無いと落ちてしまう。
+ *   **絞らずに、入っているものだけを読む。**
+ */
+export function changeSummary(topic: string, change: Record<string, unknown>): string {
+  return (TOPIC_FIELDS[topic] ?? [])
+    .map((f) => ({ f, v: displayValue(f, change[f.key]) }))
+    .filter((x) => x.v !== null)
+    .map((x) => `${x.f.label} ${x.v}`)
+    .join("／");
+}
+
+/**
  * 2つの案を項目ごとに比べる。
  *
  * ★S-4（お相手から別の案）で使う。

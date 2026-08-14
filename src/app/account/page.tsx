@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const s = await readSession();
-  if (!s) redirect("/start");
+  if (!s) redirect("/");
 
   const linked = await loadPartyAuthUid(asCaseId(s.caseId), asPartyId(s.partyId)).catch(() => null);
 
@@ -33,11 +33,11 @@ export default async function Page() {
               端末を変えても、同じアドレスでお戻りいただけます。
             </p>
             <a
-              href="/app"
+              href="/onboarding/invite"
               className="mt-6 grid place-items-center"
               style={{ border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", minHeight: 48, fontSize: 14.5 }}
             >
-              相談に戻る
+              次へ
             </a>
           </>
         ) : (
@@ -48,6 +48,16 @@ export default async function Page() {
               メールアドレスをご登録いただくと、端末を変えてもお戻りいただけます。
             </p>
             <EmailLinkForm mode="link" />
+
+            {/* ★飛ばせる。登録しないと戻れないことは上に書いてある。
+                   書いたうえで、飛ばす道を同じ画面に残す */}
+            <a
+              href="/onboarding/invite"
+              className="mt-4 grid place-items-center"
+              style={{ fontSize: 13.5, color: "var(--text-sub)", minHeight: 44 }}
+            >
+              あとで登録する
+            </a>
           </>
         )}
       </div>

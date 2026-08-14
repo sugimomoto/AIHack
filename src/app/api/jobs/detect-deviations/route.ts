@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import { todayJst } from "@/lib/today";
 
 /**
- * 逸脱の日次検知
+ * 逸脱の日次検知 — ★いまは何もしない
  *
- * ★Cloud Scheduler から呼ばれる。OIDC で認証する。
- *
- * ★現状は検知のみで、通知は行わない。
- *   通知は S10 の設計（相手に何をどう伝えるか）が決まってからにする。
- *   **決めていないことを、動かしてしまわない。**
+ * ★Cloud Scheduler から呼ばれる。トークンで認証する。
+ *   経路は残してあるが、**検知はしない。**（理由は下に）
  */
 export const dynamic = "force-dynamic";
 
@@ -19,30 +15,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "権限がありません" }, { status: 403 });
   }
 
+  // ★★ 逸脱の検知をやめた。
+  //
+  //   毎月「支払いました」「入金を確認しました」を押してもらう前提だったが、
+  //   **手間で押されない。**押されないと「確認できていません」と出て、
+  //   実際には払っているのに疑いが立つ。
+  //
+  //   > 記録率が低い台帳は、正しい信号より誤った信号を多く出す。
+  //
+  //   ★検知のロジック（detectDeviations）は残してある。
+  //     Issue #7（証跡と精算）で、**手で押させない形**にして作り直す。
   const { listCaseIds } = await import("@/infra-adapters/firestore/repositories/caseRepository");
-  const { loadSchedule } = await import("@/services/schedule");
-  const { asPartyId } = await import("@/domain/case/types");
-  const { loadForLlm } = await import("@/infra-adapters/firestore/repositories/caseRepository");
-  const { asCaseId } = await import("@/domain/case/types");
-
-  const today = todayJst();
   const caseIds = await listCaseIds();
-  let detected = 0;
 
-  for (const caseId of caseIds) {
-    try {
-      const snap = await loadForLlm(asCaseId(caseId));
-      // ★退会者を選ぶと assertOwnParty で弾かれ、そのケースの逸脱が
-      //   恒久的に検知されなくなる（レビューで検出）
-      const anyParty = snap.parties.find((p) => p.state !== "WITHDRAWN");
-      if (!anyParty) continue;
-      const r = await loadSchedule({ caseId, partyId: asPartyId(anyParty.id), today });
-      detected += r.deviations.length;
-    } catch (e) {
-      // ★1件の失敗で全体を止めない
-      console.warn("[job] ケースの検知に失敗しました", e);
-    }
-  }
-
-  return NextResponse.json({ cases: caseIds.length, deviations: detected });
+  return NextResponse.json({
+    cases: caseIds.length,
+    deviations: 0,
+    note: "逸脱の検知は行っていません（→ Issue #7）",
+  });
 }
+

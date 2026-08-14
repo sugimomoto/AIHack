@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { StartButton } from "@/components/onboarding/StartButton";
 
 /**
  * 入口
@@ -13,13 +14,11 @@ export const metadata = {
   description: "離婚しても、子どもが健やかに育つための基盤になる。",
 };
 
+/**
+ * ★「はじめる」はここには置かない（StartButton が担う）。
+ *   以下は、はじめる前でも見られるもの。
+ */
 const ROUTES = [
-  {
-    href: "/start",
-    label: "はじめる",
-    note: "役割を選ぶと、招待用のリンクが作れます。お名前もご連絡先も要りません。",
-    primary: true,
-  },
   {
     href: "/context",
     label: "AIに渡しているもの",
@@ -61,11 +60,16 @@ export default function Page() {
             メッセージを、相手に転送しません。
           </p>
           <p style={{ fontSize: 13.5, lineHeight: 2.0, color: "var(--text-sub)", marginTop: 8 }}>
-            父はAIと話し、母もAIと話します。
+            思っていることは、そのまま書いていただけます。
             <br />
-            書いた言葉そのものは、決して相手に届きません。
+            {/* ★取り決めの作られ方を、ここで先に言う。
+                   言っておかないと、取り決めの画面が唐突になる */}
+            <strong>取り決めは、ご自身で書いて残します。</strong>
             <br />
-            <strong>合意に必要な事実だけが、伝聞のかたちで越えます。</strong>
+            おふたりの記録が同じになったとき、合意になります。
+          </p>
+          <p style={{ fontSize: 12.5, lineHeight: 1.95, color: "var(--text-sub-2)", marginTop: 10 }}>
+            おふたりが直接やりとりすることには、なりません。
           </p>
           <div
             className="mt-4"
@@ -93,14 +97,20 @@ export default function Page() {
           </div>
         </section>
 
+        {/* ★お名前もご連絡先も要らない。状況もうかがわない */}
+        <StartButton />
+        <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "var(--text-sub-2)", marginTop: 8, textAlign: "center" }}>
+          お名前もご連絡先も要りません。ご関係の状態も、うかがいません。
+        </p>
+
         <div className="mt-6 flex flex-col gap-2.5">
           {ROUTES.map((r) => (
             <Link
               key={r.href}
               href={r.href}
               style={{
-                background: r.primary ? "var(--agree-bg)" : "var(--surface)",
-                border: `1px solid ${r.primary ? "var(--agree)" : "var(--border)"}`,
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
                 borderRadius: "var(--r-lg)",
                 padding: 16,
               }}
@@ -109,7 +119,7 @@ export default function Page() {
                 style={{
                   fontSize: 15,
                   fontWeight: 600,
-                  color: r.primary ? "var(--agree-text)" : "var(--text)",
+                  color: "var(--text)",
                 }}
               >
                 {r.label}

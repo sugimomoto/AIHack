@@ -241,29 +241,47 @@ async function main() {
   ok("★別のアカウントに付け替えられない", steal.status === 409);
 
   // ─────────────────────────────────────────────
-  section("⑥ 合意形成");
-  for (const [cookie, text] of [
-    [cA2, "養育費は月3万円、毎月25日、20歳までにしたい"],
-    [cB, "養育費は月3万円、毎月25日、20歳までにしたい"],
-  ] as const) {
-    await call(`/api/cases/${caseId}/messages`, { method: "POST", cookie, body: { text } });
-  }
-  const ag = await call(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, { cookie: cA2 });
-  ok("合意の状況が取れる", ag.status === 200);
-  console.log(`     ready=${ag.body.ready} converged=${ag.body.converged} state=${ag.body.state}`);
-  if (ag.body.draft?.rangeText) console.log(`     算定表: ${String(ag.body.draft.rangeText).split("\n")[0]}`);
+  section("⑥ ★取り決めは、入力で作る（仮案 → 了承）");
+
+  // ★対話からは作られない。ここが唯一の入口である
+  const TERMS = { monthlyAmount: 30000, payDay: "DAY_25", until: "AGE_20" };
+  await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cA2,
+    body: { topic: "CHILD_SUPPORT", action: "SAVE", payload: TERMS },
+  });
+
+  // ★★ 下書きのうちは、お相手に見えない
+  const hidden = await call(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, { cookie: cB });
+  ok("★下書きは、お相手に見えない", hidden.body.otherPayload === null);
+
+  const shared = await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cA2,
+    body: { topic: "CHILD_SUPPORT", action: "SHARE" },
+  });
+  ok("お相手にお渡しできる", shared.status === 200);
+
+  const delivered = await call(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, { cookie: cB });
+  ok("★お渡しすると、お相手に見える", delivered.body.otherPayload?.monthlyAmount === 30000);
+  if (delivered.body.draft?.rangeText)
+    console.log(`     算定表: ${String(delivered.body.draft.rangeText).split("\n")[0]}`);
 
   // ─────────────────────────────────────────────
   section("⑦ ★N-1／K-6：成立と、そのあとの変更");
-  for (const cookie of [cA2, cB]) {
-    await call(`/api/cases/${caseId}/agreement`, {
-      method: "POST",
-      cookie,
-      body: { topic: "CHILD_SUPPORT", status: "ACCEPTED" },
-    });
-  }
+
+  // ★了承する側は、同じ仮案に承諾する。payload はサーバが複製する
+  await call(`/api/cases/${caseId}/terms`, {
+    method: "POST",
+    cookie: cB,
+    body: { topic: "CHILD_SUPPORT", action: "APPROVE" },
+  });
   const agreed = await call(`/api/cases/${caseId}/agreement?topic=CHILD_SUPPORT`, { cookie: cA2 });
-  ok("★合意が成立する", agreed.body.state === "AGREED" && agreed.body.agreement !== null);
+  ok("★了承で合意が成立する", agreed.body.state === "AGREED" && agreed.body.agreement !== null);
+  ok(
+    "★合意した内容が、渡した内容と同じ",
+    agreed.body.agreement?.payload?.monthlyAmount === 30000,
+  );
 
   // ★自由記述を送りつけても、越えない
   const reqRev = await call(`/api/cases/${caseId}/revision`, {

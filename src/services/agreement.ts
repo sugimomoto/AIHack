@@ -27,6 +27,7 @@ import {
   loadConsents,
   loadForLlm,
   loadIncomeBands,
+  loadLiving,
   setConsent,
 } from "@/infra-adapters/firestore/repositories/caseRepository";
 import { findPublishedPayloadSchema } from "@/infra-adapters/firestore/repositories/masterRepository";
@@ -167,11 +168,18 @@ export async function loadAgreementView(input: {
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
 
-  const [all, consents, bands] = await Promise.all([
+  const [all, consents, bands, living] = await Promise.all([
     listProposalsByTopic(caseId, input.topic),
     loadConsents(caseId, input.topic),
     loadIncomeBands(caseId),
+    loadLiving(caseId).catch(() => null),
   ]);
+
+  // ★A-3：ご自身のぶんで足りないものがあるか。
+  //   ★お相手のぶんは数えない。**答え終わった人に、同じ入口を出し続けない。**
+  const needsIntake =
+    input.topic === "CHILD_SUPPORT" &&
+    (snap.children.length === 0 || !living || !bands[input.partyId]);
 
   // ★★ ここで落とす。画面で隠さない。
   //
@@ -245,6 +253,8 @@ export async function loadAgreementView(input: {
     otherPayload: theirs?.payload ?? null,
     otherSharedOn: (theirs?.sharedAt ?? "").slice(0, 10) || null,
     ownSharedOn: (mine?.sharedAt ?? "").slice(0, 10) || null,
+    /** ★ご自身のぶんで、算定表に要る情報が足りていないか（A-3 の入口） */
+    needsIntake,
     /** ★算定表の範囲。目盛を引くために数値で渡す（表示文は rangeText） */
     range: draft?.range ? { minYen: draft.range.minYen, maxYen: draft.range.maxYen } : null,
     agreement: agreed

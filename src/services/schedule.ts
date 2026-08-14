@@ -72,85 +72,36 @@ export class InvalidDateError extends Error {
   }
 }
 
+/**
+ * 決まったこと（旧「これから」）
+ *
+ * ★★ 予定を管理しない。**スケジュール管理はこのアプリの役目ではない。**
+ *
+ *   以前は、毎月の支払日・会う日を生成し、履行の申告を受け、
+ *   逸脱を検知し、リマインドを出していた。**全部やめた。**
+ *
+ *     手間 → 押されない → 記録が無い → 逸脱として検知される
+ *                                        ↓
+ *                   実際には払っているのに「確認できていません」と出る
+ *                                        ↓
+ *                        ★ 摩擦を作る。このアプリが減らすはずのもの
+ *
+ *   > 記録率が低い台帳は、正しい信号より誤った信号を多く出す。
+ *
+ * ★★ 返す内容そのものを絞る。**画面で隠さない。**
+ *   画面だけ消しても、API を見れば逸脱が読める。
+ *   「出さないと決めたもの」は、出さない側で止める。
+ *
+ * ★generateObligations・detectDeviations・remindersFor などは**残してある。**
+ *   呼ばないだけ。Issue #7（証跡と精算）で作り直すときの土台になる。
+ *
+ * @see .steering/20260812-feedback-pivot/design-upcoming.md
+ */
 export async function loadSchedule(input: { caseId: string; partyId: PartyId; today: string }) {
   if (!DATE_RE.test(input.today) || Number.isNaN(Date.parse(input.today))) throw new InvalidDateError();
   const caseId = asCaseId(input.caseId);
   const snap = await loadForLlm(caseId);
   assertOwnParty(snap, input.partyId);
-
-  // ★義務者＝非監護親（C-01 として暫定）
-  const obligor = snap.parties.find((p) => p.role === "NON_CUSTODIAL")?.id ?? snap.parties[0]?.id ?? "";
-  const items = await listAgreementItems(caseId);
-  const fulfillments = await loadFulfillments(caseId);
-
-  // ★過去にさかのぼって生成する。
-  //   当月以降しか作らないと、期日を過ぎた分が存在せず、
-  //   **逸脱を永遠に検知できない**（実機で発覚した）。
-  const from = monthsBefore(input.today, PAST_MONTHS);
-  const obligations = generateObligations({
-    items,
-    from,
-    months: PAST_MONTHS + FUTURE_MONTHS,
-    obligorPartyId: obligor,
-  });
-
-  // ★合意から、その日の詳細（時間・場所）を引く。無ければ出さない
-  const detailOf = (topic: string): string | null => {
-    const p = items.find((i) => i.topic === topic)?.payload ?? null;
-    if (!p) return null;
-    const parts = [p.timeRange, p.handoverPlace]
-      .map((x) => (typeof x === "string" ? x.trim() : ""))
-      .filter((x) => x !== "");
-    return parts.length > 0 ? parts.join(" ／ ") : null;
-  };
-
-  const rows: ScheduleRow[] = obligations
-    // ★画面には、これから来る分と、直近で記録の無い分だけを出す
-    .filter((o) => o.dueDate >= monthsBefore(input.today, 1))
-    .map((o) => {
-    const key = `${o.topic}_${o.dueDate}`;
-    const f = fulfillments[key] ?? {};
-    const state = fulfillmentStateOf(f);
-    const isOwn = o.obligorPartyId === input.partyId;
-    return {
-      key,
-      topic: o.topic,
-      dueDate: o.dueDate,
-      amountYen: o.amountYen,
-      isOwnObligation: isOwn,
-      state,
-      label: labelOf(state),
-      // ★立場に合った種別だけ。義務者は支払い、権利者は入金
-      detail: typeof o.amountYen === "number" ? null : detailOf(o.topic),
-      // ★実施の記録は今回作っていない。面会交流では申告させない
-      canReport:
-        typeof o.amountYen !== "number"
-          ? null
-          : isOwn
-            ? f.paidBy
-              ? null
-              : "PAID"
-            : f.receivedBy
-              ? null
-              : "RECEIVED",
-    };
-  });
-
-  // ★逸脱を見るのは、記録を申告できるものだけ。
-  //   面会交流には実施の記録がまだ無いので、**守られていないとは書けない。**
-  //   観測できないことを断定しない、という規律は面会交流でも同じである。
-  const keyed = obligations
-    .filter((o): o is typeof o & { amountYen: number } => typeof o.amountYen === "number")
-    .map((o) => ({ ...o, key: `${o.topic}_${o.dueDate}` }));
-  const deviations = detectDeviations(keyed, fulfillments, { today: input.today });
-
-  // ★先取特権の判定。閾値が未検証のあいだは注記が付く
-  const monthly = obligations[0]?.amountYen ?? 0;
-  const childCount = snap.children.length;
-  const enforceability =
-    deviations.length > 0 && monthly > 0
-      ? assessEnforceability({ monthlyAmountYen: monthly, childCount }, PRIORITY_CLAIM_TABLE)
-      : null;
 
   const [exceptions, arrangements] = await Promise.all([
     listExceptions(caseId).catch(() => []),
@@ -158,19 +109,10 @@ export async function loadSchedule(input: { caseId: string; partyId: PartyId; to
   ]);
 
   return {
-    rows,
-    // ★「今回だけ」の変更。保存はしていたが、読む経路がどこにも無かった
-    exceptions: exceptions.map((e) => ({ id: e.id, topic: e.topic, change: e.change })),
     // ★取り決めではない軽い約束（L2）。公正証書には載らない
     arrangements: arrangements.filter((a) => a.date >= monthsBefore(input.today, 1)),
-    // ★自分の義務のぶんだけ。相手には出さない
-    reminders: remindersFor(obligations, { partyId: input.partyId, today: input.today }).map((o) => ({
-      dueDate: o.dueDate,
-      amountYen: o.amountYen,
-    })),
-    // ★逸脱は双方に見える。片方だけが知る状態にしない
-    deviations,
-    enforceability,
+    // ★「今回だけ」の変更。取り決めそのものは変わっていない
+    exceptions: exceptions.map((e) => ({ id: e.id, topic: e.topic, change: e.change })),
   };
 }
 

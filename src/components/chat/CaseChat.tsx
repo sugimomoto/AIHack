@@ -105,6 +105,33 @@ export function CaseChat({
   //   届くことが主題である以上、**見ているのに古いまま**は許容できない。
   useRefreshOnFocus(reload);
 
+  /**
+   * ★★ いちばん下に送る（2026-08-14）。
+   *
+   *   これまで `scrollIntoView` は**送信のあとだけ**呼んでいた。
+   *   そのため、**送った人は自分の分が見える**が、
+   *   **開いただけの人は上に留まり、いちばん新しいもの——
+   *   つまりお相手から届いたもの——が画面の外にあった。**
+   *
+   *   実測：受け取り側の画面に取次ぎが「出ない」と見えていたが、
+   *   API も描画も正しく、**下に隠れていた**だけだった。
+   *
+   *   ★受け取る人ほど、下を見ない。**送った人だけが下にいた。**
+   *
+   * ★開いたときは、animation を付けずに飛ばす（動くと、何か起きたように見える）。
+   * ★あとから増えたときだけ、静かに送る。
+   */
+  const seenRef = useRef(-1);
+  useEffect(() => {
+    const n = view.messages.length + view.inbound.length + (view.outbound?.length ?? 0);
+    if (n === seenRef.current) return;
+    const first = seenRef.current === -1;
+    seenRef.current = n;
+    requestAnimationFrame(() =>
+      endRef.current?.scrollIntoView(first ? { block: "end" } : { behavior: "smooth", block: "end" }),
+    );
+  }, [view]);
+
   const send = async () => {
     const body = text.trim();
     if (!body || busy) return;

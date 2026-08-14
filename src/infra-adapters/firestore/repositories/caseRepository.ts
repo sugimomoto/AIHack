@@ -980,3 +980,36 @@ export async function loadLiving(caseId: CaseId): Promise<string | null> {
   const d = await caseRef(caseId).get();
   return (d.get("living") ?? null) as string | null;
 }
+
+/**
+ * おふたりで決めたこと（House Rule）
+ *
+ * ★公正証書には載らない。条項にもならない。
+ *   当事者が自分で決め、自分で直す。**片方だけでは決まらない。**
+ *
+ * ★`adjustments` と分けている。あちらは相談の帰結（スレッドに紐づく）で、
+ *   こちらは**スレッドに属さない、ずっと続くもの**である。
+ */
+export async function appendRule(
+  caseId: CaseId,
+  r: { kind: string; byPartyId: PartyId; value: Record<string, unknown> },
+): Promise<void> {
+  await caseRef(caseId)
+    .collection("rules")
+    .add({ ...r, createdAt: new Date().toISOString() });
+}
+
+/** ★作成順（最後が最新）。当事者ごとの最新だけを見る側で判定する */
+export async function listRules(
+  caseId: CaseId,
+): Promise<{ kind: string; byPartyId: string; value: Record<string, unknown>; createdAt: string }[]> {
+  const snap = await caseRef(caseId).collection("rules").get();
+  return snap.docs
+    .map((d) => ({
+      kind: (d.get("kind") ?? "") as string,
+      byPartyId: (d.get("byPartyId") ?? "") as string,
+      value: (d.get("value") ?? {}) as Record<string, unknown>,
+      createdAt: (d.get("createdAt") ?? "") as string,
+    }))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}

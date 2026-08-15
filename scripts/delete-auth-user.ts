@@ -31,7 +31,7 @@ const withAliases = process.argv.includes("--aliases");
  * 同じ受信箱に届くアドレスか。
  *
  * ★Gmail は **ドットを無視し、`+` 以降も無視する。**
- *   `s.ugimomoto+1@gmail.com` は `sugimomoto@gmail.com` と同じ人に届く。
+ *   `s.example+1@gmail.com` は `sexample@gmail.com` と同じ人に届く。
  *
  * ★だが **Firebase は別のユーザーとして扱う。**
  *   試すたびに増えるうえ、**打ち間違いが別アカウントになる**（実際に3件増えた）。

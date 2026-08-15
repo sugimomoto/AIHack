@@ -1,5 +1,5 @@
 ---
-title: "Aida：離婚した親同士が「関わらずに」子どもの取り決めをするAIを作った話"
+title: "Aida：離婚後の子育てを、AIが「あいだ」に立って支える——言葉は渡さず、事実は原文のまま"
 emoji: "🕊️"
 type: "tech"
 topics: ["ai", "nextjs", "typescript", "llm", "aihack"]

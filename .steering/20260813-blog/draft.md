@@ -1,5 +1,5 @@
 ---
-title: "Aida：離婚後の子育てを、AIが「あいだ」に立って支える——言葉は渡さず、事実は原文のまま"
+title: "Aida：離婚後の子育てを、AIが「あいだ」に立って支えるアプリを作った話 — 二人のコミュニケーションを支える設計ポイント"
 emoji: "🕊️"
 type: "tech"
 topics: ["ai", "nextjs", "typescript", "llm", "aihack"]
